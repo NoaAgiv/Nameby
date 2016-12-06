@@ -4,5 +4,11 @@
     <string name="loved_tab">אהובים</string>
     <string name="unloved_tab">לא אהובים</string>
     <string name="triage_tab">מיון</string>
+    <string name="mark_loved_dialog_title">סימון שם כאהוב</string>
+    <string name="mark_loved_dialog_body">האם להעביר את השם מרשימת הלא אהובים לרשימת האהובים?</string>
+    <string name="mark_unloved_dialog_title">סימון שם כלא אהוב</string>
+    <string name="mark_unloved_dialog_body">האם להעביר את השם מרשימת האהובים לרשימת הלא אהובים?</string>
+    <string name="mark_approve_button">העבר</string>
+    <string name="mark_cancel_button">בטל</string>
 
 </resources>

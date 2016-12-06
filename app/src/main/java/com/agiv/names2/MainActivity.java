@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +26,18 @@ public class MainActivity extends AppCompatActivity {
         add("ניר");
         add("איזמרלדה");
         add("שמוליקית");
+        add("אביה");
+        add("אילנה");
+        add("מיה");
+        add("טל");
+        add("איתי");
+        add("שלמה");
+        add("יהודית");
+        add("יוסי");
+        add("שלומי");
+        add("גיל");
+        add("שני");
+        add("אלון");
     }};
     public ArrayList<String> untaggedNames;
     public ArrayList<String> lovedNames = new ArrayList<>();
@@ -60,9 +76,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         lovedNamesListView = (ListView) findViewById(R.id.loved_names);
-        lovedNamesListView.setAdapter(new ArrayAdapter<>(this,R.layout.simplerow, lovedNames));
+        lovedNamesListView.setAdapter(new EditableListViewAdapter(lovedNames, unlovedNames, this,
+                getString(R.string.mark_unloved_dialog_title), getString(R.string.mark_unloved_dialog_body)));
         unlovedNamesListView = (ListView) findViewById(R.id.unloved_names);
-        unlovedNamesListView.setAdapter(new ArrayAdapter<>(this,R.layout.simplerow, unlovedNames));
+        unlovedNamesListView.setAdapter(new EditableListViewAdapter(unlovedNames, lovedNames, this,
+                getString(R.string.mark_loved_dialog_title), getString(R.string.mark_loved_dialog_body)));
         untaggedNamesView = (TextView) findViewById(R.id.untagged_names_view);
         untaggedNamesView.setText(getNextUntaggedName());
 
@@ -99,9 +117,21 @@ public class MainActivity extends AppCompatActivity {
                 String tabName = tab.getText().toString();
                 View selectedView = null;
                 if (tabName.equals(getString(R.string.loved_tab))){
+                    Collections.sort(lovedNames, new Comparator<String>() {
+                        @Override
+                        public int compare(String s, String t1) {
+                            return s.compareTo(t1);
+                        }
+                    });
                     selectedView = lovedNamesListView;
                 }
                 else if (tabName.equals(getString(R.string.unloved_tab))){
+                    Collections.sort(unlovedNames, new Comparator<String>() {
+                        @Override
+                        public int compare(String s, String t1) {
+                            return s.compareTo(t1);
+                        }
+                    });
                     selectedView = unlovedNamesListView;
                 }
                 else if (tabName.equals(getString(R.string.triage_tab))){
@@ -135,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 untaggedNamesView.setVisibility(View.GONE);
-
+                int x=1;
                 lovedNamesListView.setVisibility((View.VISIBLE));
             }
         });
