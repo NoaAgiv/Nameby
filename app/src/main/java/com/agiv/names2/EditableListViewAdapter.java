@@ -7,14 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class EditableListViewAdapter extends BaseAdapter implements ListAdapter {
     private ArrayList<String> list = new ArrayList<String>();
@@ -22,15 +19,18 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
     private Context context;
     String dialogBody = "";
     String dialogTitle = "";
+    int bottonImage = 0;
 
 
 
-    public EditableListViewAdapter(ArrayList<String> list, ArrayList<String> complementaryList,  Context context, String dialogTitle, String dialogBody) {
+    public EditableListViewAdapter(ArrayList<String> list, ArrayList<String> complementaryList,
+                                   Context context, String dialogTitle, String dialogBody, int bottonImage) {
         this.list = list;
         this.complementaryList = complementaryList;
         this.context = context;
         this.dialogBody = dialogBody;
         this.dialogTitle = dialogTitle;
+        this.bottonImage = bottonImage;
     }
 
     @Override
@@ -63,14 +63,15 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
         listItemText.setText(list.get(position));
 
         //Handle buttons and add onClickListeners
-        ImageButton deleteBtn = (ImageButton)view.findViewById(R.id.delete_btn);
+        ImageButton changeButton = (ImageButton)view.findViewById(R.id.changeButton);
+        changeButton.setImageResource(bottonImage);
 
-        deleteBtn.setOnClickListener(new View.OnClickListener(){
+        changeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 String name = list.get(position);
                 String specificDialogBody = String.format("%s\n%s", dialogBody, name);
-                final AlertDialog alertDialog = new AlertDialog.Builder(context)
+                new AlertDialog.Builder(context)
                         .setTitle(dialogTitle)
                         .setMessage(specificDialogBody)
                         .setCancelable(false)

@@ -10,7 +10,10 @@ import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView lovedNamesListView;
     private ListView unlovedNamesListView;
     private TextView untaggedNamesView;
+    private BaseAdapter lovedAdapter;
+    private BaseAdapter unlovedAdapter;
 
     private String getNextUntaggedName(){
         if (untaggedNames.isEmpty())
@@ -76,11 +81,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         lovedNamesListView = (ListView) findViewById(R.id.loved_names);
-        lovedNamesListView.setAdapter(new EditableListViewAdapter(lovedNames, unlovedNames, this,
-                getString(R.string.mark_unloved_dialog_title), getString(R.string.mark_unloved_dialog_body)));
+        lovedAdapter = new EditableListViewAdapter(lovedNames, unlovedNames, this,
+                getString(R.string.mark_unloved_dialog_title), getString(R.string.mark_unloved_dialog_body), R.drawable.dislove);
+
+        lovedNamesListView.setAdapter(lovedAdapter);
+
         unlovedNamesListView = (ListView) findViewById(R.id.unloved_names);
-        unlovedNamesListView.setAdapter(new EditableListViewAdapter(unlovedNames, lovedNames, this,
-                getString(R.string.mark_loved_dialog_title), getString(R.string.mark_loved_dialog_body)));
+
+        unlovedAdapter = new EditableListViewAdapter(unlovedNames, lovedNames, this,
+                getString(R.string.mark_loved_dialog_title), getString(R.string.mark_loved_dialog_body), R.drawable.love);
+        unlovedNamesListView.setAdapter(unlovedAdapter);
         untaggedNamesView = (TextView) findViewById(R.id.untagged_names_view);
         untaggedNamesView.setText(getNextUntaggedName());
 
@@ -123,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                             return s.compareTo(t1);
                         }
                     });
+                    lovedAdapter.notifyDataSetChanged();
                     selectedView = lovedNamesListView;
                 }
                 else if (tabName.equals(getString(R.string.unloved_tab))){
@@ -132,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                             return s.compareTo(t1);
                         }
                     });
+                    unlovedAdapter.notifyDataSetChanged();
                     selectedView = unlovedNamesListView;
                 }
                 else if (tabName.equals(getString(R.string.triage_tab))){
