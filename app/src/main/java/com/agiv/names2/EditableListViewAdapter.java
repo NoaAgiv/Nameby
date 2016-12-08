@@ -84,7 +84,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
                                 dialog.dismiss();
                             }
                         })
-                        .setNegativeButton(R.string.mark_cancel_button, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
