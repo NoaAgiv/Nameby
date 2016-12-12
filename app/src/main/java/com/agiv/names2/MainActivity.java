@@ -12,178 +12,54 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
-
+import static com.agiv.names2.NameTagger.*;
 public class MainActivity extends AppCompatActivity {
-    public ArrayList<String> names = new ArrayList() {{
-        add("Noa");
-        add("נעה");
-        add("ניר");
-        add("איזמרלדה");
-        add("שמוליקית");
-        add("אביה");
-        add("אילנה");
-        add("מיה");
-        add("טל");
-        add("איתי");
-        add("שלמה");
-        add("יהודית");
-        add("יוסי");
-        add("שלומי");
-        add("גיל");
-        add("שני");
-        add("אלון");
-    }};
-    public ArrayList<String> untaggedNames;
-    public ArrayList<String> lovedNames = new ArrayList<>();
-    public ArrayList<String> unlovedNames = new ArrayList<>();
-    private static String END_OF_LIST = "Congrats! You tagged all the names!";
-    private final Random rgenerator = new Random();
-    private ListView lovedNamesListView;
-    private ListView unlovedNamesListView;
-    private TextView untaggedNamesView;
-    private BaseAdapter lovedAdapter;
-    private BaseAdapter unlovedAdapter;
-    NameTableDBHelper nameTable;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
+
     private GoogleApiClient client;
     private FloatingActionButton addNameButton;
 
-    private String getNextUntaggedName() {
-        if (untaggedNames.isEmpty())
-            return END_OF_LIST;
-        else
-            return untaggedNames.get(rgenerator.nextInt(untaggedNames.size()));
-    }
-
-    private void addName(String name) {
-        // replace non-letters and trim edge white spaces
-        name = name.replaceAll("-", " ");
-        name = name.replaceAll("[^\\p{L}\\s]", "").trim();
-        if (name.isEmpty() || lovedNames.contains(name) || unlovedNames.contains(name))
-            return;
-
-        lovedNames.add(name);
-        untaggedNames.remove(name);
-        if (untaggedNamesView.getText().equals(name)) {
-            untaggedNamesView.setText(getNextUntaggedName());
-        }
-        if (!names.contains(name)) {
-            names.add(name);
-            // TODO: and add to db
-        }
-
-
-    }
-
-    private void markNameLoved(String name) {
-        if (!name.equals(END_OF_LIST)) {
-            lovedNames.add(name);
-            untaggedNames.remove(name);
-            DbAccess databaseAccess = DbAccess.getInstance(this);
-            databaseAccess.open();
-            databaseAccess.markNameLoved("Noa", name);
-            databaseAccess.close();
-        }
-    }
-
-    private void markNameUnloved(String name) {
-        if (!name.equals(END_OF_LIST)) {
-            unlovedNames.add(name);
-            untaggedNames.remove(name);
-            DbAccess databaseAccess = DbAccess.getInstance(this);
-            databaseAccess.open();
-            databaseAccess.markNameUnloved("Noa", name);
-            databaseAccess.close();
-        }
-    }
-
-    private void populateDb() throws FileNotFoundException, IOException{
-//        final String DB_DESTINATION = "/data/data/com.agiv.names2/databases/names.db";
-
-// Check if the database exists before copying
-//        boolean initialiseDatabase = (new File(DB_DESTINATION)).exists();
-        boolean initialiseDatabase = this.getDatabasePath("names.db").exists();
-        if (initialiseDatabase == false) {
-
-            // Open the .db file in your assets directory
-            InputStream is = MainActivity.this.getAssets().open("names.db");
-
-            // Copy the database into the destination
-            OutputStream os = new FileOutputStream(this.getDatabasePath("names.db"));
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) > 0){
-                os.write(buffer, 0, length);
-            }
-            os.flush();
-
-            os.close();
-            is.close();
-        }
-//        SQLiteDatabase db = nameTable.getWritableDatabase();
-//        ContentValues values = new ContentValues();
-//        values.put(NameContract.NameEntry.TABLE_NAMES_COLUMN_NAME, "fromDB");
+//    private void populateDb() throws IOException{
+//    // Check if the database exists before copying
+//        boolean initialiseDatabase = this.getDatabasePath("names.db").exists();
+//        if (initialiseDatabase == false) {
 //
-//// Insert the new row, returning the primary key value of the new row
-//        long newRowId = db.insert(NameContract.NameEntry.TABLE_NAMES, null, values);
-    }
+//            // Open the .db file in your assets directory
+//            InputStream is = MainActivity.this.getAssets().open("names.db");
+//
+//            // Copy the database into the destination
+//            OutputStream os = new FileOutputStream(this.getDatabasePath("names.db"));
+//            byte[] buffer = new byte[1024];
+//            int length;
+//            while ((length = is.read(buffer)) > 0){
+//                os.write(buffer, 0, length);
+//            }
+//            os.flush();
+//
+//            os.close();
+//            is.close();
+//        }
+//    }
+
     private void getNamesFromDb(){
         DbAccess databaseAccess = DbAccess.getInstance(this);
         databaseAccess.open();
-        names = databaseAccess.getNames();
         untaggedNames = databaseAccess.getUntaggedNames("Noa");
         lovedNames = databaseAccess.getLovedNames("Noa");
         unlovedNames = databaseAccess.getUnlovedNames("Noa");
         databaseAccess.close();
-
-//        SQLiteDatabase db = nameTable.getReadableDatabase();
-//        // Define a projection that specifies which columns from the database
-//// you will actually use after this query.
-//        String[] projection = {
-//                NameContract.NameEntry._ID,
-//                NameContract.NameEntry.TABLE_NAMES_COLUMN_NAME,
-//        };
-//
-//
-//        Cursor c = db.query(
-//                NameContract.NameEntry.TABLE_NAMES,                     // The table to query
-//                projection,                               // The columns to return
-//                null,                                // The columns for the WHERE clause
-//                null,                            // The values for the WHERE clause
-//                null,                                     // don't group the rows
-//                null,                                     // don't filter by row groups
-//                null                                 // The sort order
-//        );
-//
-//        c.moveToFirst();
-//        final String name = c.getString(
-//                (c.getColumnIndexOrThrow(NameContract.NameEntry.TABLE_NAMES_COLUMN_NAME))
-//        );
-//        names = new ArrayList<String>(){{add(name);}};
     }
 
 
@@ -192,50 +68,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         try {
-            populateDb();
+            init(MainActivity.this, this, 1);
+//            populateDb();
         }
         catch (Exception e){
 
         }
-        getNamesFromDb();
+//        getNamesFromDb();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        lovedNamesListView = (ListView) findViewById(R.id.loved_names);
-        lovedAdapter = new EditableListViewAdapter(lovedNames, unlovedNames, this,
-                getString(R.string.mark_unloved_dialog_title), getString(R.string.mark_unloved_dialog_body), R.drawable.dislove);
-
-        lovedNamesListView.setAdapter(lovedAdapter);
-
-        unlovedNamesListView = (ListView) findViewById(R.id.unloved_names);
-
-        unlovedAdapter = new EditableListViewAdapter(unlovedNames, lovedNames, this,
-                getString(R.string.mark_loved_dialog_title), getString(R.string.mark_loved_dialog_body), R.drawable.love);
-        unlovedNamesListView.setAdapter(unlovedAdapter);
-        untaggedNamesView = (TextView) findViewById(R.id.untagged_names_view);
-        untaggedNamesView.setText(getNextUntaggedName());
-
-        untaggedNamesView.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
-            //            public void onSwipeTop() {
-//            }
-            public void onSwipeRight() {
-
-                Toast.makeText(MainActivity.this, "unloved", Toast.LENGTH_SHORT).show();
-                markNameUnloved(untaggedNamesView.getText().toString());
-                untaggedNamesView.setText(getNextUntaggedName());
-
-            }
-
-            public void onSwipeLeft() {
-                Toast.makeText(MainActivity.this, "loved", Toast.LENGTH_SHORT).show();
-                markNameLoved(untaggedNamesView.getText().toString());
-                untaggedNamesView.setText(getNextUntaggedName());
-            }
-//            public void onSwipeBottom() {
-//            }
-
-        });
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton addNameButton = (FloatingActionButton) findViewById(R.id.add_name_button);
         TabLayout allTabs = (TabLayout) findViewById(R.id.tabs);
         allTabs.addTab(allTabs.newTab().setText(R.string.triage_tab), true);
         allTabs.addTab(allTabs.newTab().setText(R.string.loved_tab));
@@ -253,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
                             return s.compareTo(t1);
                         }
                     });
-                    lovedAdapter.notifyDataSetChanged();
-                    selectedView = lovedNamesListView;
+                    getLovedAdapter().notifyDataSetChanged();
+                    selectedView = getLovedNamesListView();
                 } else if (tabName.equals(getString(R.string.unloved_tab))) {
                     Collections.sort(unlovedNames, new Comparator<String>() {
                         @Override
@@ -262,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
                             return s.compareTo(t1);
                         }
                     });
-                    unlovedAdapter.notifyDataSetChanged();
-                    selectedView = unlovedNamesListView;
+                    getUnlovedAdapter().notifyDataSetChanged();
+                    selectedView = getUnlovedNamesListView();
                 } else if (tabName.equals(getString(R.string.triage_tab))) {
-                    selectedView = untaggedNamesView;
+                    selectedView = getUntaggedNamesView();
                 }
                 switchToView(selectedView);
 
@@ -281,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        lovedNamesListView.setOnScrollListener(new AbsListView.OnScrollListener(){
+        getLovedNamesListView().setOnScrollListener(new AbsListView.OnScrollListener(){
             // hide floating button when scrolling so it does not hide the list items
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -303,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         addNameButton = (FloatingActionButton) findViewById(R.id.add_name_button);
-        switchToView(untaggedNamesView);
+        switchToView(getUntaggedNamesView());
         addNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -322,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                                 for (String name : names) {
                                     addName(name);
                                 }
-                                lovedAdapter.notifyDataSetChanged();
+                                getLovedAdapter().notifyDataSetChanged();
                                 dialog.dismiss();
                             }
                         })
@@ -342,9 +185,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void switchToView(View selectedView) {
-        lovedNamesListView.setVisibility(View.GONE);
-        unlovedNamesListView.setVisibility(View.GONE);
-        untaggedNamesView.setVisibility(View.GONE);
+        getLovedNamesListView().setVisibility(View.GONE);
+        getUnlovedNamesListView().setVisibility(View.GONE);
+        getUntaggedNamesView().setVisibility(View.GONE);
         selectedView.setVisibility(View.VISIBLE);
     }
 

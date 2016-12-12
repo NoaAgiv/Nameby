@@ -1,8 +1,15 @@
 package com.agiv.names2;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
 * Created by Noa Agiv on 12/11/2016.
 */
@@ -22,9 +29,11 @@ public class NameTableDBHelper extends SQLiteAssetHelper {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE_NAMES IF EXISTS " + NameContract.NameEntry.TABLE_NAMES;
 
+    private Context context;
 
     public NameTableDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 //    public void onCreate(SQLiteDatabase db) {
 //        db.execSQL(SQL_CREATE_ENTRIES);

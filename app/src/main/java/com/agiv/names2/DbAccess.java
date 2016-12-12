@@ -6,6 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -18,6 +22,7 @@ public class DbAccess {
     private SQLiteOpenHelper openHelper;
     private SQLiteDatabase database;
     private static DbAccess instance;
+    private Context context;
 
     /**
      * Private constructor to aboid object creation from outside classes.
@@ -26,7 +31,31 @@ public class DbAccess {
      */
     private DbAccess(Context context) {
         this.openHelper = new NameTableDBHelper(context);
+        this.context = context;
     }
+
+    public void initialDbPopulate() throws IOException {
+        // Check if the database exists before copying
+        boolean initialiseDatabase = context.getDatabasePath("names.db").exists();
+        if (initialiseDatabase == false) {
+
+            // Open the .db file in your assets directory
+            InputStream is = context.getAssets().open("names.db");
+
+            // Copy the database into the destination
+            OutputStream os = new FileOutputStream(context.getDatabasePath("names.db"));
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0){
+                os.write(buffer, 0, length);
+            }
+            os.flush();
+
+            os.close();
+            is.close();
+        }
+    }
+
 
     /**
      * Return a singleton instance of DatabaseAccess.
