@@ -23,6 +23,12 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +36,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     public ArrayList<String> names = new ArrayList() {{
-        add("noa");
+        add("Noa");
         add("נעה");
         add("ניר");
         add("איזמרלדה");
@@ -58,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView untaggedNamesView;
     private BaseAdapter lovedAdapter;
     private BaseAdapter unlovedAdapter;
+    NameTableDBHelper nameTable;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -73,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addName(String name) {
-        // replace non-letters and trip edge white spaces
-        name = name.replaceAll("[^a-zA-Z ]", "").trim();
+        // replace non-letters and trim edge white spaces
+        name = name.replaceAll("-", " ");
+        name = name.replaceAll("[^\\p{L}\\s]", "").trim();
         if (name.isEmpty() || lovedNames.contains(name) || unlovedNames.contains(name))
             return;
 
@@ -95,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
             untaggedNames.remove(name);
+            DbAccess databaseAccess = DbAccess.getInstance(this);
+            databaseAccess.open();
+            databaseAccess.markNameLoved("Noa", name);
+            databaseAccess.close();
         }
     }
 
@@ -102,15 +114,90 @@ public class MainActivity extends AppCompatActivity {
         if (!name.equals(END_OF_LIST)) {
             unlovedNames.add(name);
             untaggedNames.remove(name);
+            DbAccess databaseAccess = DbAccess.getInstance(this);
+            databaseAccess.open();
+            databaseAccess.markNameUnloved("Noa", name);
+            databaseAccess.close();
         }
     }
+
+    private void populateDb() throws FileNotFoundException, IOException{
+//        final String DB_DESTINATION = "/data/data/com.agiv.names2/databases/names.db";
+
+// Check if the database exists before copying
+//        boolean initialiseDatabase = (new File(DB_DESTINATION)).exists();
+        boolean initialiseDatabase = this.getDatabasePath("names.db").exists();
+        if (initialiseDatabase == false) {
+
+            // Open the .db file in your assets directory
+            InputStream is = MainActivity.this.getAssets().open("names.db");
+
+            // Copy the database into the destination
+            OutputStream os = new FileOutputStream(this.getDatabasePath("names.db"));
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0){
+                os.write(buffer, 0, length);
+            }
+            os.flush();
+
+            os.close();
+            is.close();
+        }
+//        SQLiteDatabase db = nameTable.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put(NameContract.NameEntry.TABLE_NAMES_COLUMN_NAME, "fromDB");
+//
+//// Insert the new row, returning the primary key value of the new row
+//        long newRowId = db.insert(NameContract.NameEntry.TABLE_NAMES, null, values);
+    }
+    private void getNamesFromDb(){
+        DbAccess databaseAccess = DbAccess.getInstance(this);
+        databaseAccess.open();
+        names = databaseAccess.getNames();
+        untaggedNames = databaseAccess.getUntaggedNames("Noa");
+        lovedNames = databaseAccess.getLovedNames("Noa");
+        unlovedNames = databaseAccess.getUnlovedNames("Noa");
+        databaseAccess.close();
+
+//        SQLiteDatabase db = nameTable.getReadableDatabase();
+//        // Define a projection that specifies which columns from the database
+//// you will actually use after this query.
+//        String[] projection = {
+//                NameContract.NameEntry._ID,
+//                NameContract.NameEntry.TABLE_NAMES_COLUMN_NAME,
+//        };
+//
+//
+//        Cursor c = db.query(
+//                NameContract.NameEntry.TABLE_NAMES,                     // The table to query
+//                projection,                               // The columns to return
+//                null,                                // The columns for the WHERE clause
+//                null,                            // The values for the WHERE clause
+//                null,                                     // don't group the rows
+//                null,                                     // don't filter by row groups
+//                null                                 // The sort order
+//        );
+//
+//        c.moveToFirst();
+//        final String name = c.getString(
+//                (c.getColumnIndexOrThrow(NameContract.NameEntry.TABLE_NAMES_COLUMN_NAME))
+//        );
+//        names = new ArrayList<String>(){{add(name);}};
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        untaggedNames = (ArrayList<String>) names.clone();
         setContentView(R.layout.activity_main);
+        try {
+            populateDb();
+        }
+        catch (Exception e){
+
+        }
+        getNamesFromDb();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         lovedNamesListView = (ListView) findViewById(R.id.loved_names);
         lovedAdapter = new EditableListViewAdapter(lovedNames, unlovedNames, this,
