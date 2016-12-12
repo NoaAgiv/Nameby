@@ -33,7 +33,7 @@ public class NameTagger {
 
 //    private static DbAccess databaseAccess = DbAccess.getInstance(activity);
 
-    public static void init(Context context, Activity activity, int userId) throws IOException{
+    public static void initData(Context context, Activity activity, int userId) throws IOException{
         NameTagger.context = context;
         NameTagger.activity = activity;
         NameTagger.userId = userId;
@@ -90,6 +90,7 @@ public class NameTagger {
                 activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.dislove);
 
         lovedNamesListView.setAdapter(lovedAdapter);
+
 
         unlovedNamesListView = (ListView) activity.findViewById(R.id.unloved_names);
 
