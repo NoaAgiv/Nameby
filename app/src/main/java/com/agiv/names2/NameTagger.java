@@ -11,6 +11,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 /**
  * Created by Noa Agiv on 12/12/2016.
@@ -84,9 +85,24 @@ public class NameTagger {
     }
 
 
+    public static abstract class SwitchListsCallBack {
+
+        void switchLists(String name){
+
+        }
+    }
+
     private static void setListAdapters() {
         lovedNamesListView = (ListView) activity.findViewById(R.id.loved_names);
-        lovedAdapter = new EditableListViewAdapter(lovedNames, unlovedNames, activity,
+
+        SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
+            @Override
+            public void switchLists(String name) {
+                markNameUnloved(name);
+            }
+        };
+
+        lovedAdapter = new EditableListViewAdapter(lovedToUnlovedSwitch, lovedNames, activity,
                 activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.dislove);
 
         lovedNamesListView.setAdapter(lovedAdapter);
@@ -94,7 +110,14 @@ public class NameTagger {
 
         unlovedNamesListView = (ListView) activity.findViewById(R.id.unloved_names);
 
-        unlovedAdapter = new EditableListViewAdapter(unlovedNames, lovedNames, activity,
+        SwitchListsCallBack unlovedToLovedSwitch = new SwitchListsCallBack() {
+            @Override
+            public void switchLists(String name) {
+                markNameLoved(name);
+            }
+        };
+
+        unlovedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, unlovedNames, activity,
                 activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.love);
         unlovedNamesListView.setAdapter(unlovedAdapter);
         untaggedNamesView = (TextView) activity.findViewById(R.id.untagged_names_view);
@@ -119,10 +142,11 @@ public class NameTagger {
         });
     }
 
-    private static void markNameLoved(String name) {
+    public static void markNameLoved(String name) {
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
             untaggedNames.remove(name);
+            unlovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
             databaseAccess.markNameLoved("Noa", name);
@@ -130,10 +154,11 @@ public class NameTagger {
         }
     }
 
-    private static void markNameUnloved(String name) {
+    public static void markNameUnloved(String name) {
         if (!name.equals(END_OF_LIST)) {
             unlovedNames.add(name);
             untaggedNames.remove(name);
+            lovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
             databaseAccess.markNameUnloved("Noa", name);

@@ -13,24 +13,25 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static com.agiv.names2.NameTagger.*;
 public class EditableListViewAdapter extends BaseAdapter implements ListAdapter {
     private ArrayList<String> list = new ArrayList<String>();
-    private ArrayList<String> complementaryList = new ArrayList<String>();
     private Context context;
     String dialogBody = "";
     String dialogTitle = "";
-    int bottonImage = 0;
+    int buttonImage = 0;
+    NameTagger.SwitchListsCallBack switchLists;
 
 
 
-    public EditableListViewAdapter(ArrayList<String> list, ArrayList<String> complementaryList,
-                                   Context context, String dialogTitle, String dialogBody, int bottonImage) {
+    public EditableListViewAdapter(NameTagger.SwitchListsCallBack switchLists, ArrayList<String> list,
+                                   Context context, String dialogTitle, String dialogBody, int buttonImage) {
         this.list = list;
-        this.complementaryList = complementaryList;
+        this.switchLists = switchLists;
         this.context = context;
         this.dialogBody = dialogBody;
         this.dialogTitle = dialogTitle;
-        this.bottonImage = bottonImage;
+        this.buttonImage = buttonImage;
     }
 
     @Override
@@ -64,12 +65,12 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
 
         //Handle buttons and add onClickListeners
         ImageButton changeButton = (ImageButton)view.findViewById(R.id.changeButton);
-        changeButton.setImageResource(bottonImage);
+        changeButton.setImageResource(buttonImage);
 
         changeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String name = list.get(position);
+                final String name = list.get(position);
                 String specificDialogBody = String.format("%s\n%s", dialogBody, name);
                 new AlertDialog.Builder(context)
                         .setTitle(dialogTitle)
@@ -78,8 +79,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
                         .setPositiveButton(R.string.mark_approve_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String name = list.remove(position);
-                                complementaryList.add(name);
+                                switchLists.switchLists(name);
                                 notifyDataSetChanged();
                                 dialog.dismiss();
                             }

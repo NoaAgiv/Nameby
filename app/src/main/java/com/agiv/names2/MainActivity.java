@@ -33,7 +33,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             initData(MainActivity.this, this, 1);
         }
-        catch (Exception e){}
+        catch (Exception e){
+            System.out.println(e);
+        }
 
         setTabs();
         setAddButton();

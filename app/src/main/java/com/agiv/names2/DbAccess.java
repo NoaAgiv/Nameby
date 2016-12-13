@@ -40,7 +40,7 @@ public class DbAccess {
         if (initialiseDatabase == false) {
 
             // Open the .db file in your assets directory
-            InputStream is = context.getAssets().open("names.db");
+            InputStream is = context.getAssets().open("databases/names.db");
 
             // Copy the database into the destination
             OutputStream os = new FileOutputStream(context.getDatabasePath("names.db"));
@@ -162,7 +162,7 @@ public class DbAccess {
             database.insert(NameContract.NameEntry.TABLE_NAMES_USERS, null, values);
         }
         else {
-            database.update(NameContract.NameEntry.TABLE_NAMES_USERS, values, "user_id = \"" + user_id + "\" and name_id =  \"" + name_id + "", null);
+            database.update(NameContract.NameEntry.TABLE_NAMES_USERS, values, "user_id = \"" + user_id + "\" and name_id =  \"" + name_id + "\"", null);
         }
         database.close();
     }
