@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private GoogleApiClient client;
     private FloatingActionButton addNameButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,7 +159,13 @@ public class MainActivity extends AppCompatActivity {
         getLovedNamesListView().setVisibility(View.GONE);
         getUnlovedNamesListView().setVisibility(View.GONE);
         getUntaggedNamesView().setVisibility(View.GONE);
+        getLoveImage().setVisibility(View.GONE);
+        getDisloveImage().setVisibility(View.GONE);
         selectedView.setVisibility(View.VISIBLE);
+        if (selectedView.equals(getUntaggedNamesView())){
+            getLoveImage().setVisibility(View.VISIBLE);
+            getDisloveImage().setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

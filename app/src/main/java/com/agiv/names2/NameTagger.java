@@ -1,8 +1,15 @@
 package com.agiv.names2;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +35,8 @@ public class NameTagger {
     private static TextView untaggedNamesView;
     private static BaseAdapter lovedAdapter;
     private static BaseAdapter unlovedAdapter;
+    private static ImageView loveImage;
+    private static ImageView disloveImage;
     public static int userId;
     public static Context context;
     public static Activity activity;
@@ -74,6 +83,14 @@ public class NameTagger {
         return untaggedNamesView;
     }
 
+    public static ImageView getDisloveImage() {
+        return disloveImage;
+    }
+
+    public static ImageView getLoveImage() {
+        return loveImage;
+    }
+
     public static void getNamesFromDb() throws IOException {
         DbAccess databaseAccess = DbAccess.getInstance(activity);
         databaseAccess.initialDbPopulate();
@@ -91,11 +108,108 @@ public class NameTagger {
 
         }
     }
+    private static void swipeRight(){
+        final ImageView imageCopy = new ImageView(context);
+        final ImageView imageCopy2 = new ImageView(context);
+        final ImageView imageCopy3 = new ImageView(context);
 
+        imageCopy.setImageResource(R.drawable.dislove);
+        imageCopy.setX(disloveImage.getX());
+        imageCopy.setY(disloveImage.getY());
+        imageCopy2.setImageResource(R.drawable.dislove);
+        imageCopy2.setX(disloveImage.getX());
+        imageCopy2.setY(disloveImage.getY());
+        imageCopy3.setImageResource(R.drawable.dislove);
+        imageCopy3.setX(disloveImage.getX());
+        imageCopy3.setY(disloveImage.getY());
+
+        final View mainView = activity.findViewById(R.id.content_main);
+        ((ViewGroup) mainView).addView(imageCopy);
+        ((ViewGroup) mainView).addView(imageCopy2);
+        ((ViewGroup) mainView).addView(imageCopy3);
+
+        markNameUnloved(untaggedNamesView.getText().toString());
+        final ViewPropertyAnimator anim = imageCopy.animate();
+
+        anim.setListener(new android.animation.Animator.AnimatorListener(){
+
+            @Override
+            public void onAnimationStart(Animator animation){}
+
+            @Override
+            public void onAnimationCancel(Animator animation){}
+
+            @Override
+            public void onAnimationRepeat(Animator animation){}
+
+            @Override
+            public void onAnimationEnd(Animator animation){
+                untaggedNamesView.setText(getNextUntaggedName());
+                ((ViewGroup) mainView).removeView(imageCopy);
+                ((ViewGroup) mainView).removeView(imageCopy2);
+                ((ViewGroup) mainView).removeView(imageCopy3);
+            }
+        });
+        anim.translationXBy(700).setDuration(1000);
+        anim.translationYBy(-500).setDuration(500);
+        imageCopy2.animate().translationXBy(600).setDuration(1000);
+        imageCopy2.animate().translationYBy(200).setDuration(1000);
+        imageCopy3.animate().translationXBy(1500).setDuration(1000);
+    }
+    private static void swipeLeft(){
+        final ImageView loveImageCopy = new ImageView(context);
+        final ImageView loveImageCopy2 = new ImageView(context);
+        final ImageView loveImageCopy3 = new ImageView(context);
+
+        loveImageCopy.setImageResource(R.drawable.love);
+        loveImageCopy.setX(loveImage.getX());
+        loveImageCopy.setY(loveImage.getY());
+        loveImageCopy2.setImageResource(R.drawable.love);
+        loveImageCopy2.setX(loveImage.getX());
+        loveImageCopy2.setY(loveImage.getY());
+        loveImageCopy3.setImageResource(R.drawable.love);
+        loveImageCopy3.setX(loveImage.getX());
+        loveImageCopy3.setY(loveImage.getY());
+
+        final View mainView = activity.findViewById(R.id.content_main);
+        ((ViewGroup) mainView).addView(loveImageCopy);
+        ((ViewGroup) mainView).addView(loveImageCopy2);
+        ((ViewGroup) mainView).addView(loveImageCopy3);
+
+        markNameLoved(untaggedNamesView.getText().toString());
+        final ViewPropertyAnimator anim = loveImageCopy.animate();
+
+        anim.setListener(new android.animation.Animator.AnimatorListener(){
+
+            @Override
+            public void onAnimationStart(Animator animation){}
+
+            @Override
+            public void onAnimationCancel(Animator animation){}
+
+            @Override
+            public void onAnimationRepeat(Animator animation){}
+
+            @Override
+            public void onAnimationEnd(Animator animation){
+                untaggedNamesView.setText(getNextUntaggedName());
+                ((ViewGroup) mainView).removeView(loveImageCopy);
+                ((ViewGroup) mainView).removeView(loveImageCopy2);
+                ((ViewGroup) mainView).removeView(loveImageCopy3);
+            }
+        });
+        anim.translationXBy(-700).setDuration(1000);
+        anim.translationYBy(-500).setDuration(500);
+        loveImageCopy2.animate().translationXBy(-600).setDuration(1000);
+        loveImageCopy2.animate().translationYBy(200).setDuration(1000);
+        loveImageCopy3.animate().translationXBy(-1500).setDuration(1000);
+    }
     private static void setListAdapters() {
+        loveImage = (ImageView) activity.findViewById(R.id.love_image);
+        disloveImage = (ImageView) activity.findViewById(R.id.dislove_image);
         lovedNamesListView = (ListView) activity.findViewById(R.id.loved_names);
 
-        SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
+        final SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
             @Override
             public void switchLists(String name) {
                 markNameUnloved(name);
@@ -124,19 +238,11 @@ public class NameTagger {
         untaggedNamesView.setText(getNextUntaggedName());
 
         untaggedNamesView.setOnTouchListener(new OnSwipeTouchListener(context) {
-
             public void onSwipeRight() {
-
-                Toast.makeText(context, "unloved", Toast.LENGTH_SHORT).show();
-                markNameUnloved(untaggedNamesView.getText().toString());
-                untaggedNamesView.setText(getNextUntaggedName());
-
+                swipeRight();
             }
-
             public void onSwipeLeft() {
-                Toast.makeText(context, "loved", Toast.LENGTH_SHORT).show();
-                markNameLoved(untaggedNamesView.getText().toString());
-                untaggedNamesView.setText(getNextUntaggedName());
+                swipeLeft();
             }
 
         });
@@ -194,3 +300,4 @@ public class NameTagger {
     }
 
 }
+
