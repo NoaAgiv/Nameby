@@ -16,7 +16,11 @@ public class NameContract {
 
 
         public static final String TABLE_NAMES = "names";
-        public static final String TABLE_NAMES_COLUMN_NAME = "name";
+        public static final String TABLE_NAMES_NAME = "name";
+        public static final String TABLE_NAMES_INSERTED_BY = "inserted_by";
+        public static final String TABLE_NAMES_DATE_INSERTED = "data_inserted";
+        public static final String TABLE_NAMES_SEX = "sex";
+        public static final String TABLE_NAMES_POPULARITY = "popularity";
     }
 
 }

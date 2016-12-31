@@ -3,22 +3,17 @@ package com.agiv.names2;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Noa Agiv on 12/12/2016.
@@ -108,7 +103,7 @@ public class NameTagger {
 
         }
     }
-    private static void swipeRight(){
+    private static void swipeLeft(){
         final ImageView imageCopy = new ImageView(context);
         final ImageView imageCopy2 = new ImageView(context);
         final ImageView imageCopy3 = new ImageView(context);
@@ -156,7 +151,7 @@ public class NameTagger {
         imageCopy2.animate().translationYBy(200).setDuration(1000);
         imageCopy3.animate().translationXBy(1500).setDuration(1000);
     }
-    private static void swipeLeft(){
+    private static void swipeRight(){
         final ImageView loveImageCopy = new ImageView(context);
         final ImageView loveImageCopy2 = new ImageView(context);
         final ImageView loveImageCopy3 = new ImageView(context);
@@ -239,10 +234,10 @@ public class NameTagger {
 
         untaggedNamesView.setOnTouchListener(new OnSwipeTouchListener(context) {
             public void onSwipeRight() {
-                swipeRight();
+                swipeLeft();
             }
             public void onSwipeLeft() {
-                swipeLeft();
+                swipeRight();
             }
 
         });
@@ -286,11 +281,12 @@ public class NameTagger {
         if (name.isEmpty() || lovedNames.contains(name) || unlovedNames.contains(name))
             return;
 
-        lovedNames.add(name);
+        markNameLoved(name);
         untaggedNames.remove(name);
         if (untaggedNamesView.getText().equals(name)) {
             untaggedNamesView.setText(getNextUntaggedName());
         }
+
 //        if (!names.contains(name)) {
 //            names.add(name);
             // TODO: and add to db

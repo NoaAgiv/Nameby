@@ -10,7 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Noa Agiv on 12/12/2016.
@@ -147,13 +149,27 @@ public class DbAccess {
     }
 
     private void insertNameTag(String user, String name, boolean loved) {
-        ContentValues values = new ContentValues();
-        Cursor cursor = database.rawQuery("SELECT id FROM names WHERE name = \""+ name +"\"", null);
-        cursor.moveToFirst();
-        int name_id = cursor.getInt(0);
-        cursor = database.rawQuery("SELECT id FROM users WHERE name = \""+ user +"\"", null);
+        Cursor cursor = database.rawQuery("SELECT id FROM users WHERE name = \""+ user +"\"", null);
         cursor.moveToFirst();
         int user_id = cursor.getInt(0);
+
+        int name_id;
+        cursor = database.rawQuery("SELECT id FROM names WHERE name = \""+ name +"\"", null);
+        if (cursor.getCount() == 0){ //name does not exist
+            ContentValues nameTableValues = new ContentValues();
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name);
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_INSERTED_BY, user_id);
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_POPULARITY, -1);
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, "f");
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_DATE_INSERTED, new SimpleDateFormat("yyyy-MM-dd").toString());
+            name_id = ( (int) database.insert(NameContract.NameEntry.TABLE_NAMES, null , nameTableValues));
+        }
+        else {
+            cursor.moveToFirst();
+            name_id = cursor.getInt(0);
+        }
+
+        ContentValues values = new ContentValues();
         values.put(NameContract.NameEntry.TABLE_NAMES_IS_LIKED, loved);
         cursor = database.rawQuery("SELECT is_liked FROM names_users WHERE user_id = \""+ user_id +"\" and name_id =  \""+ name_id + "\" ", null);
         if (cursor.getCount()==0) {
