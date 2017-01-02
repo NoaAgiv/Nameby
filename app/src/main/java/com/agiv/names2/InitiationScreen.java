@@ -3,12 +3,14 @@ package com.agiv.names2;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,12 +48,17 @@ public class InitiationScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
         setContentView(R.layout.initiation_screen);
         ImageButton chooseFemale = (ImageButton) findViewById(R.id.choose_sex_female);
+        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
+        final SharedPreferences.Editor editor= sharedPref.edit();
         chooseFemale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.FEMALE);
+                editor.putInt("sex", GroupSettings.Sex.FEMALE.ordinal());
+                editor.commit();
+                //GroupSettings.setSex(GroupSettings.Sex.FEMALE);
                 Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(menuIntent);
             }});
@@ -59,7 +66,9 @@ public class InitiationScreen extends AppCompatActivity {
         chooseMale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.MALE);
+                editor.putInt("sex", GroupSettings.Sex.MALE.ordinal());
+                editor.commit();
+                //GroupSettings.setSex(GroupSettings.Sex.MALE);
                 Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(menuIntent);
             }});

@@ -2,12 +2,14 @@ package com.agiv.names2;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
+        GroupSettings.setSex(GroupSettings.Sex.values()[sharedPref.getInt("sex", -1)]);
+        Log.w("myApp", sharedPref.getInt("sex", -1) + "");
         try {
             initData(MainActivity.this, this, 1);
         }
