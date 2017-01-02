@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.EditText;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
 
     AbsListView.OnScrollListener listScrollMoveButtonListener = new AbsListView.OnScrollListener(){
         // hide floating button when scrolling so it does not hide the list items

@@ -95,7 +95,7 @@ public class DbAccess {
      */
     public ArrayList<String> getNames() {
         ArrayList<String> list = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT name FROM names", null);
+        Cursor cursor = database.rawQuery("SELECT name FROM names where sex = \"" + GroupSettings.getSexString() + "\"", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             list.add(cursor.getString(0));
@@ -112,7 +112,8 @@ public class DbAccess {
                 "SELECT names.name from names " +
                 "JOIN names_users on names.id = names_users.name_id " +
                 "JOIN users on users.id = names_users.user_id " +
-                "WHERE users.name = \"" + user + "\" " +
+                "WHERE sex =\"" + GroupSettings.getSexString() + "\"" +
+                        "and users.name = \"" + user + "\" " +
                         "and names_users.is_liked = " + loved_int;
 
 
@@ -160,7 +161,7 @@ public class DbAccess {
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_INSERTED_BY, user_id);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_POPULARITY, -1);
-            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, "f");
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, GroupSettings.getSexString());
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_DATE_INSERTED, new SimpleDateFormat("yyyy-MM-dd").toString());
             name_id = ( (int) database.insert(NameContract.NameEntry.TABLE_NAMES, null , nameTableValues));
         }
