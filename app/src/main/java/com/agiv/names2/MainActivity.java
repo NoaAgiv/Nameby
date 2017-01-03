@@ -34,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
-        GroupSettings.setSex(GroupSettings.Sex.values()[sharedPref.getInt("sex", -1)]);
-        Log.w("myApp", sharedPref.getInt("sex", -1) + "");
         try {
             initData(MainActivity.this, this, 1);
         }

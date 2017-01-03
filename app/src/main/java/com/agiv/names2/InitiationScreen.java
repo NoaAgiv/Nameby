@@ -48,18 +48,24 @@ public class InitiationScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-
+        final Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
+        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
+        GroupSettings.Sex sex = sharedPref.getInt("sex", -1)==-1 ? null : GroupSettings.Sex.values()[sharedPref.getInt("sex", -1)];
+        if (sex!=null){
+            GroupSettings.setSex(sex);
+            startActivity(menuIntent);
+            return;
+        }
+        final SharedPreferences.Editor editor= sharedPref.edit();
         setContentView(R.layout.initiation_screen);
         ImageButton chooseFemale = (ImageButton) findViewById(R.id.choose_sex_female);
-        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
-        final SharedPreferences.Editor editor= sharedPref.edit();
+
         chooseFemale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editor.putInt("sex", GroupSettings.Sex.FEMALE.ordinal());
                 editor.commit();
-                //GroupSettings.setSex(GroupSettings.Sex.FEMALE);
-                Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
+                GroupSettings.setSex(GroupSettings.Sex.FEMALE);
                 startActivity(menuIntent);
             }});
         ImageButton chooseMale = (ImageButton) findViewById(R.id.choose_sex_male);
@@ -68,8 +74,7 @@ public class InitiationScreen extends AppCompatActivity {
             public void onClick(View view) {
                 editor.putInt("sex", GroupSettings.Sex.MALE.ordinal());
                 editor.commit();
-                //GroupSettings.setSex(GroupSettings.Sex.MALE);
-                Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
+                GroupSettings.setSex(GroupSettings.Sex.MALE);
                 startActivity(menuIntent);
             }});
     }
