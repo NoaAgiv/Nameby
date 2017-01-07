@@ -3,8 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.agiv.names2.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/sex_settings"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/menu_sex_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/family_settings"
+        android:orderInCategory="100"
+        android:title="@string/menu_family_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/change_user"
+        android:orderInCategory="100"
+        android:title="@string/menu_change_user_settings"
         app:showAsAction="never" />
 </menu>

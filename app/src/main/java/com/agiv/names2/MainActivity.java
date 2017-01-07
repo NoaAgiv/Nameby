@@ -2,6 +2,7 @@ package com.agiv.names2;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,12 +10,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
-import android.widget.Button;
 import android.widget.EditText;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -28,12 +27,18 @@ public class MainActivity extends AppCompatActivity {
 
     private GoogleApiClient client;
     private FloatingActionButton addNameButton;
+    private SharedPreferences.Editor editor;
+    Intent sexChooseIntent;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sexChooseIntent = new Intent(getBaseContext(), InitiationScreen.class);
+        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
+        editor = sharedPref.edit();
+
         try {
             initData(MainActivity.this, this, 1);
         }
@@ -187,7 +192,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.sex_settings) {
+            editor.putInt("sex", -1);
+            editor.commit();
+            startActivity(sexChooseIntent);
             return true;
         }
 

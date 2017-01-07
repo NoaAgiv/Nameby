@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">ניימבי</string>
-    <string name="action_settings">Settings</string>
+    <string name="menu_sex_settings">החלף מין</string>
+    <string name="menu_change_user_settings">החלף משתמש</string>
+    <string name="menu_family_settings">הגדר משפחה</string>
     <string name="loved_tab">אהובים</string>
     <string name="unloved_tab">לא אהובים</string>
     <string name="triage_tab">מיון</string>
