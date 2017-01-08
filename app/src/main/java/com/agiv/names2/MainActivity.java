@@ -22,6 +22,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.Collections;
 import java.util.Comparator;
+
+import static com.agiv.names2.GroupSettings.getCurrentUser;
+import static com.agiv.names2.GroupSettings.setCurrentUser;
 import static com.agiv.names2.NameTagger.*;
 public class MainActivity extends AppCompatActivity {
 
@@ -197,6 +200,26 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
             startActivity(sexChooseIntent);
             return true;
+        }
+        if (id == R.id.change_user){
+            if (getCurrentUser().equals("Noa")){
+                setCurrentUser("Nir", editor);
+                try {
+                    initData(MainActivity.this, this, 1);
+                }
+                catch (Exception e){
+                    System.out.println(e);
+                }
+            }
+            else if (getCurrentUser().equals("Nir")){
+                setCurrentUser("Noa", editor);
+                try {
+                    initData(MainActivity.this, this, 1);
+                }
+                catch (Exception e){
+                    System.out.println(e);
+                }
+            }
         }
 
         return super.onOptionsItemSelected(item);

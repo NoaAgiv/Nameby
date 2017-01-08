@@ -90,9 +90,10 @@ public class NameTagger {
         DbAccess databaseAccess = DbAccess.getInstance(activity);
         databaseAccess.initialDbPopulate();
         databaseAccess.open();
-        untaggedNames = databaseAccess.getUntaggedNames("Noa");
-        lovedNames = databaseAccess.getLovedNames("Noa");
-        unlovedNames = databaseAccess.getUnlovedNames("Noa");
+        String user = GroupSettings.getCurrentUser();
+        untaggedNames = databaseAccess.getUntaggedNames(user);
+        lovedNames = databaseAccess.getLovedNames(user);
+        unlovedNames = databaseAccess.getUnlovedNames(user);
         databaseAccess.close();
     }
 
@@ -250,7 +251,7 @@ public class NameTagger {
             unlovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
-            databaseAccess.markNameLoved("Noa", name);
+            databaseAccess.markNameLoved(GroupSettings.getCurrentUser(), name);
             databaseAccess.close();
         }
     }
@@ -262,7 +263,7 @@ public class NameTagger {
             lovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
-            databaseAccess.markNameUnloved("Noa", name);
+            databaseAccess.markNameUnloved(GroupSettings.getCurrentUser(), name);
             databaseAccess.close();
         }
     }
