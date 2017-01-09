@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sexChooseIntent = new Intent(getBaseContext(), InitiationScreen.class);
-        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
-        editor = sharedPref.edit();
 
         try {
             initData(MainActivity.this, this, 1);
@@ -125,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         allTabs.addTab(allTabs.newTab().setText(R.string.triage_tab), true);
         allTabs.addTab(allTabs.newTab().setText(R.string.loved_tab));
         allTabs.addTab(allTabs.newTab().setText(R.string.unloved_tab));
+        allTabs.addTab(allTabs.newTab().setText(R.string.name_matches));
 
         allTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -152,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
                 } else if (tabName.equals(getString(R.string.triage_tab))) {
                     selectedView = getUntaggedNamesView();
                 }
+                else if (tabName.equals(getString(R.string.name_matches))) {
+                    selectedView = getMatchedNamesListView();
+                }
                 switchToView(selectedView);
 
             }
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
     private void switchToView(View selectedView) {
         getLovedNamesListView().setVisibility(View.GONE);
         getUnlovedNamesListView().setVisibility(View.GONE);
+        getMatchedNamesListView().setVisibility(View.GONE);
         getUntaggedNamesView().setVisibility(View.GONE);
         getLoveImage().setVisibility(View.GONE);
         getDisloveImage().setVisibility(View.GONE);
@@ -196,14 +199,13 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.sex_settings) {
-            editor.putInt("sex", -1);
-            editor.commit();
+            GroupSettings.unsetSex();
             startActivity(sexChooseIntent);
             return true;
         }
         if (id == R.id.change_user){
             if (getCurrentUser().equals("Noa")){
-                setCurrentUser("Nir", editor);
+                setCurrentUser("Nir");
                 try {
                     initData(MainActivity.this, this, 1);
                 }
@@ -212,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             else if (getCurrentUser().equals("Nir")){
-                setCurrentUser("Noa", editor);
+                setCurrentUser("Noa");
                 try {
                     initData(MainActivity.this, this, 1);
                 }

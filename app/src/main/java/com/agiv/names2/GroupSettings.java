@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
  */
 
 public class GroupSettings {
+    static SharedPreferences sharedPref;
+    static SharedPreferences.Editor editor;
     static Sex sex;
     static String currentUser;
 
@@ -15,12 +17,17 @@ public class GroupSettings {
         MALE
     }
 
+    public static void init(SharedPreferences shp){
+        sharedPref = shp;
+        editor = shp.edit();
+    }
+
     public static Sex getSex() {
-        return sex;
+        return sharedPref.getInt("sex", -1)==-1 ? null : GroupSettings.Sex.values()[sharedPref.getInt("sex", -1)];
     }
 
     public static String getSexString() {
-        if (sex.equals(Sex.FEMALE))
+        if (getSex().equals(Sex.FEMALE))
             return "f";
         else
             return "m";
@@ -28,13 +35,22 @@ public class GroupSettings {
 
     public static void setSex(Sex sex) {
         GroupSettings.sex = sex;
+        editor.putInt("sex", sex.ordinal());
+        editor.commit();
+
+    }
+
+    public static void unsetSex() {
+        editor.putInt("sex", -1);
+        editor.commit();
+        GroupSettings.sex = null;
     }
 
     public static String getCurrentUser() {
-        return currentUser;
+        return sharedPref.getString("user", null);
     }
 
-    public static void setCurrentUser(String currentUser, SharedPreferences.Editor editor) {
+    public static void setCurrentUser(String currentUser) {
         GroupSettings.currentUser = currentUser;
         editor.putString("user", currentUser);
         editor.commit();

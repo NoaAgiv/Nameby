@@ -6,8 +6,10 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,12 +28,14 @@ public class NameTagger {
     private static String END_OF_LIST = "Congrats! You tagged all the names!";
     private static final Random rgenerator = new Random();
     private static ListView lovedNamesListView;
+    private static ListView matchedNamesListView;
     private static ListView unlovedNamesListView;
     private static TextView untaggedNamesView;
     private static BaseAdapter lovedAdapter;
     private static BaseAdapter unlovedAdapter;
     private static ImageView loveImage;
     private static ImageView disloveImage;
+    private static BaseAdapter matchedAdapter;
     public static int userId;
     public static Context context;
     public static Activity activity;
@@ -62,10 +66,13 @@ public class NameTagger {
         return lovedNamesListView;
     }
 
+    public static ListView getMatchedNamesListView() {
+        return matchedNamesListView;
+    }
+
     public static ListView getUnlovedNamesListView() {
         return unlovedNamesListView;
     }
-
     public static BaseAdapter getLovedAdapter() {
         return lovedAdapter;
     }
@@ -230,9 +237,17 @@ public class NameTagger {
         unlovedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, unlovedNames, activity,
                 activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.love);
         unlovedNamesListView.setAdapter(unlovedAdapter);
+
+        matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
+        ArrayList<String> matchedNames = new ArrayList<>();
+        // TODO: change to a regular ListAdapter below
+        matchedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, matchedNames, activity,
+                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.love);
+
+        matchedNamesListView.setAdapter(matchedAdapter);
+
         untaggedNamesView = (TextView) activity.findViewById(R.id.untagged_names_view);
         untaggedNamesView.setText(getNextUntaggedName());
-
         untaggedNamesView.setOnTouchListener(new OnSwipeTouchListener(context) {
             public void onSwipeRight() {
                 swipeLeft();

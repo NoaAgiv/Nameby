@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,22 +22,6 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.Collections;
-import java.util.Comparator;
-
-import static com.agiv.names2.NameTagger.addName;
-import static com.agiv.names2.NameTagger.context;
-import static com.agiv.names2.NameTagger.getDisloveImage;
-import static com.agiv.names2.NameTagger.getLoveImage;
-import static com.agiv.names2.NameTagger.getLovedAdapter;
-import static com.agiv.names2.NameTagger.getLovedNamesListView;
-import static com.agiv.names2.NameTagger.getUnlovedAdapter;
-import static com.agiv.names2.NameTagger.getUnlovedNamesListView;
-import static com.agiv.names2.NameTagger.getUntaggedNamesView;
-import static com.agiv.names2.NameTagger.initData;
-import static com.agiv.names2.NameTagger.lovedNames;
-import static com.agiv.names2.NameTagger.unlovedNames;
-
 public class InitiationScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
@@ -49,22 +32,19 @@ public class InitiationScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         final Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
-        final SharedPreferences sharedPref= getSharedPreferences("group_settings", 0);
-        GroupSettings.Sex sex = sharedPref.getInt("sex", -1)==-1 ? null : GroupSettings.Sex.values()[sharedPref.getInt("sex", -1)];
+        GroupSettings.init(getSharedPreferences("group_settings", 0));
+        GroupSettings.Sex sex = GroupSettings.getSex();
         if (sex!=null){
             GroupSettings.setSex(sex);
             startActivity(menuIntent);
             return;
         }
-        final SharedPreferences.Editor editor= sharedPref.edit();
         setContentView(R.layout.initiation_screen);
         ImageButton chooseFemale = (ImageButton) findViewById(R.id.choose_sex_female);
 
         chooseFemale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editor.putInt("sex", GroupSettings.Sex.FEMALE.ordinal());
-                editor.commit();
                 GroupSettings.setSex(GroupSettings.Sex.FEMALE);
                 startActivity(menuIntent);
             }});
@@ -72,8 +52,6 @@ public class InitiationScreen extends AppCompatActivity {
         chooseMale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editor.putInt("sex", GroupSettings.Sex.MALE.ordinal());
-                editor.commit();
                 GroupSettings.setSex(GroupSettings.Sex.MALE);
                 startActivity(menuIntent);
             }});
