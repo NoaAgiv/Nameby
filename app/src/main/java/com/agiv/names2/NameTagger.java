@@ -6,10 +6,8 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,6 +23,7 @@ public class NameTagger {
     public static ArrayList<String> untaggedNames;
     public static ArrayList<String> lovedNames = new ArrayList<>();
     public static ArrayList<String> unlovedNames = new ArrayList<>();
+    public static ArrayList<String> matchedNames = new ArrayList<>();
     private static String END_OF_LIST = "Congrats! You tagged all the names!";
     private static final Random rgenerator = new Random();
     private static ListView lovedNamesListView;
@@ -79,6 +78,9 @@ public class NameTagger {
 
     public static BaseAdapter getUnlovedAdapter() {
         return unlovedAdapter;
+    }
+    public static BaseAdapter getMatchedAdapter() {
+        return matchedAdapter;
     }
 
     public static TextView getUntaggedNamesView() {
@@ -239,12 +241,15 @@ public class NameTagger {
         unlovedNamesListView.setAdapter(unlovedAdapter);
 
         matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
-        ArrayList<String> matchedNames = new ArrayList<>();
+
+
         // TODO: change to a regular ListAdapter below
         matchedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, matchedNames, activity,
                 activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.love);
 
         matchedNamesListView.setAdapter(matchedAdapter);
+
+        updateMatchedNames();
 
         untaggedNamesView = (TextView) activity.findViewById(R.id.untagged_names_view);
         untaggedNamesView.setText(getNextUntaggedName());
@@ -257,6 +262,18 @@ public class NameTagger {
             }
 
         });
+    }
+
+    public static void updateMatchedNames(){
+        DbAccess databaseAccess = DbAccess.getInstance(context);
+        databaseAccess.open();
+        ArrayList<String> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getCurrentUser().equals("Noa")? "Nir" : "Noa");
+        databaseAccess.close();
+        databaseAccess.close();
+        partnerLovedNames.retainAll(lovedNames);
+        matchedNames.clear();
+        matchedNames.addAll(partnerLovedNames);
+        matchedAdapter.notifyDataSetChanged();
     }
 
     public static void markNameLoved(String name) {
@@ -302,13 +319,8 @@ public class NameTagger {
         if (untaggedNamesView.getText().equals(name)) {
             untaggedNamesView.setText(getNextUntaggedName());
         }
-
-//        if (!names.contains(name)) {
-//            names.add(name);
-            // TODO: and add to db
-//        }
-
-
+        getLovedAdapter().notifyDataSetChanged();
+        getMatchedAdapter().notifyDataSetChanged();
     }
 
 }

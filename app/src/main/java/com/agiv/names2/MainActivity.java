@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedView = getUntaggedNamesView();
                 }
                 else if (tabName.equals(getString(R.string.name_matches))) {
+                    updateMatchedNames();
                     selectedView = getMatchedNamesListView();
                 }
                 switchToView(selectedView);
