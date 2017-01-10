@@ -12,7 +12,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -20,7 +25,9 @@ import java.util.Random;
  */
 
 public class NameTagger {
-    public static ArrayList<String> untaggedNames;
+    public static ArrayList<Name> untaggedNames;
+    public static ArrayList<String> partnerlovedNames = new ArrayList<>();
+    public static ArrayList<String> untaggedPartnerlovedNames = new ArrayList<>();
     public static ArrayList<String> lovedNames = new ArrayList<>();
     public static ArrayList<String> unlovedNames = new ArrayList<>();
     public static ArrayList<String> matchedNames = new ArrayList<>();
@@ -57,7 +64,7 @@ public class NameTagger {
         return lovedNames;
     }
 
-    public static ArrayList<String> getUntaggedNames() {
+    public static ArrayList<Name> getUntaggedNames() {
         return untaggedNames;
     }
 
@@ -104,6 +111,9 @@ public class NameTagger {
         lovedNames = databaseAccess.getLovedNames(user);
         unlovedNames = databaseAccess.getUnlovedNames(user);
         databaseAccess.close();
+        partnerlovedNames = getPartnerLovedNames();
+        updateUntaggedNames();
+        untaggedPartnerlovedNames = getUntaggedPartnerLovedNames();
     }
 
 
@@ -264,22 +274,43 @@ public class NameTagger {
         });
     }
 
+
+
+
+    public static void updateUntaggedNames(){
+        Name.setLovedByPartner(untaggedNames, partnerlovedNames);
+    }
+
+    public static ArrayList<String> getUntaggedPartnerLovedNames(){
+        ArrayList<String> untaggedPartnerLovedNamed = new ArrayList<String>();
+        for (Name name : untaggedNames){
+            if (name.lovedByPartner = true)
+                untaggedPartnerLovedNamed.add(name.name);
+        }
+        return untaggedPartnerLovedNamed;
+    }
+
     public static void updateMatchedNames(){
-        DbAccess databaseAccess = DbAccess.getInstance(context);
-        databaseAccess.open();
-        ArrayList<String> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getCurrentUser().equals("Noa")? "Nir" : "Noa");
-        databaseAccess.close();
-        databaseAccess.close();
+        ArrayList<String> partnerLovedNames = (ArrayList<String>) partnerlovedNames.clone();
         partnerLovedNames.retainAll(lovedNames);
         matchedNames.clear();
         matchedNames.addAll(partnerLovedNames);
         matchedAdapter.notifyDataSetChanged();
     }
 
+    private static ArrayList<String> getPartnerLovedNames(){
+        DbAccess databaseAccess = DbAccess.getInstance(context);
+        databaseAccess.open();
+        ArrayList<String> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getCurrentUser().equals("Noa")? "Nir" : "Noa");
+        databaseAccess.close();
+        return partnerLovedNames;
+    }
+
     public static void markNameLoved(String name) {
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
             untaggedNames.remove(name);
+            untaggedPartnerlovedNames.remove(name);
             unlovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
@@ -292,6 +323,7 @@ public class NameTagger {
         if (!name.equals(END_OF_LIST)) {
             unlovedNames.add(name);
             untaggedNames.remove(name);
+            untaggedPartnerlovedNames.remove(name);
             lovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
@@ -303,9 +335,36 @@ public class NameTagger {
     private static String getNextUntaggedName() {
         if (untaggedNames.isEmpty())
             return END_OF_LIST;
-        else
-            return untaggedNames.get(rgenerator.nextInt(untaggedNames.size()));
+        else{
+            if (getFromPartnerLovedNamesRandonChoice())
+                return getRandomFromPartnerLovedNames();
+            else
+                return getRandomFromUntaggedPopularityBias();
+        }
     }
+
+    private static String getRandomFromUntaggedPopularityBias(){
+        Collections.sort(untaggedNames, new Comparator<Name>() {
+            @Override
+            public int compare(Name name1, Name name2) {
+                return name2.popularity - name1.popularity;
+            }
+        });
+        return untaggedNames.get(rgenerator.nextInt(10)).name;
+    }
+
+    private static String getRandomFromPartnerLovedNames(){
+        return untaggedPartnerlovedNames.get(rgenerator.nextInt(untaggedPartnerlovedNames.size()));
+    }
+
+    private static boolean getFromPartnerLovedNamesRandonChoice(){
+        int rnd = rgenerator.nextInt(100);
+        if (rnd < 20)
+            return false;
+        else
+            return true;
+    }
+
 
     public static void addName(String name) {
         // replace non-letters and trim edge white spaces
@@ -315,7 +374,6 @@ public class NameTagger {
             return;
 
         markNameLoved(name);
-        untaggedNames.remove(name);
         if (untaggedNamesView.getText().equals(name)) {
             untaggedNamesView.setText(getNextUntaggedName());
         }
@@ -324,4 +382,3 @@ public class NameTagger {
     }
 
 }
-

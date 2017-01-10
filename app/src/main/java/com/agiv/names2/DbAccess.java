@@ -3,6 +3,7 @@ package com.agiv.names2;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -93,23 +94,17 @@ public class DbAccess {
      *
      * @return a List of quotes
      */
-    public ArrayList<String> getNames() {
-        ArrayList<String> list = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT name FROM names where sex = \"" + GroupSettings.getSexString() + "\"", null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            list.add(cursor.getString(0));
-            cursor.moveToNext();
-        }
+    public ArrayList<Name> getNames() {
+        Cursor cursor = database.rawQuery("SELECT name, popularity FROM names where sex = \"" + GroupSettings.getSexString() + "\"", null);
+        ArrayList<Name> list = populateNameList(cursor);
         cursor.close();
         return list;
     }
 
-    private ArrayList<String> getNames(String user, boolean loved) {
+    private ArrayList<Name> getNames(String user, boolean loved) {
         int loved_int = loved? 1 : 0;
-        ArrayList<String> list = new ArrayList<>();
         String query =
-                "SELECT names.name from names " +
+                "SELECT names.name, names.popularity from names " +
                 "JOIN names_users on names.id = names_users.name_id " +
                 "JOIN users on users.id = names_users.user_id " +
                 "WHERE sex =\"" + GroupSettings.getSexString() + "\"" +
@@ -118,27 +113,44 @@ public class DbAccess {
 
 
         Cursor cursor = database.rawQuery(query, null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            list.add(cursor.getString(0));
-            cursor.moveToNext();
-        }
+        ArrayList<Name> list = populateNameList(cursor);
         cursor.close();
         return list;
     }
 
+    public ArrayList<Name> populateNameList(Cursor cursor){
+        ArrayList<Name> list = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            list.add(new Name(cursor.getString(0), cursor.getInt(1)));
+            cursor.moveToNext();
+        }
+        return list;
+    }
+
     public ArrayList<String> getLovedNames(String user) {
-        return getNames(user, true);
+        ArrayList<String> lovedNames = new ArrayList<>();
+        for (Name name : getNames(user, true)){
+            lovedNames.add(name.name);
+        }
+        return lovedNames;
     }
 
     public ArrayList<String> getUnlovedNames(String user) {
-        return getNames(user, false);
+        ArrayList<String> unlovedNames = new ArrayList<>();
+        for (Name name : getNames(user, false)){
+            unlovedNames.add(name.name);
+        }
+        return unlovedNames;
     }
 
-    public ArrayList<String> getUntaggedNames(String user) {
-        ArrayList<String> untaggedNames = ((ArrayList<String>) getNames().clone());
-        untaggedNames.removeAll(getLovedNames(user));
-        untaggedNames.removeAll(getUnlovedNames(user));
+    public ArrayList<Name> getUntaggedNames(String user) {
+        ArrayList<Name> untaggedNames = new ArrayList<>();
+        ArrayList<Name> names = ((ArrayList<Name>) getNames().clone());
+        for (Name name : names){
+            if (!getLovedNames(user).contains(name.name) && !getUnlovedNames(user).contains(name.name))
+                    untaggedNames.add(name);
+        }
         return untaggedNames;
     }
     public void markNameLoved(String user, String name) {
