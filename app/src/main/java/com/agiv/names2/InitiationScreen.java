@@ -22,6 +22,9 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import static com.agiv.names2.GroupSettings.getCurrentUser;
+import static com.agiv.names2.GroupSettings.setCurrentUser;
+
 public class InitiationScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
@@ -33,6 +36,8 @@ public class InitiationScreen extends AppCompatActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         final Intent menuIntent = new Intent(getBaseContext(), MainActivity.class);
         GroupSettings.init(getSharedPreferences("group_settings", 0));
+        if (getCurrentUser() == null)
+                setCurrentUser("Noa");
         GroupSettings.Sex sex = GroupSettings.getSex();
         if (sex!=null){
             GroupSettings.setSex(sex);

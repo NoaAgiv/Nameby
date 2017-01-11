@@ -3,6 +3,7 @@ package com.agiv.names2;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
@@ -283,8 +284,9 @@ public class NameTagger {
 
     public static ArrayList<String> getUntaggedPartnerLovedNames(){
         ArrayList<String> untaggedPartnerLovedNamed = new ArrayList<String>();
+        Name a = untaggedNames.get(0);
         for (Name name : untaggedNames){
-            if (name.lovedByPartner = true)
+            if (name.lovedByPartner == true)
                 untaggedPartnerLovedNamed.add(name.name);
         }
         return untaggedPartnerLovedNamed;
@@ -310,7 +312,7 @@ public class NameTagger {
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
             untaggedNames.remove(name);
-            untaggedPartnerlovedNames.remove(name);
+            removeFromUntaggedNameList(name);
             unlovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
             databaseAccess.open();
@@ -319,10 +321,20 @@ public class NameTagger {
         }
     }
 
+    private static void removeFromUntaggedNameList(String name){
+        Name nameToRemove = null;
+        for (Name untaggedName : untaggedNames) {
+            if (untaggedName.name.equals(name))
+                nameToRemove = untaggedName;
+
+        }
+        untaggedNames.remove(nameToRemove);
+    }
+
     public static void markNameUnloved(String name) {
         if (!name.equals(END_OF_LIST)) {
             unlovedNames.add(name);
-            untaggedNames.remove(name);
+            removeFromUntaggedNameList(name);
             untaggedPartnerlovedNames.remove(name);
             lovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
@@ -347,17 +359,19 @@ public class NameTagger {
         Collections.sort(untaggedNames, new Comparator<Name>() {
             @Override
             public int compare(Name name1, Name name2) {
-                return name2.popularity - name1.popularity;
+                return name1.popularity - name2.popularity;
             }
         });
         return untaggedNames.get(rgenerator.nextInt(10)).name;
     }
 
     private static String getRandomFromPartnerLovedNames(){
+        Log.i("size", untaggedPartnerlovedNames.size() + "");
         return untaggedPartnerlovedNames.get(rgenerator.nextInt(untaggedPartnerlovedNames.size()));
     }
 
     private static boolean getFromPartnerLovedNamesRandonChoice(){
+        if (untaggedPartnerlovedNames.isEmpty()) return false;
         int rnd = rgenerator.nextInt(100);
         if (rnd < 20)
             return false;
