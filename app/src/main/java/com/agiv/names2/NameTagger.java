@@ -233,7 +233,7 @@ public class NameTagger {
         };
 
         lovedAdapter = new EditableListViewAdapter(lovedToUnlovedSwitch, lovedNames, activity,
-                activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.dislove);
+                activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.edit_unlove);
 
         lovedNamesListView.setAdapter(lovedAdapter);
 
@@ -248,7 +248,7 @@ public class NameTagger {
         };
 
         unlovedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, unlovedNames, activity,
-                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.love);
+                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.edit_love);
         unlovedNamesListView.setAdapter(unlovedAdapter);
 
         matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
@@ -266,12 +266,26 @@ public class NameTagger {
         untaggedNamesView.setText(getNextUntaggedName());
         untaggedNamesView.setOnTouchListener(new OnSwipeTouchListener(context) {
             public void onSwipeRight() {
-                swipeLeft();
-            }
-            public void onSwipeLeft() {
                 swipeRight();
             }
+            public void onSwipeLeft() {
+                swipeLeft();
+            }
 
+        });
+
+        loveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeRight();
+            }
+        });
+
+        disloveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeLeft();
+            }
         });
     }
 

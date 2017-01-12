@@ -32,8 +32,8 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="5dp"
         android:background="@android:color/transparent"
-
-        android:src="@drawable/love" />
+        android:layout_marginTop="?attr/actionBarSize"
+        android:src="@drawable/add_loved" />
 
     <ImageView
         android:id="@+id/dislove_image"
@@ -43,8 +43,8 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="5dp"
         android:background="@android:color/transparent"
-
-        android:src="@drawable/dislove" />
+        android:layout_marginTop="?attr/actionBarSize"
+        android:src="@drawable/add_unloved" />
 
     <ListView
         android:id="@+id/loved_names"
