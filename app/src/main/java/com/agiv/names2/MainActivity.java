@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton addNameButton;
     private SharedPreferences.Editor editor;
     Intent sexChooseIntent;
-
+    private TextView user_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        user_name = (TextView) findViewById(R.id.user_name);
+        user_name.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
         setSupportActionBar(toolbar);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -218,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                     System.out.println(e);
                 }
+                user_name.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
             }
             else if (getCurrentUser().equals("Nir")){
                 setCurrentUser("Noa");
@@ -226,7 +231,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 catch (Exception e){
                     System.out.println(e);
+
                 }
+                user_name.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
             }
         }
 

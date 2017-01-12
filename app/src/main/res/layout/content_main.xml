@@ -13,13 +13,25 @@
     tools:context="com.agiv.names2.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:stretchColumns="1">
+        <TableRow>
+        <ImageView
+            android:id="@+id/dislove_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:src="@drawable/add_unloved" />
 
     <TextView
         android:id="@+id/untagged_names_view"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:textSize="50sp"
         android:padding="32dp"
         android:text="name example" />
@@ -28,39 +40,22 @@
         android:id="@+id/love_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
         android:background="@android:color/transparent"
-        android:layout_marginTop="?attr/actionBarSize"
         android:src="@drawable/add_loved" />
-
-    <ImageView
-        android:id="@+id/dislove_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:src="@drawable/add_unloved" />
-
+        </TableRow>
+</TableLayout>
     <ListView
         android:id="@+id/loved_names"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </ListView>
     <ListView
         android:id="@+id/unloved_names"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </ListView>
     <ListView
         android:id="@+id/matched_names"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </ListView>

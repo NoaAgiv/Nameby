@@ -19,7 +19,13 @@
             android:background="#a64dff"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
+
     </android.support.design.widget.AppBarLayout>
+<LinearLayout
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
@@ -31,6 +37,23 @@
         app:tabGravity="fill"
         app:tabMode="fixed"
         />
+    <TextView
+        android:id="@+id/user_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top|center"
+        android:textSize="20sp"
+        android:padding="20dp"
+        android:adjustViewBounds="true"
+        android:textColor="#a64dff"
+        android:background="#e0e0eb"
+        android:text="user example" />
+
+
+
+
+    <include layout="@layout/content_main" />
+</LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_name_button"
@@ -38,11 +61,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:padding="0dp"
+
         android:src="@drawable/add" />
-
-    <include layout="@layout/content_main" />
-
 </android.support.design.widget.CoordinatorLayout>
