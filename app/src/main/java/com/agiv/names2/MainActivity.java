@@ -1,13 +1,11 @@
 package com.agiv.names2;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -38,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton addNameButton;
     private SharedPreferences.Editor editor;
     Intent sexChooseIntent;
-    private TextView user_name;
+    private TextView userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +57,14 @@ public class MainActivity extends AppCompatActivity {
         getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        user_name = (TextView) findViewById(R.id.user_name);
-        user_name.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
+        userName = (TextView) findViewById(R.id.user_name);
+        userName.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
+        userName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeUser();
+            }
+            });
         setSupportActionBar(toolbar);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -214,30 +218,30 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.change_user){
-            if (getCurrentUser().equals("Noa")){
-                setCurrentUser("Nir");
-                try {
-                    initData(MainActivity.this, this, 1);
-                }
-                catch (Exception e){
-                    System.out.println(e);
-                }
-                user_name.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
-            }
-            else if (getCurrentUser().equals("Nir")){
-                setCurrentUser("Noa");
-                try {
-                    initData(MainActivity.this, this, 1);
-                }
-                catch (Exception e){
-                    System.out.println(e);
-
-                }
-                user_name.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
-            }
+            changeUser();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void changeUser(String user){
+        setCurrentUser(user);
+        try {
+            initData(MainActivity.this, this, 1);
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+        userName.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
+    }
+
+    private void changeUser(){
+        if (getCurrentUser().equals("Noa")){
+            changeUser("Nir");
+        }
+        else if (getCurrentUser().equals("Nir")){
+            changeUser("Noa");
+        }
     }
 
     /**
