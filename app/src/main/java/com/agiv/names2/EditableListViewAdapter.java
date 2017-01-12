@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import static com.agiv.names2.NameTagger.*;
 public class EditableListViewAdapter extends BaseAdapter implements ListAdapter {
     private ArrayList<String> list = new ArrayList<String>();
     private Context context;
@@ -56,7 +55,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
         View view = convertView;
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.simplerow, null);
+            view = inflater.inflate(R.layout.editable_row, null);
         }
 
         //Handle TextView and display string from your list

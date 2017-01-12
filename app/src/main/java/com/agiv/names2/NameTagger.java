@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -255,11 +257,8 @@ public class NameTagger {
 
 
         // TODO: change to a regular ListAdapter below
-        matchedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, matchedNames, activity,
-                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.love);
-
+        matchedAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, matchedNames);
         matchedNamesListView.setAdapter(matchedAdapter);
-
         updateMatchedNames();
 
         untaggedNamesView = (TextView) activity.findViewById(R.id.untagged_names_view);
