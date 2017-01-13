@@ -284,7 +284,7 @@ public class NameTagger {
     public static void markNameLoved(String name) {
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
-            untaggedNames.remove(name);
+            untaggedPartnerlovedNames.remove(name);
             removeFromUntaggedNameList(name);
             unlovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);
