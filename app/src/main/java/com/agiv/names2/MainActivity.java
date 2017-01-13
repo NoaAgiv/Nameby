@@ -27,7 +27,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static com.agiv.names2.GroupSettings.changeUser;
 import static com.agiv.names2.GroupSettings.getCurrentUser;
+import static com.agiv.names2.GroupSettings.getGreenUser;
+import static com.agiv.names2.GroupSettings.getYellowUser;
 import static com.agiv.names2.GroupSettings.setCurrentUser;
 import static com.agiv.names2.NameTagger.*;
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton addNameButton;
     private SharedPreferences.Editor editor;
     Intent sexChooseIntent;
+    Intent familyMembersIntent;
     private TextView userName;
 
     @Override
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sexChooseIntent = new Intent(getBaseContext(), InitiationScreen.class);
+        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
 
         try {
             initData(MainActivity.this, this, 1);
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 changeUser();
+                changeUserInit();
             }
             });
         setSupportActionBar(toolbar);
@@ -166,6 +172,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if (tabName.equals(getString(R.string.name_matches))) {
                     updateMatchedNames();
+                    Collections.sort(matchedNames, new Comparator<String>() {
+                        @Override
+                        public int compare(String s, String t1) {
+                            return s.compareTo(t1);
+                        }
+                    });
                     selectedView = getMatchedNamesListView();
                 }
                 switchToView(selectedView);
@@ -217,15 +229,20 @@ public class MainActivity extends AppCompatActivity {
             startActivity(sexChooseIntent);
             return true;
         }
+        if (id == R.id.family_settings) {
+            GroupSettings.setFamilyMembersEdited(false);
+            startActivity(familyMembersIntent);
+            return true;
+        }
         if (id == R.id.change_user){
             changeUser();
+            changeUserInit();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void changeUser(String user){
-        setCurrentUser(user);
+    private void changeUserInit(){
         try {
             initData(MainActivity.this, this, 1);
         }
@@ -235,14 +252,6 @@ public class MainActivity extends AppCompatActivity {
         userName.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
     }
 
-    private void changeUser(){
-        if (getCurrentUser().equals("Noa")){
-            changeUser("Nir");
-        }
-        else if (getCurrentUser().equals("Nir")){
-            changeUser("Noa");
-        }
-    }
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.

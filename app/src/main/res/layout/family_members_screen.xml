@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.agiv.names2.MainActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#a64dff"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/edit_family_members_settings"
+            android:textSize="30sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:paddingTop="@dimen/fab_margin"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="@dimen/fab_margin"
+            android:background="@null"
+            android:text="@string/edit_family_members_settings" />
+
+        <LinearLayout
+            android:id="@+id/choose_sex_buttons"
+            android:layout_below="@+id/edit_family_members_settings"
+            android:layout_width="fill_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/fab_margin"
+            android:orientation="horizontal">
+
+            <!--android:layout_marginRight="10dp"-->
+            <ImageButton
+                android:id="@+id/user_green"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:background="@null"
+                android:src="@drawable/user_green"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/user_yellow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/user_yellow"
+                android:background="@null"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/editexts_users"
+            android:layout_below="@+id/choose_sex_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
+
+            <!--android:layout_marginRight="10dp"-->
+            <EditText
+                android:id="@+id/green_user_name"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:textAlignment="center"
+                android:background="@drawable/rect"
+                android:padding="10dp"
+                android:paddingLeft="20dp"
+                android:textSize="20sp"
+                android:inputType="text"
+                android:text="@string/choose_female"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/yellow_user_name"
+                android:inputType="text"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:text="@string/choose_male"
+                android:textAlignment="center"
+                android:background="@drawable/rect"
+                android:padding="10dp"
+                android:paddingLeft="20dp"
+                android:textSize="20sp"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:background="@null"
+        android:layout_margin="@dimen/fab_margin"
+
+        android:src="@drawable/next" />
+
+
+</android.support.design.widget.CoordinatorLayout>

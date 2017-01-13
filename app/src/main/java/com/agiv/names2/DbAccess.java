@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 /**
  * Created by Noa Agiv on 12/12/2016.
@@ -96,9 +97,28 @@ public class DbAccess {
      */
     public ArrayList<Name> getNames() {
         Cursor cursor = database.rawQuery("SELECT name, popularity FROM names where sex = \"" + GroupSettings.getSexString() + "\"", null);
+
         ArrayList<Name> list = populateNameList(cursor);
         cursor.close();
         return list;
+    }
+
+    public ArrayList<String> getUsers() {
+        Cursor cursor = database.rawQuery("SELECT name FROM users", null);
+        ArrayList<String> list = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            list.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return list;
+    }
+
+    public void editUserName(String oldUserName, String newUserName) {
+        ContentValues values = new ContentValues();
+        values.put("name", newUserName);
+        database.update("users", values, "name = \"" + oldUserName + "\"", null);
     }
 
     private ArrayList<Name> getNames(String user, boolean loved) {

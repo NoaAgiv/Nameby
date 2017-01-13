@@ -125,6 +125,24 @@ public class NameTagger {
         partnerlovedNames = getPartnerLovedNames();
         updateUntaggedNames();
         untaggedPartnerlovedNames = getUntaggedPartnerLovedNames();
+        Collections.sort(matchedNames, new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) {
+                return s.compareTo(t1);
+            }
+        });
+        Collections.sort(lovedNames, new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) {
+                return s.compareTo(t1);
+            }
+        });
+        Collections.sort(unlovedNames, new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) {
+                return s.compareTo(t1);
+            }
+        });
     }
 
 
@@ -258,7 +276,7 @@ public class NameTagger {
     private static ArrayList<String> getPartnerLovedNames(){
         DbAccess databaseAccess = DbAccess.getInstance(context);
         databaseAccess.open();
-        ArrayList<String> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getCurrentUser().equals("Noa")? "Nir" : "Noa");
+        ArrayList<String> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getNotCurrentUser());
         databaseAccess.close();
         return partnerLovedNames;
     }

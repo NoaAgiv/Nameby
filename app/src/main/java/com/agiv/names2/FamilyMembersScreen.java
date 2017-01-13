@@ -1,19 +1,13 @@
 package com.agiv.names2;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -22,10 +16,18 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import static com.agiv.names2.GroupSettings.getCurrentUser;
-import static com.agiv.names2.GroupSettings.setCurrentUser;
+import java.util.List;
 
-public class InitiationScreen extends AppCompatActivity {
+import static com.agiv.names2.GroupSettings.getCurrentUser;
+import static com.agiv.names2.GroupSettings.isFamilyMembersEdited;
+import static com.agiv.names2.GroupSettings.setCurrentUser;
+import static com.agiv.names2.GroupSettings.sex;
+
+/**
+ * Created by Noa Agiv on 1/13/2017.
+ */
+
+public class FamilyMembersScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
 
@@ -34,29 +36,49 @@ public class InitiationScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        final Intent FamilyIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
+        final Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
         GroupSettings.init(getSharedPreferences("group_settings", 0));
-        GroupSettings.Sex sex = GroupSettings.getSex();
-        if (sex!=null){
-            GroupSettings.setSex(sex);
-            startActivity(FamilyIntent);
+        final DbAccess databaseAccess = DbAccess.getInstance(this);
+        databaseAccess.open();
+        final List<String> users = databaseAccess.getUsers();
+        databaseAccess.close();
+        if (isFamilyMembersEdited()){
+            GroupSettings.setGreenUser(users.get(0));
+            GroupSettings.setYellowUser(users.get(1));
+            startActivity(mainIntent);
             return;
         }
-        setContentView(R.layout.initiation_screen);
-        ImageButton chooseFemale = (ImageButton) findViewById(R.id.choose_sex_female);
+        setContentView(R.layout.family_members_screen);
+        ImageButton chooseFemale = (ImageButton) findViewById(R.id.next);
+
+        final EditText greenUser = (EditText) findViewById(R.id.green_user_name);
+        greenUser.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        greenUser.setText(users.get(0));
+        final EditText yellowUser = (EditText) findViewById(R.id.yellow_user_name);
+        yellowUser.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        yellowUser.setText(users.get(1));
+
 
         chooseFemale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.FEMALE);
-                startActivity(FamilyIntent);
-            }});
-        ImageButton chooseMale = (ImageButton) findViewById(R.id.choose_sex_male);
-        chooseMale.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.MALE);
-                startActivity(FamilyIntent);
+                String greenName = greenUser.getText().toString();
+                String yellowName = yellowUser.getText().toString();
+                GroupSettings.setFamilyMembersEdited(true);
+                if (!greenName.equals(users.get(0))){
+                    databaseAccess.open();
+                    databaseAccess.editUserName(users.get(0), greenName);
+                    databaseAccess.close();
+                }
+                if (!yellowName.equals(users.get(1))){
+                    databaseAccess.open();
+                    databaseAccess.editUserName(users.get(1), yellowName);
+                    databaseAccess.close();
+                }
+                GroupSettings.setGreenUser(greenName);
+                GroupSettings.setYellowUser(yellowName);
+                GroupSettings.setCurrentUser(greenName);
+                startActivity(mainIntent);
             }});
     }
 
