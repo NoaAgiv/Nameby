@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 changeUser();
+                int userImage = getCurrentUser().equals(getGreenUser())? R.drawable.user_green : R.drawable.user_yellow;
+                userName.setCompoundDrawablesWithIntrinsicBounds(0, 0, userImage, 0);
                 changeUserInit();
             }
             });

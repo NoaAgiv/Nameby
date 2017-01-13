@@ -45,6 +45,7 @@ public class FamilyMembersScreen extends AppCompatActivity {
         if (isFamilyMembersEdited()){
             GroupSettings.setGreenUser(users.get(0));
             GroupSettings.setYellowUser(users.get(1));
+            GroupSettings.setCurrentUser(users.get(0));
             startActivity(mainIntent);
             return;
         }
