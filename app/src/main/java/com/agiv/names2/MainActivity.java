@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         setAddButton();
         getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
         getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
+        getMatchedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         userName = (TextView) findViewById(R.id.user_name);
