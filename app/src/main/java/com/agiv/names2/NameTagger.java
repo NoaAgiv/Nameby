@@ -7,28 +7,19 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Rect;
+import android.support.design.widget.TabLayout;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
-import android.view.animation.Animation;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
+import java.security.acl.Group;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -53,18 +44,24 @@ public class NameTagger {
     private static ImageView loveImage;
     private static ImageView disloveImage;
     private static BaseAdapter matchedAdapter;
-    public static int userId;
+    public static TabLayout.Tab matchTab;
     public static Context context;
     public static Activity activity;
 
 //    private static DbAccess databaseAccess = DbAccess.getInstance(activity);
 
-    public static void initData(Context context, Activity activity, int userId) throws IOException{
+    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab) throws IOException{
         NameTagger.context = context;
         NameTagger.activity = activity;
-        NameTagger.userId = userId;
+        NameTagger.matchTab = matchTab;
         getNamesFromDb();
         setListAdapters();
+        int unseenMatchesCount = GroupSettings.getCurrentUserUnseenMatches();
+        if (unseenMatchesCount > 0)
+            matchTab.setText(context.getText(R.string.name_matches) + " (" + unseenMatchesCount + ")");
+        else
+            matchTab.setText(R.string.name_matches);
+
     }
 
     public static ArrayList<String> getUnlovedNames() {
@@ -160,6 +157,8 @@ public class NameTagger {
     }
 
     private static void swipeRight(){
+//        final MediaPlayer mp = MediaPlayer.create(context, R.raw.soho);
+//        mp.start();
         markNameLoved(untaggedNamesView.getText().toString());
         emphesize_animation(loveImage);
     }
@@ -284,7 +283,13 @@ public class NameTagger {
     public static void markNameLoved(String name) {
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
-            untaggedPartnerlovedNames.remove(name);
+            if (untaggedPartnerlovedNames.remove(name)){
+                int unseenMatchesCount = GroupSettings.getCurrentUserUnseenMatches();
+                unseenMatchesCount++;
+                GroupSettings.setCurrentUserUnseenMatches(unseenMatchesCount);
+                GroupSettings.increasePartnerUnseenMatches();
+                matchTab.setText(context.getText(R.string.name_matches) + " (" + unseenMatchesCount + ")");
+            }
             removeFromUntaggedNameList(name);
             unlovedNames.remove(name);
             DbAccess databaseAccess = DbAccess.getInstance(context);

@@ -13,38 +13,14 @@
     tools:context="com.agiv.names2.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:id="@+id/untagged_table"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="70dp"
-        android:stretchColumns="1">
-        <TableRow>
-        <ImageView
-            android:id="@+id/dislove_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:src="@drawable/add_unloved" />
-
     <TextView
         android:id="@+id/untagged_names_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:textSize="50sp"
+        android:textSize="40sp"
         android:padding="32dp"
         android:text="name example" />
-
-    <ImageView
-        android:id="@+id/love_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:src="@drawable/add_loved" />
-        </TableRow>
-</TableLayout>
     <ListView
         android:id="@+id/loved_names"
         android:layout_width="match_parent"
@@ -62,6 +38,30 @@
     </ListView>
 
 
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:id="@+id/untagged_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:stretchColumns="1">
+        <TableRow>
+            <ImageView
+                android:id="@+id/dislove_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/add_unloved" />
+
+            <ImageView
+                android:id="@+id/love_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@android:color/transparent"
+                android:src="@drawable/add_loved" />
+        </TableRow>
+    </TableLayout>
 
 
 

@@ -1,20 +1,13 @@
 package com.agiv.names2;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.android.gms.appindexing.Action;
@@ -22,10 +15,7 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import static com.agiv.names2.GroupSettings.getCurrentUser;
-import static com.agiv.names2.GroupSettings.setCurrentUser;
-
-public class InitiationScreen extends AppCompatActivity {
+public class ChooseSexScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
 
@@ -42,7 +32,7 @@ public class InitiationScreen extends AppCompatActivity {
             startActivity(FamilyIntent);
             return;
         }
-        setContentView(R.layout.initiation_screen);
+        setContentView(R.layout.choose_sex_screen);
         ImageButton chooseFemale = (ImageButton) findViewById(R.id.choose_sex_female);
 
         chooseFemale.setOnClickListener(new View.OnClickListener() {

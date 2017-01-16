@@ -14,6 +14,8 @@ public class GroupSettings {
     static String notCurrentUser;
     static String greenUser;
     static String yellowUser;
+    static int yellowUserUnseenMatches;
+    static int greenUserUnseenMatches;
     static boolean familyMembersEdited = false;
 
     public enum Sex{
@@ -35,6 +37,54 @@ public class GroupSettings {
         editor.putBoolean("family_member_edited", familyMembersEdited);
         editor.commit();
         GroupSettings.familyMembersEdited = familyMembersEdited;
+    }
+
+    public static int getYellowUserUnseenMatches() {
+        return sharedPref.getInt("yellow_user_unseen_mathces", 0);
+    }
+
+    public static void setYellowUserUnseenMatches(int yellowUserUnseenMatches) {
+        editor.putInt("yellow_user_unseen_mathces", yellowUserUnseenMatches);
+        editor.commit();
+        GroupSettings.yellowUserUnseenMatches = yellowUserUnseenMatches;
+    }
+
+    public static int getCurrentUserUnseenMatches() {
+        if (currentUser.equals(getGreenUser())){
+            return getGreenUserUnseenMatches();
+        }
+        else if (currentUser.equals(getYellowUser())){
+            return getYellowUserUnseenMatches();
+        }
+        return 0;
+    }
+
+    public static void setCurrentUserUnseenMatches(int userUnseenMatches) {
+        if (currentUser.equals(getGreenUser())){
+            setGreenUserUnseenMatches(userUnseenMatches);
+        }
+        else if (currentUser.equals(getYellowUser())){
+            setYellowUserUnseenMatches(userUnseenMatches);
+        }
+    }
+
+    public static void increasePartnerUnseenMatches() {
+        if (currentUser.equals(getGreenUser())){
+            setYellowUserUnseenMatches(getYellowUserUnseenMatches() + 1);
+        }
+        else if (currentUser.equals(getYellowUser())){
+            setGreenUserUnseenMatches(getGreenUserUnseenMatches() + 1);
+        }
+    }
+
+    public static int getGreenUserUnseenMatches() {
+        return sharedPref.getInt("green_user_unseen_mathces", 0);
+    }
+
+    public static void setGreenUserUnseenMatches(int greenUserUnseenMatches) {
+        editor.putInt("green_user_unseen_mathces", greenUserUnseenMatches);
+        editor.commit();
+        GroupSettings.greenUserUnseenMatches = greenUserUnseenMatches;
     }
 
     public static Sex getSex() {

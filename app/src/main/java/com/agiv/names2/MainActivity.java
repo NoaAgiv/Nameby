@@ -30,8 +30,7 @@ import java.util.Comparator;
 import static com.agiv.names2.GroupSettings.changeUser;
 import static com.agiv.names2.GroupSettings.getCurrentUser;
 import static com.agiv.names2.GroupSettings.getGreenUser;
-import static com.agiv.names2.GroupSettings.getYellowUser;
-import static com.agiv.names2.GroupSettings.setCurrentUser;
+import static com.agiv.names2.GroupSettings.unsetSex;
 import static com.agiv.names2.NameTagger.*;
 public class MainActivity extends AppCompatActivity {
 
@@ -41,22 +40,23 @@ public class MainActivity extends AppCompatActivity {
     Intent sexChooseIntent;
     Intent familyMembersIntent;
     private TextView userName;
+    private TabLayout.Tab matchTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sexChooseIntent = new Intent(getBaseContext(), InitiationScreen.class);
+        sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
         familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
-
+        setTabs();
         try {
-            initData(MainActivity.this, this, 1);
+            initData(MainActivity.this, this, matchTab);
         }
         catch (Exception e){
             System.out.println(e);
         }
 
-        setTabs();
+
         setAddButton();
         getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
         getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
@@ -68,10 +68,7 @@ public class MainActivity extends AppCompatActivity {
         userName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeUser();
-                int userImage = getCurrentUser().equals(getGreenUser())? R.drawable.user_green : R.drawable.user_yellow;
-                userName.setCompoundDrawablesWithIntrinsicBounds(0, 0, userImage, 0);
-                changeUserInit();
+                switchUser();
             }
             });
         setSupportActionBar(toolbar);
@@ -79,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void switchUser() {
+        changeUser();
+        int userImage = getCurrentUser().equals(getGreenUser())? R.drawable.user_green : R.drawable.user_yellow;
+        userName.setCompoundDrawablesWithIntrinsicBounds(0, 0, userImage, 0);
+        changeUserInit();
     }
 
 
@@ -146,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         allTabs.addTab(allTabs.newTab().setText(R.string.loved_tab));
         allTabs.addTab(allTabs.newTab().setText(R.string.unloved_tab));
         allTabs.addTab(allTabs.newTab().setText(R.string.name_matches));
-
+        matchTab = allTabs.getTabAt(3);
         allTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -173,7 +177,9 @@ public class MainActivity extends AppCompatActivity {
                 } else if (tabName.equals(getString(R.string.triage_tab))) {
                     selectedView = getUntaggedNamesView();
                 }
-                else if (tabName.equals(getString(R.string.name_matches))) {
+                else if (tabName.contains(getString(R.string.name_matches))) {
+                    matchTab.setText(R.string.name_matches);
+                    GroupSettings.setCurrentUserUnseenMatches(0);
                     updateMatchedNames();
                     Collections.sort(matchedNames, new Comparator<String>() {
                         @Override
@@ -238,8 +244,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.change_user){
-            changeUser();
-            changeUserInit();
+            switchUser();
         }
 
         return super.onOptionsItemSelected(item);
@@ -247,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void changeUserInit(){
         try {
-            initData(MainActivity.this, this, 1);
+            initData(MainActivity.this, this, matchTab);
         }
         catch (Exception e){
             System.out.println(e);

@@ -114,18 +114,19 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
+        <ImageButton
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|right"
+            android:background="@null"
+            android:layout_below="@+id/editexts_users"
+            android:layout_margin="@dimen/fab_margin"
 
+            android:src="@drawable/next" />
     </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:background="@null"
-        android:layout_margin="@dimen/fab_margin"
 
-        android:src="@drawable/next" />
 
 
 </android.support.design.widget.CoordinatorLayout>
