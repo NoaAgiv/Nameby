@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
                 } else if (tabName.equals(getString(R.string.triage_tab))) {
                     selectedView = getUntaggedNamesView();
                 }
-                else if (tabName.contains(getString(R.string.name_matches))) {
-                    matchTab.setText(R.string.name_matches);
+                else if (tab.getPosition() == 3 ){ //matches
+                    setMatchTabCount(-1);
                     GroupSettings.setCurrentUserUnseenMatches(0);
                     updateMatchedNames();
                     Collections.sort(matchedNames, new Comparator<String>() {

@@ -7,6 +7,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.support.design.widget.TabLayout;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,6 +48,10 @@ public class NameTagger {
     public static Context context;
     public static Activity activity;
 
+    public static MediaPlayer loveSound;
+    public static MediaPlayer unlikeSound;
+    public static MediaPlayer matchSound;
+
 //    private static DbAccess databaseAccess = DbAccess.getInstance(activity);
 
     public static void initData(Context context, Activity activity, TabLayout.Tab matchTab) throws IOException{
@@ -57,13 +61,23 @@ public class NameTagger {
         getNamesFromDb();
         setListAdapters();
         int unseenMatchesCount = GroupSettings.getCurrentUserUnseenMatches();
-        if (unseenMatchesCount > 0)
-            matchTab.setText(context.getText(R.string.name_matches) + " (" + unseenMatchesCount + ")");
-        else
-            matchTab.setText(R.string.name_matches);
+        setMatchTabCount(unseenMatchesCount);
+        loveSound = MediaPlayer.create(context, R.raw.c_tone);
+        unlikeSound = MediaPlayer.create(context, R.raw.a_tone);
+        matchSound = MediaPlayer.create(context, R.raw.pin_drop_match);
 
     }
 
+    public static void setMatchTabCount(int unseenMatchesCount){
+        if (unseenMatchesCount > 0) {
+            matchTab.setText("(" + unseenMatchesCount + ")");
+            matchTab.setIcon(R.drawable.love);
+        }
+        else {
+            matchTab.setText(R.string.name_matches);
+            matchTab.setIcon(null);
+        }
+    }
     public static ArrayList<String> getUnlovedNames() {
         return unlovedNames;
     }
@@ -152,20 +166,23 @@ public class NameTagger {
 
 
     private static void swipeLeft(){
+        unlikeSound.start();
         markNameUnloved(untaggedNamesView.getText().toString());
         emphesize_animation(disloveImage);
     }
 
     private static void swipeRight(){
-//        final MediaPlayer mp = MediaPlayer.create(context, R.raw.soho);
-//        mp.start();
-        markNameLoved(untaggedNamesView.getText().toString());
+        boolean isMatch = markNameLoved(untaggedNamesView.getText().toString());
+        if (isMatch)
+            matchSound.start();
+        else
+            loveSound.start();
         emphesize_animation(loveImage);
     }
 
     private static void emphesize_animation(View view){
-        PropertyValuesHolder scalex = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.2f);
-        PropertyValuesHolder scaley = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.2f);
+        PropertyValuesHolder scalex = PropertyValuesHolder.ofFloat(View.SCALE_X, 1.3f);
+        PropertyValuesHolder scaley = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1.3f);
         ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(view, scalex, scaley);
         anim.setRepeatCount(1);
         anim.setRepeatMode(ValueAnimator.REVERSE);
@@ -256,7 +273,6 @@ public class NameTagger {
 
     public static ArrayList<String> getUntaggedPartnerLovedNames(){
         ArrayList<String> untaggedPartnerLovedNamed = new ArrayList<String>();
-        Name a = untaggedNames.get(0);
         for (Name name : untaggedNames){
             if (name.lovedByPartner == true)
                 untaggedPartnerLovedNamed.add(name.name);
@@ -280,15 +296,17 @@ public class NameTagger {
         return partnerLovedNames;
     }
 
-    public static void markNameLoved(String name) {
+    public static boolean markNameLoved(String name) {
+        boolean isMatch = false;
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
             if (untaggedPartnerlovedNames.remove(name)){
+                isMatch = true;
                 int unseenMatchesCount = GroupSettings.getCurrentUserUnseenMatches();
                 unseenMatchesCount++;
                 GroupSettings.setCurrentUserUnseenMatches(unseenMatchesCount);
                 GroupSettings.increasePartnerUnseenMatches();
-                matchTab.setText(context.getText(R.string.name_matches) + " (" + unseenMatchesCount + ")");
+                setMatchTabCount(unseenMatchesCount);
             }
             removeFromUntaggedNameList(name);
             unlovedNames.remove(name);
@@ -297,6 +315,7 @@ public class NameTagger {
             databaseAccess.markNameLoved(GroupSettings.getCurrentUser(), name);
             databaseAccess.close();
         }
+        return isMatch;
     }
 
     private static void removeFromUntaggedNameList(String name){

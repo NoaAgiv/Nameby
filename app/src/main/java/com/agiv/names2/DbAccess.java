@@ -187,7 +187,7 @@ public class DbAccess {
         int user_id = cursor.getInt(0);
 
         int name_id;
-        cursor = database.rawQuery("SELECT id FROM names WHERE name = \""+ name +"\"", null);
+        cursor = database.rawQuery("SELECT id FROM names WHERE sex = \""+ GroupSettings.getSexString() +"\" and name = \""+ name + "\"", null);
         if (cursor.getCount() == 0){ //name does not exist
             ContentValues nameTableValues = new ContentValues();
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name);
