@@ -1,4 +1,4 @@
-package com.agiv.names2;
+package com.agiv.nameby;
 
 import android.content.SharedPreferences;
 

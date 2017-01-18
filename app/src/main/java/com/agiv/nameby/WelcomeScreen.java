@@ -1,4 +1,4 @@
-package com.agiv.names2;
+package com.agiv.nameby;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -8,48 +8,80 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-public class ChooseSexScreen extends AppCompatActivity {
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import static com.agiv.nameby.GroupSettings.isHelpScreenSeen;
+import static com.agiv.nameby.GroupSettings.setIsHelpScreenSeen;
+
+public class WelcomeScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
-
-
+    private Queue<String> texts;
+    private Intent chooseSexIntent;
+    private TextView welcomeText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        final Intent FamilyIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
+        chooseSexIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
         GroupSettings.init(getSharedPreferences("group_settings", 0));
-        GroupSettings.Sex sex = GroupSettings.getSex();
-        if (sex!=null){
-            GroupSettings.setSex(sex);
-            startActivity(FamilyIntent);
+        if (isHelpScreenSeen()){
+            startActivity(chooseSexIntent);
             return;
         }
-        setContentView(R.layout.choose_sex_screen);
-        ImageButton chooseFemale = (ImageButton) findViewById(R.id.choose_sex_female);
+        else{
+            setIsHelpScreenSeen(true);
+        }
+        setContentView(R.layout.welcome_screen);
+        welcomeText = (TextView) findViewById(R.id.welcome_text);
+        Button skipButton = (Button) findViewById(R.id.skip);
+        ImageButton nextButton = (ImageButton) findViewById(R.id.next);
+        texts = new ArrayDeque<String>() {{
+            add(getText(R.string.help_text).toString());
+            add(getText(R.string.initiation_help_text).toString());
+            add(getText(R.string.nevigation_help_text).toString());
+            add(getText(R.string.nevigation_help_text2).toString());
+            add(getText(R.string.nevigation_help_text3).toString());
+        }};
 
-        chooseFemale.setOnClickListener(new View.OnClickListener() {
+        welcomeText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.FEMALE);
-                startActivity(FamilyIntent);
+                moveToNextHelpText();
             }});
-        ImageButton chooseMale = (ImageButton) findViewById(R.id.choose_sex_male);
-        chooseMale.setOnClickListener(new View.OnClickListener() {
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.MALE);
-                startActivity(FamilyIntent);
+                moveToNextHelpText();
+            }});
+
+        skipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(chooseSexIntent);
             }});
     }
 
+    private void moveToNextHelpText(){
+        String text = texts.poll();
+        if (text != null) {
+            welcomeText.setText(text);
+        }
+        else {
+            startActivity(chooseSexIntent);
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

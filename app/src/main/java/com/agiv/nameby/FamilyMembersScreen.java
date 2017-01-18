@@ -1,85 +1,113 @@
-package com.agiv.names2;
+package com.agiv.nameby;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
-import static com.agiv.names2.GroupSettings.isHelpScreenSeen;
+import static com.agiv.nameby.GroupSettings.isFamilyMembersEdited;
 
-public class WelcomeScreen extends AppCompatActivity {
+/**
+ * Created by Noa Agiv on 1/13/2017.
+ */
+
+public class FamilyMembersScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
-    private Queue<String> texts;
-    private Intent chooseSexIntent;
-    private TextView welcomeText;
+    private List<String> users;
+    private DbAccess databaseAccess;
+    private Intent mainIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        chooseSexIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
+        mainIntent = new Intent(getBaseContext(), MainActivity.class);
         GroupSettings.init(getSharedPreferences("group_settings", 0));
-        if (isHelpScreenSeen()){
-            startActivity(chooseSexIntent);
+        databaseAccess = DbAccess.getInstance(this);
+        databaseAccess.open();
+        users = databaseAccess.getUsers();
+        databaseAccess.close();
+        if (isFamilyMembersEdited()){
+            GroupSettings.setGreenUser(users.get(0));
+            GroupSettings.setYellowUser(users.get(1));
+            GroupSettings.setCurrentUser(users.get(0));
+            startActivity(mainIntent);
             return;
         }
-        setContentView(R.layout.welcome_screen);
-        welcomeText = (TextView) findViewById(R.id.welcome_text);
-        Button skipButton = (Button) findViewById(R.id.skip);
+        setContentView(R.layout.family_members_screen);
         ImageButton nextButton = (ImageButton) findViewById(R.id.next);
-        texts = new ArrayDeque<String>() {{
-            add(getText(R.string.help_text).toString());
-            add(getText(R.string.initiation_help_text).toString());
-            add(getText(R.string.nevigation_help_text).toString());
-            add(getText(R.string.nevigation_help_text2).toString());
-            add(getText(R.string.nevigation_help_text3).toString());
-        }};
 
-        welcomeText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                moveToNextHelpText();
-            }});
+        final EditText greenUser = (EditText) findViewById(R.id.green_user_name);
+        greenUser.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        greenUser.setText(users.get(0));
+        final EditText yellowUser = (EditText) findViewById(R.id.yellow_user_name);
+        yellowUser.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        yellowUser.setText(users.get(1));
+
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToNextHelpText();
-            }});
+                String greenName = greenUser.getText().toString();
+                String yellowName = yellowUser.getText().toString();
+                if (greenName.equals(yellowName) || greenName.isEmpty() || yellowName.isEmpty()) {
+                    showErrorAlert();
+                }
+                else{
+                    setUsersAndContinue(greenName, yellowName);
+                }
 
-        skipButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(chooseSexIntent);
             }});
     }
 
-    private void moveToNextHelpText(){
-        String text = texts.poll();
-        if (text != null) {
-            welcomeText.setText(text);
+    private void setUsersAndContinue(String greenName, String yellowName){
+        GroupSettings.setFamilyMembersEdited(true);
+        if (!greenName.equals(users.get(0))){
+            databaseAccess.open();
+            databaseAccess.editUserName(users.get(0), greenName);
+            databaseAccess.close();
         }
-        else {
-            startActivity(chooseSexIntent);
+        if (!yellowName.equals(users.get(1))){
+            databaseAccess.open();
+            databaseAccess.editUserName(users.get(1), yellowName);
+            databaseAccess.close();
         }
+        GroupSettings.setGreenUser(greenName);
+        GroupSettings.setYellowUser(yellowName);
+        GroupSettings.setCurrentUser(greenName);
+        startActivity(mainIntent);
     }
+
+    private void showErrorAlert(){
+        new AlertDialog.Builder(FamilyMembersScreen.this)
+                .setTitle(R.string.error_dialog_title)
+                .setMessage(R.string.error_set_usernames_dialog_body)
+                .setCancelable(false)
+                .setPositiveButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

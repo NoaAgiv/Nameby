@@ -1,4 +1,4 @@
-package com.agiv.names2;
+package com.agiv.nameby;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -27,12 +27,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static com.agiv.names2.GroupSettings.changeUser;
-import static com.agiv.names2.GroupSettings.getCurrentUser;
-import static com.agiv.names2.GroupSettings.getGreenUser;
-import static com.agiv.names2.GroupSettings.setIsHelpScreenSeen;
-import static com.agiv.names2.GroupSettings.unsetSex;
-import static com.agiv.names2.NameTagger.*;
+import static com.agiv.nameby.GroupSettings.changeUser;
+import static com.agiv.nameby.GroupSettings.getCurrentUser;
+import static com.agiv.nameby.GroupSettings.getGreenUser;
+import static com.agiv.nameby.GroupSettings.setIsHelpScreenSeen;
+import static com.agiv.nameby.NameTagger.*;
 public class MainActivity extends AppCompatActivity {
 
     private GoogleApiClient client;
