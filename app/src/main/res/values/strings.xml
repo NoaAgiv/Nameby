@@ -16,6 +16,8 @@
     <string name="cancel_button">בטל</string>
     <string name="add_dialog_title">הוספת שמות</string>
     <string name="add_dialog_body">הקלידו פה שמות מופרדים בשורה חדשה. השמות יועברו אוטומטית לרשימת השמות האהובים</string>
+    <string name="error_dialog_title">שגיאה</string>
+    <string name="error_set_usernames_dialog_body">בחרתם בשמות זהים למשתמשים השונים או שאחד משמות המשתמשים ריק. אנא הזינו שמות משתמש שונים בכל שפה שתבחרו</string>
     <string name="add_approve_button">הוסף</string>
     <string name="choose_female">בת</string>
     <string name="choose_male">בן</string>

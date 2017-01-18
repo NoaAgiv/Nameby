@@ -1,5 +1,7 @@
 package com.agiv.names2;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +24,8 @@ import static com.agiv.names2.GroupSettings.getCurrentUser;
 import static com.agiv.names2.GroupSettings.isFamilyMembersEdited;
 import static com.agiv.names2.GroupSettings.setCurrentUser;
 import static com.agiv.names2.GroupSettings.sex;
+import static com.agiv.names2.NameTagger.addName;
+import static com.agiv.names2.NameTagger.getLovedAdapter;
 
 /**
  * Created by Noa Agiv on 1/13/2017.
@@ -30,17 +34,18 @@ import static com.agiv.names2.GroupSettings.sex;
 public class FamilyMembersScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
-
-
+    private List<String> users;
+    private DbAccess databaseAccess;
+    private Intent mainIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        final Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+        mainIntent = new Intent(getBaseContext(), MainActivity.class);
         GroupSettings.init(getSharedPreferences("group_settings", 0));
-        final DbAccess databaseAccess = DbAccess.getInstance(this);
+        databaseAccess = DbAccess.getInstance(this);
         databaseAccess.open();
-        final List<String> users = databaseAccess.getUsers();
+        users = databaseAccess.getUsers();
         databaseAccess.close();
         if (isFamilyMembersEdited()){
             GroupSettings.setGreenUser(users.get(0));
@@ -50,7 +55,7 @@ public class FamilyMembersScreen extends AppCompatActivity {
             return;
         }
         setContentView(R.layout.family_members_screen);
-        ImageButton chooseFemale = (ImageButton) findViewById(R.id.next);
+        ImageButton nextButton = (ImageButton) findViewById(R.id.next);
 
         final EditText greenUser = (EditText) findViewById(R.id.green_user_name);
         greenUser.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -60,27 +65,52 @@ public class FamilyMembersScreen extends AppCompatActivity {
         yellowUser.setText(users.get(1));
 
 
-        chooseFemale.setOnClickListener(new View.OnClickListener() {
+        nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String greenName = greenUser.getText().toString();
                 String yellowName = yellowUser.getText().toString();
-                GroupSettings.setFamilyMembersEdited(true);
-                if (!greenName.equals(users.get(0))){
-                    databaseAccess.open();
-                    databaseAccess.editUserName(users.get(0), greenName);
-                    databaseAccess.close();
+                if (greenName.equals(yellowName) || greenName.isEmpty() || yellowName.isEmpty()) {
+                    showErrorAlert();
                 }
-                if (!yellowName.equals(users.get(1))){
-                    databaseAccess.open();
-                    databaseAccess.editUserName(users.get(1), yellowName);
-                    databaseAccess.close();
+                else{
+                    setUsersAndContinue(greenName, yellowName);
                 }
-                GroupSettings.setGreenUser(greenName);
-                GroupSettings.setYellowUser(yellowName);
-                GroupSettings.setCurrentUser(greenName);
-                startActivity(mainIntent);
+
             }});
+    }
+
+    private void setUsersAndContinue(String greenName, String yellowName){
+        GroupSettings.setFamilyMembersEdited(true);
+        if (!greenName.equals(users.get(0))){
+            databaseAccess.open();
+            databaseAccess.editUserName(users.get(0), greenName);
+            databaseAccess.close();
+        }
+        if (!yellowName.equals(users.get(1))){
+            databaseAccess.open();
+            databaseAccess.editUserName(users.get(1), yellowName);
+            databaseAccess.close();
+        }
+        GroupSettings.setGreenUser(greenName);
+        GroupSettings.setYellowUser(yellowName);
+        GroupSettings.setCurrentUser(greenName);
+        startActivity(mainIntent);
+    }
+
+    private void showErrorAlert(){
+        new AlertDialog.Builder(FamilyMembersScreen.this)
+                .setTitle(R.string.error_dialog_title)
+                .setMessage(R.string.error_set_usernames_dialog_body)
+                .setCancelable(false)
+                .setPositiveButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .show();
     }
 
     @Override
