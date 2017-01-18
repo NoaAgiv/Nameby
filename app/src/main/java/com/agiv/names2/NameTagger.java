@@ -229,7 +229,7 @@ public class NameTagger {
         unlovedNamesListView.setAdapter(unlovedAdapter);
 
         matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
-
+        matchedNamesListView.setEnabled(false);
 
         // TODO: change to a regular ListAdapter below
         matchedAdapter = new SimpleListViewAdapter(matchedNames, context);
