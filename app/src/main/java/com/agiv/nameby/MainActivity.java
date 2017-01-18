@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 switchUser();
             }
             });
+        toolbar.setLogo(R.drawable.icon);
         setSupportActionBar(toolbar);
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
