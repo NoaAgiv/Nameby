@@ -17,6 +17,7 @@ public class GroupSettings {
     static int yellowUserUnseenMatches;
     static int greenUserUnseenMatches;
     static boolean familyMembersEdited = false;
+    static boolean helpScreenSeen = false;
 
     public enum Sex{
         FEMALE,
@@ -28,6 +29,15 @@ public class GroupSettings {
         editor = shp.edit();
     }
 
+    public static boolean isHelpScreenSeen() {
+        return sharedPref.getBoolean("help_screen_screen", false);
+    }
+
+    public static void setIsHelpScreenSeen(boolean isHelpScreenSeen) {
+        editor.putBoolean("help_screen_screen", isHelpScreenSeen);
+        editor.commit();
+        GroupSettings.helpScreenSeen = isHelpScreenSeen;
+    }
 
     public static boolean isFamilyMembersEdited() {
         return sharedPref.getBoolean("family_member_edited", false);

@@ -30,6 +30,7 @@ import java.util.Comparator;
 import static com.agiv.names2.GroupSettings.changeUser;
 import static com.agiv.names2.GroupSettings.getCurrentUser;
 import static com.agiv.names2.GroupSettings.getGreenUser;
+import static com.agiv.names2.GroupSettings.setIsHelpScreenSeen;
 import static com.agiv.names2.GroupSettings.unsetSex;
 import static com.agiv.names2.NameTagger.*;
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     Intent sexChooseIntent;
     Intent familyMembersIntent;
+    Intent helpIntent;
     private TextView userName;
     private TabLayout.Tab matchTab;
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
         familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
+        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
         setTabs();
         try {
             initData(MainActivity.this, this, matchTab);
@@ -245,6 +248,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.change_user){
             switchUser();
+        }
+        if (id == R.id.help){
+            setIsHelpScreenSeen(false);
+            startActivity(helpIntent);
         }
 
         return super.onOptionsItemSelected(item);
