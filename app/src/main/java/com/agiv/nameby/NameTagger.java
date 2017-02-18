@@ -285,7 +285,7 @@ public class NameTagger {
 
 
     public static void updateUntaggedNames(){
-        Name.setLovedByPartner(untaggedNames, partnerlovedNames);
+        Name2.setLovedByPartner(untaggedNames, partnerlovedNames);
     }
 
     public static ArrayList<Name2> getUntaggedPartnerLovedNames(){

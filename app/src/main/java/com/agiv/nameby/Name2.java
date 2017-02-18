@@ -37,9 +37,9 @@ public class Name2 {
         lovedByPartner = true;
     }
 
-    public static void setLovedByPartner(List<Name2> allNames, List<String> lovedByPartner){
+    public static void setLovedByPartner(List<Name2> allNames, List<Name2> lovedByPartner){
         for (Name2 name : allNames){
-            if (lovedByPartner.contains(name.name))
+            if (lovedByPartner.contains(name))
                 name.setLovedByPartner();
         }
     }
