@@ -1,7 +1,5 @@
 package com.agiv.nameby;
 
-import android.content.Context;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
@@ -11,7 +9,7 @@ import android.widget.TextView;
 
 public class NameTextView {
     TextView textView;
-    Name2 currentName = null;
+    Name currentName = null;
 
     public NameTextView(TextView textView) {
         this.textView = textView;
@@ -21,11 +19,11 @@ public class NameTextView {
         return currentName.name;
     }
 
-    public Name2 getCurrentName(){
+    public Name getCurrentName(){
         return currentName;
     }
 
-    public final void setName(Name2 name){
+    public final void setName(Name name){
         currentName = name;
         textView.setText(name.name);
 

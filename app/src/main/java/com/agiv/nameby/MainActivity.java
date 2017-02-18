@@ -12,27 +12,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import org.w3c.dom.Comment;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 //                Log.w("onChildAdded:", dataSnapshot.getKey());
 //
 //                // A new comment has been added, add it to the displayed list
-//                Name2 name = dataSnapshot.getValue(Name2.class);
+//                Name name = dataSnapshot.getValue(Name.class);
 //                Log.w("onChildAdded:", name.name);
 ////                NameTagger.setLists(name);
 //
@@ -251,18 +241,18 @@ public class MainActivity extends AppCompatActivity {
                 String tabName = tab.getText().toString();
                 View selectedView = null;
                 if (tabName.equals(getString(R.string.loved_tab))) {
-                    Collections.sort(lovedNames, new Comparator<Name2>() {
+                    Collections.sort(lovedNames, new Comparator<Name>() {
                         @Override
-                        public int compare(Name2 s, Name2 t1) {
+                        public int compare(Name s, Name t1) {
                             return s.name.compareTo(t1.name);
                         }
                     });
                     getLovedAdapter().notifyDataSetChanged();
                     selectedView = getLovedNamesListView();
                 } else if (tabName.equals(getString(R.string.unloved_tab))) {
-                    Collections.sort(unlovedNames, new Comparator<Name2>() {
+                    Collections.sort(unlovedNames, new Comparator<Name>() {
                         @Override
-                        public int compare(Name2 s, Name2 t1) {
+                        public int compare(Name s, Name t1) {
                             return s.name.compareTo(t1.name);
                         }
                     });
@@ -275,9 +265,9 @@ public class MainActivity extends AppCompatActivity {
                     setMatchTabCount(-1);
                     GroupSettings.setCurrentUserUnseenMatches(0);
                     updateMatchedNames();
-                    Collections.sort(matchedNames, new Comparator<Name2>() {
+                    Collections.sort(matchedNames, new Comparator<Name>() {
                         @Override
-                        public int compare(Name2 s, Name2 t1) {
+                        public int compare(Name s, Name t1) {
                             return s.name.compareTo(t1.name);
                         }
                     });

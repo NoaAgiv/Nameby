@@ -14,7 +14,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class EditableListViewAdapter extends BaseAdapter implements ListAdapter {
-    private ArrayList<Name2> list = new ArrayList<Name2>();
+    private ArrayList<Name> list = new ArrayList<Name>();
     private Context context;
     String dialogBody = "";
     String dialogTitle = "";
@@ -23,7 +23,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
 
 
 
-    public EditableListViewAdapter(NameTagger.SwitchListsCallBack switchLists, ArrayList<Name2> list,
+    public EditableListViewAdapter(NameTagger.SwitchListsCallBack switchLists, ArrayList<Name> list,
                                    Context context, String dialogTitle, String dialogBody, int buttonImage) {
         this.list = list;
         this.switchLists = switchLists;
@@ -69,7 +69,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
         changeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                final Name2 name = list.get(position);
+                final Name name = list.get(position);
                 String specificDialogBody = String.format("%s\n%s", dialogBody, name);
                 new AlertDialog.Builder(context)
                         .setTitle(dialogTitle)

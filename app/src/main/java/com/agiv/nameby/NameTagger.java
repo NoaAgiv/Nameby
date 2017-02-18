@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,13 +27,13 @@ import java.util.Random;
  */
 
 public class NameTagger {
-    public static ArrayList<Name2> untaggedNames;
-    public static ArrayList<Name2> partnerlovedNames = new ArrayList<>();
-    public static ArrayList<Name2> untaggedPartnerlovedNames = new ArrayList<>();
-    public static ArrayList<Name2> lovedNames = new ArrayList<>();
-    public static ArrayList<Name2> unlovedNames = new ArrayList<>();
-    public static ArrayList<Name2> matchedNames = new ArrayList<>();
-    private static Name2 END_OF_LIST = new Name2("Congrats! You tagged all the names!","f", 0);
+    public static ArrayList<Name> untaggedNames;
+    public static ArrayList<Name> partnerlovedNames = new ArrayList<>();
+    public static ArrayList<Name> untaggedPartnerlovedNames = new ArrayList<>();
+    public static ArrayList<Name> lovedNames = new ArrayList<>();
+    public static ArrayList<Name> unlovedNames = new ArrayList<>();
+    public static ArrayList<Name> matchedNames = new ArrayList<>();
+    private static Name END_OF_LIST = new Name("Congrats! You tagged all the names!","f", 0);
     private static final Random rgenerator = new Random();
     private static ListView lovedNamesListView;
     private static ListView matchedNamesListView;
@@ -55,7 +54,7 @@ public class NameTagger {
 
 //    private static DbAccess databaseAccess = DbAccess.getInstance(activity);
 
-//    public void setLists(Name2 name){
+//    public void setLists(Name name){
 //        addNameToListIfNotExists(untaggedNames, name);
 //        addNameToListIfNotExists(lovedNames, name);
 //            untaggedNames.add(name)
@@ -68,7 +67,7 @@ public class NameTagger {
 //        untaggedPartnerlovedNames = getUntaggedPartnerLovedNames();
 //    }
 
-    public void addNameToListIfNotExists(ArrayList<Name2> list, Name2 element){
+    public void addNameToListIfNotExists(ArrayList<Name> list, Name element){
         if (!list.contains(element))
             list.add(element);
     }
@@ -96,15 +95,15 @@ public class NameTagger {
             matchTab.setIcon(null);
         }
     }
-    public static ArrayList<Name2> getUnlovedNames() {
+    public static ArrayList<Name> getUnlovedNames() {
         return unlovedNames;
     }
 
-    public static ArrayList<Name2> getLovedNames() {
+    public static ArrayList<Name> getLovedNames() {
         return lovedNames;
     }
 
-    public static ArrayList<Name2> getUntaggedNames() {
+    public static ArrayList<Name> getUntaggedNames() {
         return untaggedNames;
     }
 
@@ -154,21 +153,21 @@ public class NameTagger {
         partnerlovedNames = getPartnerLovedNames();
         updateUntaggedNames();
         untaggedPartnerlovedNames = getUntaggedPartnerLovedNames();
-        Collections.sort(matchedNames, new Comparator<Name2>() {
+        Collections.sort(matchedNames, new Comparator<Name>() {
             @Override
-            public int compare(Name2 s, Name2 t1) {
+            public int compare(Name s, Name t1) {
                 return s.name.compareTo(t1.name);
             }
         });
-        Collections.sort(lovedNames, new Comparator<Name2>() {
+        Collections.sort(lovedNames, new Comparator<Name>() {
             @Override
-            public int compare(Name2 s, Name2 t1) {
+            public int compare(Name s, Name t1) {
                 return s.name.compareTo(t1.name);
             }
         });
-        Collections.sort(unlovedNames, new Comparator<Name2>() {
+        Collections.sort(unlovedNames, new Comparator<Name>() {
             @Override
-            public int compare(Name2 s, Name2 t1) {
+            public int compare(Name s, Name t1) {
                 return s.name.compareTo(t1.name);
             }
         });
@@ -177,7 +176,7 @@ public class NameTagger {
 
     public static abstract class SwitchListsCallBack {
 
-        void switchLists(Name2 name){
+        void switchLists(Name name){
 
         }
     }
@@ -222,7 +221,7 @@ public class NameTagger {
 
         final SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
             @Override
-            public void switchLists(Name2 name) {
+            public void switchLists(Name name) {
                 markNameUnloved(name);
             }
         };
@@ -237,7 +236,7 @@ public class NameTagger {
 
         SwitchListsCallBack unlovedToLovedSwitch = new SwitchListsCallBack() {
             @Override
-            public void switchLists(Name2 name) {
+            public void switchLists(Name name) {
                 markNameLoved(name);
             }
         };
@@ -285,12 +284,12 @@ public class NameTagger {
 
 
     public static void updateUntaggedNames(){
-        Name2.setLovedByPartner(untaggedNames, partnerlovedNames);
+        Name.setLovedByPartner(untaggedNames, partnerlovedNames);
     }
 
-    public static ArrayList<Name2> getUntaggedPartnerLovedNames(){
-        ArrayList<Name2> untaggedPartnerLovedNamed = new ArrayList<Name2>();
-        for (Name2 name : untaggedNames){
+    public static ArrayList<Name> getUntaggedPartnerLovedNames(){
+        ArrayList<Name> untaggedPartnerLovedNamed = new ArrayList<Name>();
+        for (Name name : untaggedNames){
             if (name.lovedByPartner == true)
                 untaggedPartnerLovedNamed.add(name);
         }
@@ -298,22 +297,22 @@ public class NameTagger {
     }
 
     public static void updateMatchedNames(){
-        ArrayList<Name2> partnerLovedNames = (ArrayList<Name2>) partnerlovedNames.clone();
+        ArrayList<Name> partnerLovedNames = (ArrayList<Name>) partnerlovedNames.clone();
         partnerLovedNames.retainAll(lovedNames);
         matchedNames.clear();
         matchedNames.addAll(partnerLovedNames);
         matchedAdapter.notifyDataSetChanged();
     }
 
-    private static ArrayList<Name2> getPartnerLovedNames(){
+    private static ArrayList<Name> getPartnerLovedNames(){
         DbAccess databaseAccess = DbAccess.getInstance(context);
         databaseAccess.open();
-        ArrayList<Name2> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getNotCurrentUser());
+        ArrayList<Name> partnerLovedNames = databaseAccess.getLovedNames(GroupSettings.getNotCurrentUser());
         databaseAccess.close();
         return partnerLovedNames;
     }
 
-    public static boolean markNameLoved(Name2 name) {
+    public static boolean markNameLoved(Name name) {
         boolean isMatch = false;
         if (!name.equals(END_OF_LIST)) {
             lovedNames.add(name);
@@ -335,9 +334,9 @@ public class NameTagger {
         return isMatch;
     }
 
-    private static void removeFromUntaggedNameList(Name2 name){
-        Name2 nameToRemove = null;
-        for (Name2 untaggedName : untaggedNames) {
+    private static void removeFromUntaggedNameList(Name name){
+        Name nameToRemove = null;
+        for (Name untaggedName : untaggedNames) {
             if (untaggedName.equals(name))
                 nameToRemove = untaggedName;
 
@@ -345,7 +344,7 @@ public class NameTagger {
         untaggedNames.remove(nameToRemove);
     }
 
-    public static void markNameUnloved(Name2 name) {
+    public static void markNameUnloved(Name name) {
         if (!name.equals(END_OF_LIST)) {
             unlovedNames.add(name);
             removeFromUntaggedNameList(name);
@@ -358,7 +357,7 @@ public class NameTagger {
         }
     }
 
-    private static Name2 getNextUntaggedName() {
+    private static Name getNextUntaggedName() {
         if (untaggedNames.isEmpty())
             return END_OF_LIST;
         else{
@@ -369,17 +368,17 @@ public class NameTagger {
         }
     }
 
-    private static Name2 getRandomFromUntaggedPopularityBias(){
-        Collections.sort(untaggedNames, new Comparator<Name2>() {
+    private static Name getRandomFromUntaggedPopularityBias(){
+        Collections.sort(untaggedNames, new Comparator<Name>() {
             @Override
-            public int compare(Name2 name1, Name2 name2) {
-                return name1.popularity - name2.popularity;
+            public int compare(Name name1, Name name) {
+                return name1.popularity - name.popularity;
             }
         });
         return untaggedNames.get(rgenerator.nextInt(10));
     }
 
-    private static Name2 getRandomFromPartnerLovedNames(){
+    private static Name getRandomFromPartnerLovedNames(){
         Log.i("size", untaggedPartnerlovedNames.size() + "");
         return untaggedPartnerlovedNames.get(rgenerator.nextInt(untaggedPartnerlovedNames.size()));
     }
@@ -401,7 +400,7 @@ public class NameTagger {
         if (name.isEmpty() || lovedNames.contains(name) || unlovedNames.contains(name))
             return;
 
-        markNameLoved(new Name2(name, GroupSettings.getSexString(), 100));
+        markNameLoved(new Name(name, GroupSettings.getSexString(), 100));
         if (untaggedNamesView.getText().equals(name)) {
             if (untaggedNamesView.getText().equals(name)) {
                 untaggedNamesView.setName(getNextUntaggedName());

@@ -6,19 +6,19 @@ import java.util.List;
  * Created by Noa Agiv on 1/9/2017.
  */
 
-public class Name2 {
+public class Name {
     public String name;
     public String gender;
     public int popularity;
     public boolean lovedByPartner = false;
 
-    public Name2(String name, String gender, int popularity){
+    public Name(String name, String gender, int popularity){
       this.name = name;
       this.gender = gender;
       this.popularity = popularity;
     }
 
-    public Name2() {
+    public Name() {
     }
 
     public void setGender(String gender) {
@@ -37,8 +37,8 @@ public class Name2 {
         lovedByPartner = true;
     }
 
-    public static void setLovedByPartner(List<Name2> allNames, List<Name2> lovedByPartner){
-        for (Name2 name : allNames){
+    public static void setLovedByPartner(List<Name> allNames, List<Name> lovedByPartner){
+        for (Name name : allNames){
             if (lovedByPartner.contains(name))
                 name.setLovedByPartner();
         }
@@ -50,10 +50,10 @@ public class Name2 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Name2 name2 = (Name2) o;
+        Name name = (Name) o;
 
-        if (!name.equals(name2.name)) return false;
-        return gender.equals(name2.gender);
+        if (!this.name.equals(name.name)) return false;
+        return gender.equals(name.gender);
 
     }
 

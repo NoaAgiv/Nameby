@@ -11,12 +11,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class SimpleListViewAdapter extends BaseAdapter implements ListAdapter {
-    private ArrayList<Name2> list = new ArrayList<Name2>();
+    private ArrayList<Name> list = new ArrayList<Name>();
     private Context context;
 
 
 
-    public SimpleListViewAdapter(ArrayList<Name2> list, Context context) {
+    public SimpleListViewAdapter(ArrayList<Name> list, Context context) {
         this.list = list;
         this.context = context;
     }
