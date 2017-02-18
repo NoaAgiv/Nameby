@@ -11,12 +11,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class SimpleListViewAdapter extends BaseAdapter implements ListAdapter {
-    private ArrayList<String> list = new ArrayList<String>();
+    private ArrayList<Name2> list = new ArrayList<Name2>();
     private Context context;
 
 
 
-    public SimpleListViewAdapter(ArrayList<String> list, Context context) {
+    public SimpleListViewAdapter(ArrayList<Name2> list, Context context) {
         this.list = list;
         this.context = context;
     }
@@ -48,7 +48,7 @@ public class SimpleListViewAdapter extends BaseAdapter implements ListAdapter {
 
         //Handle TextView and display string from your list
         TextView listItemText = (TextView)view.findViewById(R.id.list_item_string);
-        listItemText.setText(list.get(position));
+        listItemText.setText(list.get(position).name);
 
         return view;
     }

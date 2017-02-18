@@ -20,9 +20,9 @@ public class Name {
         lovedByPartner = true;
     }
 
-    public static void setLovedByPartner(List<Name> allNames, List<String> lovedByPartner){
-        for (Name name : allNames){
-            if (lovedByPartner.contains(name.name))
+    public static void setLovedByPartner(List<Name2> allNames, List<Name2> lovedByPartner){
+        for (Name2 name : allNames){
+            if (lovedByPartner.contains(name))
                 name.setLovedByPartner();
         }
     }

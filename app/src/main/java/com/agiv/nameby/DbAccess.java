@@ -92,10 +92,10 @@ public class DbAccess {
      *
      * @return a List of quotes
      */
-    public ArrayList<Name> getNames() {
-        Cursor cursor = database.rawQuery("SELECT name, popularity FROM names where sex = \"" + GroupSettings.getSexString() + "\"", null);
+    public ArrayList<Name2> getNames() {
+        Cursor cursor = database.rawQuery("SELECT name, sex, popularity FROM names where sex = \"" + GroupSettings.getSexString() + "\"", null);
 
-        ArrayList<Name> list = populateNameList(cursor);
+        ArrayList<Name2> list = populateNameList(cursor);
         cursor.close();
         return list;
     }
@@ -118,10 +118,10 @@ public class DbAccess {
         database.update("users", values, "name = \"" + oldUserName + "\"", null);
     }
 
-    private ArrayList<Name> getNames(String user, boolean loved) {
+    private ArrayList<Name2> getNames(String user, boolean loved) {
         int loved_int = loved? 1 : 0;
         String query =
-                "SELECT names.name, names.popularity from names " +
+                "SELECT names.name, names.sex, names.popularity from names " +
                 "JOIN names_users on names.id = names_users.name_id " +
                 "JOIN users on users.id = names_users.user_id " +
                 "WHERE sex =\"" + GroupSettings.getSexString() + "\"" +
@@ -130,55 +130,57 @@ public class DbAccess {
 
 
         Cursor cursor = database.rawQuery(query, null);
-        ArrayList<Name> list = populateNameList(cursor);
+        ArrayList<Name2> list = populateNameList(cursor);
         cursor.close();
         return list;
     }
 
-    public ArrayList<Name> populateNameList(Cursor cursor){
-        ArrayList<Name> list = new ArrayList<>();
+    public ArrayList<Name2> populateNameList(Cursor cursor){
+        ArrayList<Name2> list = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            list.add(new Name(cursor.getString(0), cursor.getInt(1)));
+            list.add(new Name2(cursor.getString(0), cursor.getString(1), cursor.getInt(2)));
             cursor.moveToNext();
         }
         return list;
     }
 
-    public ArrayList<String> getLovedNames(String user) {
-        ArrayList<String> lovedNames = new ArrayList<>();
-        for (Name name : getNames(user, true)){
-            lovedNames.add(name.name);
+    public ArrayList<Name2> getLovedNames(String user) {
+        ArrayList<Name2> lovedNames = new ArrayList<>();
+        for (Name2 name : getNames(user, true)){
+            lovedNames.add(name);
         }
         return lovedNames;
     }
 
-    public ArrayList<String> getUnlovedNames(String user) {
-        ArrayList<String> unlovedNames = new ArrayList<>();
-        for (Name name : getNames(user, false)){
-            unlovedNames.add(name.name);
+    public ArrayList<Name2> getUnlovedNames(String user) {
+        ArrayList<Name2> unlovedNames = new ArrayList<>();
+        for (Name2 name : getNames(user, false)){
+            unlovedNames.add(name);
         }
         return unlovedNames;
     }
 
-    public ArrayList<Name> getUntaggedNames(String user) {
-        ArrayList<Name> untaggedNames = new ArrayList<>();
-        ArrayList<Name> names = ((ArrayList<Name>) getNames().clone());
-        for (Name name : names){
-            if (!getLovedNames(user).contains(name.name) && !getUnlovedNames(user).contains(name.name))
+    public ArrayList<Name2> getUntaggedNames(String user) {
+        ArrayList<Name2> untaggedNames = new ArrayList<>();
+        ArrayList<Name2> names = ((ArrayList<Name2>) getNames().clone());
+        ArrayList<Name2> lovedNames = getLovedNames(user);
+        ArrayList<Name2> unlovedNames = getUnlovedNames(user);
+        for (Name2 name : names){
+            if (!lovedNames.contains(name) && !unlovedNames.contains(name))
                     untaggedNames.add(name);
         }
         return untaggedNames;
     }
-    public void markNameLoved(String user, String name) {
+    public void markNameLoved(String user, Name2 name) {
         insertNameTag(user, name, true);
     }
 
-    public void markNameUnloved(String user, String name) {
+    public void markNameUnloved(String user, Name2 name) {
         insertNameTag(user, name, false);
     }
 
-    private void insertNameTag(String user, String name, boolean loved) {
+    private void insertNameTag(String user, Name2 name, boolean loved) {
         Cursor cursor = database.rawQuery("SELECT id FROM users WHERE name = \""+ user +"\"", null);
         cursor.moveToFirst();
         int user_id = cursor.getInt(0);
@@ -187,7 +189,7 @@ public class DbAccess {
         cursor = database.rawQuery("SELECT id FROM names WHERE sex = \""+ GroupSettings.getSexString() +"\" and name = \""+ name + "\"", null);
         if (cursor.getCount() == 0){ //name does not exist
             ContentValues nameTableValues = new ContentValues();
-            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name);
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name.name);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_INSERTED_BY, user_id);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_POPULARITY, -1);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, GroupSettings.getSexString());

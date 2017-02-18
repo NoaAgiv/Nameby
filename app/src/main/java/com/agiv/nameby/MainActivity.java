@@ -12,17 +12,27 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Comment;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,7 +67,87 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e){
             System.out.println(e);
         }
-
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        DatabaseReference myRef = database.getReference("names");
+//
+//        ChildEventListener childEventListener = new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+//                Log.w("onChildAdded:", dataSnapshot.getKey());
+//
+//                // A new comment has been added, add it to the displayed list
+//                Name2 name = dataSnapshot.getValue(Name2.class);
+//                Log.w("onChildAdded:", name.name);
+////                NameTagger.setLists(name);
+//
+//
+//                // ...
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+////                Log.d(TAG, "onChildChanged:" + dataSnapshot.getKey());
+////
+////                // A comment has changed, use the key to determine if we are displaying this
+////                // comment and if so displayed the changed comment.
+////                Comment newComment = dataSnapshot.getValue(Comment.class);
+////                String commentKey = dataSnapshot.getKey();
+////
+////                // ...
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+////                Log.d(TAG, "onChildRemoved:" + dataSnapshot.getKey());
+////
+////                // A comment has changed, use the key to determine if we are displaying this
+////                // comment and if so remove it.
+////                String commentKey = dataSnapshot.getKey();
+////
+////                // ...
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+////                Log.d(TAG, "onChildMoved:" + dataSnapshot.getKey());
+////
+////                // A comment has changed position, use the key to determine if we are
+////                // displaying this comment and if so move it.
+////                Comment movedComment = dataSnapshot.getValue(Comment.class);
+////                String commentKey = dataSnapshot.getKey();
+//
+//                // ...
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+////                Log.w("postComments:onCancelled", databaseError.toException());
+////                Toast.makeText(mContext, "Failed to load comments.",
+////                        Toast.LENGTH_SHORT).show();
+//            }
+//        };
+////        myRef.addChildEventListener(childEventListener);
+////
+////        ValueEventListener postListener = new ValueEventListener() {
+////            @Override
+////            public void onDataChange(DataSnapshot dataSnapshot) {
+////                // Get Post object and use the values to update the UI
+//////                String st = dataSnapshot.getValue(String.class);
+////                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+////                    Log.w("loadPost:onCancelled", postSnapshot.getKey());
+////                    int i  =2;
+////                }
+//////                 ...
+////            }
+////
+////            @Override
+////            public void onCancelled(DatabaseError databaseError) {
+//////                // Getting Post failed, log a message
+//////                Log.w("loadPost:onCancelled", databaseError.toException());
+//////                // ...
+////            }
+////        };
+//        myRef.addValueEventListener(postListener);
 
         setAddButton();
         getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
@@ -79,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        switchToView(getUntaggedNamesView());
     }
 
     private void switchUser() {
@@ -113,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     private void setAddButton(){
         addNameButton = (FloatingActionButton) findViewById(R.id.add_name_button);
         addNameButton.getBackground().setColorFilter(Color.parseColor("#a64dff"), PorterDuff.Mode.MULTIPLY);
-        switchToView(getUntaggedNamesView());
+
         addNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,19 +251,19 @@ public class MainActivity extends AppCompatActivity {
                 String tabName = tab.getText().toString();
                 View selectedView = null;
                 if (tabName.equals(getString(R.string.loved_tab))) {
-                    Collections.sort(lovedNames, new Comparator<String>() {
+                    Collections.sort(lovedNames, new Comparator<Name2>() {
                         @Override
-                        public int compare(String s, String t1) {
-                            return s.compareTo(t1);
+                        public int compare(Name2 s, Name2 t1) {
+                            return s.name.compareTo(t1.name);
                         }
                     });
                     getLovedAdapter().notifyDataSetChanged();
                     selectedView = getLovedNamesListView();
                 } else if (tabName.equals(getString(R.string.unloved_tab))) {
-                    Collections.sort(unlovedNames, new Comparator<String>() {
+                    Collections.sort(unlovedNames, new Comparator<Name2>() {
                         @Override
-                        public int compare(String s, String t1) {
-                            return s.compareTo(t1);
+                        public int compare(Name2 s, Name2 t1) {
+                            return s.name.compareTo(t1.name);
                         }
                     });
                     getUnlovedAdapter().notifyDataSetChanged();
@@ -184,10 +275,10 @@ public class MainActivity extends AppCompatActivity {
                     setMatchTabCount(-1);
                     GroupSettings.setCurrentUserUnseenMatches(0);
                     updateMatchedNames();
-                    Collections.sort(matchedNames, new Comparator<String>() {
+                    Collections.sort(matchedNames, new Comparator<Name2>() {
                         @Override
-                        public int compare(String s, String t1) {
-                            return s.compareTo(t1);
+                        public int compare(Name2 s, Name2 t1) {
+                            return s.name.compareTo(t1.name);
                         }
                     });
                     selectedView = getMatchedNamesListView();
