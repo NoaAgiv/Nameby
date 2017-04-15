@@ -19,11 +19,11 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
     String dialogBody = "";
     String dialogTitle = "";
     int buttonImage = 0;
-    NameTagger.SwitchListsCallBack switchLists;
+    NameTagger2.SwitchListsCallBack switchLists;
 
 
 
-    public EditableListViewAdapter(NameTagger.SwitchListsCallBack switchLists, ArrayList<Name> list,
+    public EditableListViewAdapter(NameTagger2.SwitchListsCallBack switchLists, ArrayList<Name> list,
                                    Context context, String dialogTitle, String dialogBody, int buttonImage) {
         this.list = list;
         this.switchLists = switchLists;
@@ -70,7 +70,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
             @Override
             public void onClick(View v) {
                 final Name name = list.get(position);
-                String specificDialogBody = String.format("%s\n%s", dialogBody, name);
+                String specificDialogBody = String.format("%s\n%s", dialogBody, name.name);
                 new AlertDialog.Builder(context)
                         .setTitle(dialogTitle)
                         .setMessage(specificDialogBody)

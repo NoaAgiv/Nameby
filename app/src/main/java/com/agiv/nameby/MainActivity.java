@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,14 +25,19 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.agiv.nameby.GroupSettings.changeUser;
 import static com.agiv.nameby.GroupSettings.getCurrentUser;
 import static com.agiv.nameby.GroupSettings.getGreenUser;
 import static com.agiv.nameby.GroupSettings.setIsHelpScreenSeen;
-import static com.agiv.nameby.NameTagger.*;
+//import static com.agiv.nameby.NameTagger.*;
+import static com.agiv.nameby.NameTagger2.*;
 public class MainActivity extends AppCompatActivity {
 
     private GoogleApiClient client;
@@ -43,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView userName;
     private TabLayout.Tab matchTab;
 
+    private enum ViewName{
+        lovedNames,
+        unlovedNames,
+        untaggedNames,
+        matchedNames
+    }
+
+    private Map<ViewName, View> views;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,95 +65,17 @@ public class MainActivity extends AppCompatActivity {
         sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
         familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
         helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
-        setTabs();
-        try {
-            initData(MainActivity.this, this, matchTab);
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        DatabaseReference myRef = database.getReference("names");
-//
-//        ChildEventListener childEventListener = new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-//                Log.w("onChildAdded:", dataSnapshot.getKey());
-//
-//                // A new comment has been added, add it to the displayed list
-//                Name name = dataSnapshot.getValue(Name.class);
-//                Log.w("onChildAdded:", name.name);
-////                NameTagger.setLists(name);
-//
-//
-//                // ...
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-////                Log.d(TAG, "onChildChanged:" + dataSnapshot.getKey());
-////
-////                // A comment has changed, use the key to determine if we are displaying this
-////                // comment and if so displayed the changed comment.
-////                Comment newComment = dataSnapshot.getValue(Comment.class);
-////                String commentKey = dataSnapshot.getKey();
-////
-////                // ...
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-////                Log.d(TAG, "onChildRemoved:" + dataSnapshot.getKey());
-////
-////                // A comment has changed, use the key to determine if we are displaying this
-////                // comment and if so remove it.
-////                String commentKey = dataSnapshot.getKey();
-////
-////                // ...
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-////                Log.d(TAG, "onChildMoved:" + dataSnapshot.getKey());
-////
-////                // A comment has changed position, use the key to determine if we are
-////                // displaying this comment and if so move it.
-////                Comment movedComment = dataSnapshot.getValue(Comment.class);
-////                String commentKey = dataSnapshot.getKey();
-//
-//                // ...
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-////                Log.w("postComments:onCancelled", databaseError.toException());
-////                Toast.makeText(mContext, "Failed to load comments.",
-////                        Toast.LENGTH_SHORT).show();
-//            }
-//        };
-////        myRef.addChildEventListener(childEventListener);
-////
-////        ValueEventListener postListener = new ValueEventListener() {
-////            @Override
-////            public void onDataChange(DataSnapshot dataSnapshot) {
-////                // Get Post object and use the values to update the UI
-//////                String st = dataSnapshot.getValue(String.class);
-////                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-////                    Log.w("loadPost:onCancelled", postSnapshot.getKey());
-////                    int i  =2;
-////                }
-//////                 ...
-////            }
-////
-////            @Override
-////            public void onCancelled(DatabaseError databaseError) {
-//////                // Getting Post failed, log a message
-//////                Log.w("loadPost:onCancelled", databaseError.toException());
-//////                // ...
-////            }
-////        };
-//        myRef.addValueEventListener(postListener);
+        Log.d("view", "initiating data");
+        NameTagger2.initData(MainActivity.this, this, matchTab);
 
+        Log.d("view", "setting UI");
+        views = new HashMap<ViewName, View>() {{
+            put(ViewName.lovedNames, getLovedNamesListView());
+            put(ViewName.unlovedNames, getUnlovedNamesListView());
+            put(ViewName.untaggedNames, getUntaggedNamesView());
+            put(ViewName.matchedNames, getMatchedNamesListView());
+        }};
+        setTabs();
         setAddButton();
         getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
         getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
@@ -159,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        switchToView(getUntaggedNamesView());
+        switchToView(ViewName.untaggedNames);
     }
 
     private void switchUser() {
@@ -209,9 +146,9 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton(R.string.add_approve_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String[] names = input.getText().toString().split("\n");
-                                for (String name : names) {
-                                    addName(name);
+                                String[] untaggedNames = input.getText().toString().split("\n");
+                                for (String name : untaggedNames) {
+//                                    addName(name);
                                 }
                                 getLovedAdapter().notifyDataSetChanged();
                                 dialog.dismiss();
@@ -239,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 String tabName = tab.getText().toString();
-                View selectedView = null;
+                ViewName selectedView = null;
                 if (tabName.equals(getString(R.string.loved_tab))) {
                     Collections.sort(lovedNames, new Comparator<Name>() {
                         @Override
@@ -248,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     getLovedAdapter().notifyDataSetChanged();
-                    selectedView = getLovedNamesListView();
+                    selectedView = ViewName.lovedNames;
                 } else if (tabName.equals(getString(R.string.unloved_tab))) {
                     Collections.sort(unlovedNames, new Comparator<Name>() {
                         @Override
@@ -257,21 +194,21 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     getUnlovedAdapter().notifyDataSetChanged();
-                    selectedView = getUnlovedNamesListView();
+                    selectedView = ViewName.unlovedNames;
                 } else if (tabName.equals(getString(R.string.triage_tab))) {
-                    selectedView = getUntaggedNamesView();
+                    selectedView = ViewName.untaggedNames;
                 }
                 else if (tab.getPosition() == 3 ){ //matches
-                    setMatchTabCount(-1);
+//                    setMatchTabCount(-1);
                     GroupSettings.setCurrentUserUnseenMatches(0);
-                    updateMatchedNames();
+//                    updateMatchedNames();
                     Collections.sort(matchedNames, new Comparator<Name>() {
                         @Override
                         public int compare(Name s, Name t1) {
                             return s.name.compareTo(t1.name);
                         }
                     });
-                    selectedView = getMatchedNamesListView();
+                    selectedView = ViewName.matchedNames;
                 }
                 switchToView(selectedView);
 
@@ -288,18 +225,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void switchToView(View selectedView) {
-        getLovedNamesListView().setVisibility(View.GONE);
-        getUnlovedNamesListView().setVisibility(View.GONE);
-        getMatchedNamesListView().setVisibility(View.GONE);
-        getUntaggedNamesView().setVisibility(View.GONE);
-        getLoveImage().setVisibility(View.GONE);
-        getDisloveImage().setVisibility(View.GONE);
-        selectedView.setVisibility(View.VISIBLE);
-        if (selectedView.equals(getUntaggedNamesView())){
-            getLoveImage().setVisibility(View.VISIBLE);
-            getDisloveImage().setVisibility(View.VISIBLE);
+    private void switchToView(ViewName viewName) {
+        View requestedView = views.get(viewName);
+        for (View view : views.values()){
+            Log.w("view", "switch");
+            if (!view.equals(requestedView))
+                view.setVisibility(View.GONE);
+            else
+                view.setVisibility(View.VISIBLE);
         }
+//        getLovedNamesListView().setVisibility(View.GONE);
+//        getUnlovedNamesListView().setVisibility(View.GONE);
+//        getMatchedNamesListView().setVisibility(View.GONE);
+//        getUntaggedNamesView().setVisibility(View.GONE);
+//        selectedView.setVisibility(View.VISIBLE);
+//        if (selectedView.equals(getUntaggedNamesView())){
+//            getLoveImage().setVisibility(View.VISIBLE);
+//            getDisloveButton().setVisibility(View.VISIBLE);
+//        }
     }
 
     @Override
@@ -340,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void changeUserInit(){
         try {
-            initData(MainActivity.this, this, matchTab);
+            NameTagger2.initData(MainActivity.this, this, matchTab);
         }
         catch (Exception e){
             System.out.println(e);

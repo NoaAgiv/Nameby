@@ -19,6 +19,7 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.agiv.nameby.GroupSettings.isFamilyMembersEdited;
@@ -39,10 +40,14 @@ public class FamilyMembersScreen extends AppCompatActivity {
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         mainIntent = new Intent(getBaseContext(), MainActivity.class);
         GroupSettings.init(getSharedPreferences("group_settings", 0));
-        databaseAccess = DbAccess.getInstance(this);
-        databaseAccess.open();
-        users = databaseAccess.getUsers();
-        databaseAccess.close();
+//        databaseAccess = DbAccess.getInstance(this);
+//        databaseAccess.open();
+//        users = databaseAccess.getUsers();
+        users = new ArrayList<String>(){{
+           add("נעה");
+            add("ניר");
+        }};
+//        databaseAccess.close();
         if (isFamilyMembersEdited()){
             GroupSettings.setGreenUser(users.get(0));
             GroupSettings.setYellowUser(users.get(1));
