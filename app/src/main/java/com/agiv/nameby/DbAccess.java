@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.agiv.nameby.entities.Name;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +95,7 @@ public class DbAccess {
      * @return a List of quotes
      */
     public ArrayList<Name> getNames() {
-        Cursor cursor = database.rawQuery("SELECT name, sex, popularity FROM untaggedNames where sex = \"" + GroupSettings.getSexString() + "\"", null);
+        Cursor cursor = database.rawQuery("SELECT name, sex, popularity FROM untaggedNames where sex = \"" + Settings.getSexString() + "\"", null);
 
         ArrayList<Name> list = populateNameList(cursor);
         cursor.close();
@@ -124,7 +126,7 @@ public class DbAccess {
                 "SELECT untaggedNames.name, untaggedNames.sex, untaggedNames.popularity from untaggedNames " +
                 "JOIN names_users on untaggedNames.id = names_users.name_id " +
                 "JOIN users on users.id = names_users.user_id " +
-                "WHERE sex =\"" + GroupSettings.getSexString() + "\"" +
+                "WHERE sex =\"" + Settings.getSexString() + "\"" +
                         "and users.name = \"" + user + "\" " +
                         "and names_users.is_liked = " + loved_int;
 
@@ -186,13 +188,13 @@ public class DbAccess {
         int user_id = cursor.getInt(0);
 
         int name_id;
-        cursor = database.rawQuery("SELECT id FROM untaggedNames WHERE sex = \""+ GroupSettings.getSexString() +"\" and name = \""+ name + "\"", null);
+        cursor = database.rawQuery("SELECT id FROM untaggedNames WHERE sex = \""+ Settings.getSexString() +"\" and name = \""+ name + "\"", null);
         if (cursor.getCount() == 0){ //name does not exist
             ContentValues nameTableValues = new ContentValues();
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name.name);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_INSERTED_BY, user_id);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_POPULARITY, -1);
-            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, GroupSettings.getSexString());
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, Settings.getSexString());
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_DATE_INSERTED, new SimpleDateFormat("yyyy-MM-dd").toString());
             name_id = ( (int) database.insert(NameContract.NameEntry.TABLE_NAMES, null , nameTableValues));
         }

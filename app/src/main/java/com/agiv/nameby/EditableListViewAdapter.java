@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.agiv.nameby.entities.Name;
+
 import java.util.ArrayList;
 
 public class EditableListViewAdapter extends BaseAdapter implements ListAdapter {

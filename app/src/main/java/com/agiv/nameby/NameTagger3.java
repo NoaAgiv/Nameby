@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.agiv.nameby.entities.Name;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,8 +20,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static com.agiv.nameby.Name.NameTag;
-import static com.agiv.nameby.Name.NameTag.*;
+import static com.agiv.nameby.entities.Name.NameTag;
+import static com.agiv.nameby.entities.Name.NameTag.*;
 
 /**
  * Created by Noa Agiv on 3/11/2017.
@@ -84,7 +85,7 @@ public class NameTagger3 {
 
 
 //        setListAdapters();
-        int unseenMatchesCount = GroupSettings.getCurrentUserUnseenMatches();
+        int unseenMatchesCount = Settings.getCurrentUserUnseenMatches();
 //        setMatchTabCount(unseenMatchesCount);
 //        loveSound = MediaPlayer.create(context, R.raw.c_tone);
 //        unlikeSound = MediaPlayer.create(context, R.raw.a_tone);
@@ -164,7 +165,7 @@ public class NameTagger3 {
         final ValueEventListener TagsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                setUserNameTag(GroupSettings.getCurrentUser(), dataSnapshot);
+                setUserNameTag(Settings.getCurrentUser(), dataSnapshot);
             }
 
             @Override
@@ -183,9 +184,9 @@ public class NameTagger3 {
                 femaleNames.conditionalAddAll(names, NameList.femaleFilter);
                 maleNames.conditionalAddAll(names, NameList.maleFilter);
 
-                DatabaseReference userTagsRef = database.getReference("users/"+ GroupSettings.getCurrentUser() + "/tags");
+                DatabaseReference userTagsRef = database.getReference("users/"+ Settings.getCurrentUser() + "/tags");
                 for (Name name : names) {
-                    userTagsRef.child(Integer.toString(name.id)).addListenerForSingleValueEvent(TagsListener);
+                    userTagsRef.child(name.id).addListenerForSingleValueEvent(TagsListener);
                 }
             }
 
@@ -199,7 +200,7 @@ public class NameTagger3 {
     private static void setUserNameTag(String user, DataSnapshot usereTagData){
         // since all untaggedNames in lists are references,
         // all lists should be updated by updating any Name reference
-        int id = Integer.valueOf(usereTagData.getKey());
+        String id = usereTagData.getKey();
         Name name = allNames.getById(id);
         if (usereTagData.getValue()==null) {
             allNames.getById(id).tagName(user, Name.NameTag.untagged);
@@ -208,8 +209,8 @@ public class NameTagger3 {
             allNames.getById(id).tagName(user, (String) usereTagData.getValue());
         }
         updateListsWithName(name);
-        Log.w("tag", Integer.toString(id));
-//        Log.w("tag", lovedNames.get(id).userTags.get(GroupSettings.getCurrentUser()).toString());
+        Log.w("tag", id);
+//        Log.w("tag", lovedNames.get(id).userTags.get(Settings.getCurrentUser()).toString());
     }
 
     private static boolean updateListsWithName(Name name){

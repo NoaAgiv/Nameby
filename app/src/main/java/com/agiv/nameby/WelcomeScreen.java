@@ -21,8 +21,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import static com.agiv.nameby.GroupSettings.isHelpScreenSeen;
-import static com.agiv.nameby.GroupSettings.setIsHelpScreenSeen;
+import static com.agiv.nameby.Settings.isHelpScreenSeen;
+import static com.agiv.nameby.Settings.setIsHelpScreenSeen;
 
 public class WelcomeScreen extends AppCompatActivity {
 
@@ -35,7 +35,7 @@ public class WelcomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         chooseSexIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
-        GroupSettings.init(getSharedPreferences("group_settings", 0));
+        Settings.init(getSharedPreferences("group_settings", 0));
         if (isHelpScreenSeen()){
             startActivity(chooseSexIntent);
             return;

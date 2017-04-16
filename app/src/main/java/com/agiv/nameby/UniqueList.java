@@ -39,6 +39,13 @@ public class UniqueList<T> extends ArrayList<T> {
         }
     }
 
+    public void addIf(T obj, ListCondition<T> listCond){
+        if (listCond.apply(obj)) {
+            this.add(obj);
+        }
+
+    }
+
     public interface ListCondition<T>{
         boolean apply(T obj);
     }

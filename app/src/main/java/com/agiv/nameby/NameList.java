@@ -1,6 +1,6 @@
 package com.agiv.nameby;
 
-import java.util.Objects;
+import com.agiv.nameby.entities.Name;
 
 /**
  * Created by Noa Agiv on 2/28/2017.
@@ -30,9 +30,9 @@ public class NameList extends UniqueList<Name> {
     };
 
     public static class IdCondition implements ListCondition<Name>{
-        int id;
+        String id;
 
-        public IdCondition(int id){
+        public IdCondition(String id){
             this.id = id;
         }
         @Override
@@ -41,7 +41,7 @@ public class NameList extends UniqueList<Name> {
         }
     }
 
-    public Name getById(int id){
+    public Name getById(String id){
         return this.firstSatisfies(new NameList.IdCondition(id));
     }
 }

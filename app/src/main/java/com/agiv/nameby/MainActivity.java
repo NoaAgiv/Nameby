@@ -20,22 +20,21 @@ import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.agiv.nameby.entities.Name;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static com.agiv.nameby.GroupSettings.changeUser;
-import static com.agiv.nameby.GroupSettings.getCurrentUser;
-import static com.agiv.nameby.GroupSettings.getGreenUser;
-import static com.agiv.nameby.GroupSettings.setIsHelpScreenSeen;
+import static com.agiv.nameby.Settings.changeUser;
+import static com.agiv.nameby.Settings.getCurrentUser;
+import static com.agiv.nameby.Settings.getGreenUser;
+import static com.agiv.nameby.Settings.setIsHelpScreenSeen;
 //import static com.agiv.nameby.NameTagger.*;
 import static com.agiv.nameby.NameTagger2.*;
 public class MainActivity extends AppCompatActivity {
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         userName = (TextView) findViewById(R.id.user_name);
-        userName.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
+        userName.setText(getString(R.string.user_name) + " : " + Settings.getCurrentUser());
         userName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -200,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if (tab.getPosition() == 3 ){ //matches
 //                    setMatchTabCount(-1);
-                    GroupSettings.setCurrentUserUnseenMatches(0);
+                    Settings.setCurrentUserUnseenMatches(0);
 //                    updateMatchedNames();
                     Collections.sort(matchedNames, new Comparator<Name>() {
                         @Override
@@ -261,12 +260,12 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.sex_settings) {
-            GroupSettings.unsetSex();
+            Settings.unsetSex();
             startActivity(sexChooseIntent);
             return true;
         }
         if (id == R.id.family_settings) {
-            GroupSettings.setFamilyMembersEdited(false);
+            Settings.setFamilyMembersEdited(false);
             startActivity(familyMembersIntent);
             return true;
         }
@@ -288,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e){
             System.out.println(e);
         }
-        userName.setText(getString(R.string.user_name) + " : " + GroupSettings.getCurrentUser());
+        userName.setText(getString(R.string.user_name) + " : " + Settings.getCurrentUser());
     }
 
 

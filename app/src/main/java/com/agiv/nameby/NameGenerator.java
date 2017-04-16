@@ -1,5 +1,7 @@
 package com.agiv.nameby;
 
+import com.agiv.nameby.entities.Name;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;

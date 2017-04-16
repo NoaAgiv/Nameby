@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.agiv.nameby.entities.Name;
+
 import java.util.ArrayList;
 
 public class SimpleListViewAdapter extends BaseAdapter implements ListAdapter {

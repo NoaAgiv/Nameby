@@ -22,7 +22,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.agiv.nameby.GroupSettings.isFamilyMembersEdited;
+import static com.agiv.nameby.Settings.isFamilyMembersEdited;
 
 /**
  * Created by Noa Agiv on 1/13/2017.
@@ -39,7 +39,7 @@ public class FamilyMembersScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         mainIntent = new Intent(getBaseContext(), MainActivity.class);
-        GroupSettings.init(getSharedPreferences("group_settings", 0));
+        Settings.init(getSharedPreferences("group_settings", 0));
 //        databaseAccess = DbAccess.getInstance(this);
 //        databaseAccess.open();
 //        users = databaseAccess.getUsers();
@@ -49,9 +49,9 @@ public class FamilyMembersScreen extends AppCompatActivity {
         }};
 //        databaseAccess.close();
         if (isFamilyMembersEdited()){
-            GroupSettings.setGreenUser(users.get(0));
-            GroupSettings.setYellowUser(users.get(1));
-            GroupSettings.setCurrentUser(users.get(0));
+            Settings.setGreenUser(users.get(0));
+            Settings.setYellowUser(users.get(1));
+            Settings.setCurrentUser(users.get(0));
             startActivity(mainIntent);
             return;
         }
@@ -84,7 +84,7 @@ public class FamilyMembersScreen extends AppCompatActivity {
     }
 
     private void setUsersAndContinue(String greenName, String yellowName){
-        GroupSettings.setFamilyMembersEdited(true);
+        Settings.setFamilyMembersEdited(true);
         if (!greenName.equals(users.get(0))){
             databaseAccess.open();
             databaseAccess.editUserName(users.get(0), greenName);
@@ -95,9 +95,9 @@ public class FamilyMembersScreen extends AppCompatActivity {
             databaseAccess.editUserName(users.get(1), yellowName);
             databaseAccess.close();
         }
-        GroupSettings.setGreenUser(greenName);
-        GroupSettings.setYellowUser(yellowName);
-        GroupSettings.setCurrentUser(greenName);
+        Settings.setGreenUser(greenName);
+        Settings.setYellowUser(yellowName);
+        Settings.setCurrentUser(greenName);
         startActivity(mainIntent);
     }
 

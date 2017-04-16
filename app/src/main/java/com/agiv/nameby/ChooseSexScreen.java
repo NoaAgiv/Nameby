@@ -26,10 +26,10 @@ public class ChooseSexScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         final Intent FamilyIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
-        GroupSettings.init(getSharedPreferences("group_settings", 0));
-        GroupSettings.Sex sex = GroupSettings.getSex();
+        Settings.init(getSharedPreferences("group_settings", 0));
+        Settings.Sex sex = Settings.getSex();
         if (sex!=null){
-            GroupSettings.setSex(sex);
+            Settings.setSex(sex);
             startActivity(FamilyIntent);
             return;
         }
@@ -43,14 +43,14 @@ public class ChooseSexScreen extends AppCompatActivity {
         chooseFemale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.FEMALE);
+                Settings.setSex(Settings.Sex.FEMALE);
                 startActivity(FamilyIntent);
             }});
         ImageButton chooseMale = (ImageButton) findViewById(R.id.choose_sex_male);
         chooseMale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupSettings.setSex(GroupSettings.Sex.MALE);
+                Settings.setSex(Settings.Sex.MALE);
                 startActivity(FamilyIntent);
             }});
     }

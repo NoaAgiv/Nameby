@@ -1,8 +1,8 @@
-package com.agiv.nameby;
+package com.agiv.nameby.entities;
 
-import java.security.acl.Group;
+import com.agiv.nameby.Settings;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,13 +10,13 @@ import java.util.Map;
  */
 
 public class Name {
-    public int id;
+    public String id;
     public String name;
     public String gender;
     public int popularity;
     public Map<String, NameTag> userTags = new HashMap<>();
 
-    enum NameTag{
+    public enum NameTag{
         untagged,
         loved,
         unloved,
@@ -34,6 +34,10 @@ public class Name {
       this.name = name;
       this.gender = gender;
       this.popularity = popularity;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Name() {
@@ -62,11 +66,11 @@ public class Name {
 
     public void tagName(String tag) {
         NameTag tagEnum = NameTag.valueOf(tag);
-        userTags.put(GroupSettings.currentUser, tagEnum);
+        userTags.put(Settings.currentUser, tagEnum);
     }
 
     public void tagName(NameTag tag) {
-        userTags.put(GroupSettings.currentUser, tag);
+        userTags.put(Settings.currentUser, tag);
     }
 
     public void tagName(String user, String tag) {
@@ -79,7 +83,7 @@ public class Name {
     }
 
     public NameTag getTag() {
-        return userTags.get(GroupSettings.getCurrentUser());
+        return userTags.get(Settings.getCurrentUser());
     }
 
     public boolean isUnanimouslyPositive() {
@@ -141,7 +145,7 @@ public class Name {
 
     @Override
     public int hashCode() {
-        return id;
+        return Integer.valueOf(id);
     }
 
 

@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.agiv.nameby.entities.Name;
+
 
 /**
  * Created by Noa Agiv on 2/17/2017.

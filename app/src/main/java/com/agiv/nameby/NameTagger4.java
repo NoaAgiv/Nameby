@@ -4,6 +4,7 @@ package com.agiv.nameby;
 
 import android.support.design.widget.TabLayout;
 
+import com.agiv.nameby.entities.Name;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,7 +34,7 @@ public class NameTagger4 {
 
 
 //        setListAdapters();
-//        int unseenMatchesCount = GroupSettings.getCurrentUserUnseenMatches();
+//        int unseenMatchesCount = Settings.getCurrentUserUnseenMatches();
 //        setMatchTabCount(unseenMatchesCount);
 //        loveSound = MediaPlayer.create(context, R.raw.c_tone);
 //        unlikeSound = MediaPlayer.create(context, R.raw.a_tone);
@@ -49,7 +50,7 @@ public class NameTagger4 {
         final ValueEventListener TagsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-//                setUserNameTag(GroupSettings.getCurrentUser(), dataSnapshot);
+//                setUserNameTag(Settings.getCurrentUser(), dataSnapshot);
             }
 
             @Override
@@ -64,9 +65,9 @@ public class NameTagger4 {
                 List<Name> names = dataSnapshot.getValue(t);
 
 
-                DatabaseReference userTagsRef = database.getReference("users/"+ GroupSettings.getCurrentUser() + "/tags");
+                DatabaseReference userTagsRef = database.getReference("users/"+ Settings.getCurrentUser() + "/tags");
                 for (Name name : names) {
-                    userTagsRef.child(Integer.toString(name.id)).addListenerForSingleValueEvent(TagsListener);
+                    userTagsRef.child(name.id).addListenerForSingleValueEvent(TagsListener);
                 }
             }
 
