@@ -404,7 +404,7 @@
 //        if (name.isEmpty() || lovedNames.contains(name) || unlovedNames.contains(name))
 //            return;
 //
-//        markNameLoved(new Name(name, GroupSettings.getSexString(), 100));
+//        markNameLoved(new Name(name, GroupSettings.getGenderString(), 100));
 //        if (untaggedNamesView.getText().equals(name)) {
 //            if (untaggedNamesView.getText().equals(name)) {
 //                untaggedNamesView.setName(getNextUntaggedName());

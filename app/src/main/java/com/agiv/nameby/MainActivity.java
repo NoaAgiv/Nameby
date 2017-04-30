@@ -13,7 +13,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.StateSet;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,8 +20,6 @@ import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.agiv.nameby.entities.Family;
-import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -33,7 +30,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
@@ -267,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.sex_settings) {
-            Settings.unsetSex();
+            Settings.unsetGender();
             startActivity(sexChooseIntent);
             return true;
         }

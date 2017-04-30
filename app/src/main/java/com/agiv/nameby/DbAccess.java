@@ -95,7 +95,7 @@ public class DbAccess {
      * @return a List of quotes
      */
     public ArrayList<Name> getNames() {
-        Cursor cursor = database.rawQuery("SELECT name, sex, popularity FROM untaggedNames where sex = \"" + Settings.getSexString() + "\"", null);
+        Cursor cursor = database.rawQuery("SELECT name, gender, popularity FROM untaggedNames where gender = \"" + Settings.getGenderString() + "\"", null);
 
         ArrayList<Name> list = populateNameList(cursor);
         cursor.close();
@@ -123,10 +123,10 @@ public class DbAccess {
     private ArrayList<Name> getNames(String user, boolean loved) {
         int loved_int = loved? 1 : 0;
         String query =
-                "SELECT untaggedNames.name, untaggedNames.sex, untaggedNames.popularity from untaggedNames " +
+                "SELECT untaggedNames.name, untaggedNames.gender, untaggedNames.popularity from untaggedNames " +
                 "JOIN names_users on untaggedNames.id = names_users.name_id " +
                 "JOIN users on users.id = names_users.user_id " +
-                "WHERE sex =\"" + Settings.getSexString() + "\"" +
+                "WHERE gender =\"" + Settings.getGenderString() + "\"" +
                         "and users.name = \"" + user + "\" " +
                         "and names_users.is_liked = " + loved_int;
 
@@ -188,13 +188,13 @@ public class DbAccess {
         int user_id = cursor.getInt(0);
 
         int name_id;
-        cursor = database.rawQuery("SELECT id FROM untaggedNames WHERE sex = \""+ Settings.getSexString() +"\" and name = \""+ name + "\"", null);
+        cursor = database.rawQuery("SELECT id FROM untaggedNames WHERE gender = \""+ Settings.getGenderString() +"\" and name = \""+ name + "\"", null);
         if (cursor.getCount() == 0){ //name does not exist
             ContentValues nameTableValues = new ContentValues();
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name.name);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_INSERTED_BY, user_id);
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_POPULARITY, -1);
-            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, Settings.getSexString());
+            nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_SEX, Settings.getGenderString());
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_DATE_INSERTED, new SimpleDateFormat("yyyy-MM-dd").toString());
             name_id = ( (int) database.insert(NameContract.NameEntry.TABLE_NAMES, null , nameTableValues));
         }

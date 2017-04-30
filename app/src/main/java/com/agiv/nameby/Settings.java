@@ -12,7 +12,7 @@ import com.agiv.nameby.entities.Member;
 public class Settings {
     static SharedPreferences sharedPref;
     static SharedPreferences.Editor editor;
-    static Sex sex;
+    static Gender gender;
     public static String currentUser;
 
     static String notCurrentUser;
@@ -28,7 +28,7 @@ public class Settings {
     static String familyId = "1";
     static Family family;
 
-    public enum Sex{
+    public enum Gender {
         FEMALE,
         MALE
     }
@@ -134,28 +134,28 @@ public class Settings {
         Settings.greenUserUnseenMatches = greenUserUnseenMatches;
     }
 
-    public static Sex getSex() {
-        return sharedPref.getInt("sex", -1)==-1 ? null : Settings.Sex.values()[sharedPref.getInt("sex", -1)];
+    public static Gender getGender() {
+        return sharedPref.getInt("gender", -1)==-1 ? null : Gender.values()[sharedPref.getInt("gender", -1)];
     }
 
-    public static String getSexString() {
-        if (getSex().equals(Sex.FEMALE))
+    public static String getGenderString() {
+        if (getGender().equals(Gender.FEMALE))
             return "f";
         else
             return "m";
     }
 
-    public static void setSex(Sex sex) {
-        Settings.sex = sex;
-        editor.putInt("sex", sex.ordinal());
+    public static void setGender(Gender gender) {
+        Settings.gender = gender;
+        editor.putInt("gender", gender.ordinal());
         editor.commit();
 
     }
 
-    public static void unsetSex() {
-        editor.putInt("sex", -1);
+    public static void unsetGender() {
+        editor.putInt("gender", -1);
         editor.commit();
-        Settings.sex = null;
+        Settings.gender = null;
     }
 
     public static String getMemberId(){
