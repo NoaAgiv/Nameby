@@ -57,12 +57,8 @@ public class Settings {
         Settings.member = member;
     }
 
-    public static String getMemberId() {
-        return memberId;
-    }
-
-    public static void setMemberId(String memberId) {
-        Settings.memberId = memberId;
+    public static void setMemberId(String id) {
+        Settings.memberId = id;
     }
 
     public static void init(SharedPreferences shp){
@@ -160,6 +156,10 @@ public class Settings {
         editor.putInt("sex", -1);
         editor.commit();
         Settings.sex = null;
+    }
+
+    public static String getMemberId(){
+        return memberId;
     }
 
     public static String getCurrentUser() {

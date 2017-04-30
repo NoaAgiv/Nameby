@@ -1,7 +1,10 @@
 package com.agiv.nameby.entities;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by Noa Agiv on 4/16/2017.
@@ -18,7 +21,40 @@ public class Family {
         this.id = id;
     }
 
+    public Member getMember(String memberId){
+        for (Member m : familyMembers){
+            if (m.id.equals(memberId))
+                return m;
+        }
+        return null;
+    }
     public void addMember(Member member) {
         familyMembers.add(member);
+        Log.i("Family",String.format("added %s to %s", member, this));
+    }
+
+    public boolean isUnanimouslyPositive(Name name) {
+        for (Member member : familyMembers) {
+            if (member.isPositiveTag(name))
+                return false;
+        }
+        return true;
+    }
+
+    public boolean isPositiveForSomeone(Name name) {
+        for (Member member : familyMembers) {
+            if (member.isPositiveTag(name))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Family{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", gender='" + gender +
+                '}';
     }
 }

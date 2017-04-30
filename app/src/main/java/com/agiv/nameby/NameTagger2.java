@@ -5,25 +5,18 @@ import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.util.Log;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.agiv.nameby.Firebase.Firebase;
+import com.agiv.nameby.entities.Member;
+import static com.agiv.nameby.entities.Member.NameTag.*;
+import static com.agiv.nameby.entities.Member.NameTag;
 import com.agiv.nameby.entities.Name;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import static com.agiv.nameby.entities.Name.NameTag;
-import static com.agiv.nameby.entities.Name.NameTag.*;
 
 /**
  * Created by Noa Agiv on 3/11/2017.
@@ -47,14 +40,14 @@ public class NameTagger2 {
     public static NameList untaggedPartnerPositiveNames = new NameList();
 
     // List Views
-    private static ListView lovedNamesListView;
-    private static ListView matchedNamesListView;
-    private static ListView unlovedNamesListView;
-    private static BaseAdapter lovedAdapter;
-    private static BaseAdapter untaggedAdapter;
-    private static BaseAdapter unlovedAdapter;
-    private static BaseAdapter maybeAdapter;
-    private static BaseAdapter matchedAdapter;
+    public static ListView lovedNamesListView;
+    public static ListView matchedNamesListView;
+    public static ListView unlovedNamesListView;
+    public static BaseAdapter lovedAdapter;
+    public static BaseAdapter untaggedAdapter;
+    public static BaseAdapter unlovedAdapter;
+    public static BaseAdapter maybeAdapter;
+    public static BaseAdapter matchedAdapter;
 
     // Other Views
     private static NameTaggerViewContainer untaggedNamesView;
@@ -62,20 +55,6 @@ public class NameTagger2 {
     // Helpers
     private static NameGenerator ngen;
 
-    // Mappers
-    public static Map<Name.NameTag, NameList> tagListMap = new HashMap<Name.NameTag, NameList>(){{
-        put(Name.NameTag.loved, lovedNames);
-        put(Name.NameTag.untagged, untaggedNames);
-        put(Name.NameTag.unloved, unlovedNames);
-        put(Name.NameTag.maybe, maybeNames);
-    }};
-    public static Map<NameList, ListAdapter> listToAdapterMap = new HashMap<NameList, ListAdapter>(){{
-        put(lovedNames, lovedAdapter);
-        put(untaggedNames, untaggedAdapter);
-        put(unlovedNames, unlovedAdapter);
-        put(maybeNames, maybeAdapter);
-        put(matchedNames, maybeAdapter);
-    }};
 
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -86,9 +65,11 @@ public class NameTagger2 {
 //        matchTab = matchTab;
 //        FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG);
         Firebase.initFamilyListener(Settings.getFamilyId());
-        initLists2();
+//        System.out.println("init family " + Settings.getFamily().familyMembers);
+        Firebase.initNameTagListeners();
         initViewAdapters();
         initUntaggedArea();
+
 
 
 //        setListAdapters();
@@ -98,6 +79,29 @@ public class NameTagger2 {
 //        unlikeSound = MediaPlayer.create(context, R.raw.a_tone);
 //        matchSound = MediaPlayer.create(context, R.raw.pin_drop_match);
 
+    }
+
+    public static void initName(Name name){
+        allNames.addIf(name, NameList.validNameFilter);
+        femaleNames.addIf(name, NameList.femaleFilter);
+        maleNames.addIf(name, NameList.maleFilter);
+    }
+
+    public static List<String> getNameIds(){
+        return allNames.getIds();
+    }
+
+    public static void initTag(Member member, String nameId, String tagStr){
+        Member.NameTag tag = untagged;
+        if (tagStr!=null) {
+            tag = Member.NameTag.valueOf(tagStr);
+        }
+        Name name = allNames.getById(nameId);
+
+        setMemberNameTag(member, name, tag);
+        if (member.equals(Settings.getMember())) {
+            updateListsWithTags(name, member);
+        }
     }
 
     private static void initUntaggedArea(){
@@ -149,114 +153,54 @@ public class NameTagger2 {
 
     }
 
-    public static void saveNameTag(Name name){
-        String user = Settings.getCurrentUser();
-        DatabaseReference tagsRef = database.getReference("users/" + user + "/tags");
+    public static void saveNameTag(Name name, Member member){
+        DatabaseReference tagsRef = database.getReference("users/" + member.id + "/tags");
         DatabaseReference nameTagRef = tagsRef.child(String.valueOf(name.id));
-        Log.w("save", name.getTag().toString());
-        Log.w("save", String.valueOf(name.id));
-        Log.w("save", name.name);
 
-        nameTagRef.setValue(name.getTag());
+        nameTagRef.setValue(member.getTag(name));
     }
 
     public static boolean markNameLoved(Name name){
-        name.tagName(Name.NameTag.loved);
-        saveNameTag(name);
-        return updateListsWithName(name);
+        Member member = Settings.getMember();
+        member.tagName(name, loved);
+        saveNameTag(name, member);
+        return updateListsWithTags(name, member);
     }
 
     public static boolean markNameUnloved(Name name){
-        name.tagName(NameTag.unloved);
-        saveNameTag(name);
-        return updateListsWithName(name);
+
+        Member member = Settings.getMember();
+        member.tagName(name, unloved);
+        saveNameTag(name, member);
+        return updateListsWithTags(name, member);
     }
 
     public static abstract class SwitchListsCallBack {
         void switchLists(Name name){}
     }
 
-    private static void initLists2(){
-//        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference namesRef = database.getReference("names");
-
-        final ValueEventListener TagsListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                setUserNameTag(Settings.getCurrentUser(), dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-
-        final ChildEventListener namesListener = new ChildEventListener(){
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                String id = dataSnapshot.getKey();
-                Name name = dataSnapshot.getValue(Name.class);
-                name.setId(id);
-                allNames.addIf(name, NameList.validNameFilter);
-                femaleNames.addIf(name, NameList.femaleFilter);
-                maleNames.addIf(name, NameList.maleFilter);
-                DatabaseReference userTagsRef = database.getReference("users/"+ Settings.getCurrentUser() + "/tags");
-                userTagsRef.child(id).addListenerForSingleValueEvent(TagsListener);
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-
-        namesRef.addChildEventListener(namesListener);
 
 
-    }
-
-    private static void setUserNameTag(String user, DataSnapshot usereTagData){
-        // since all names in lists are references,
-        // all lists should be updated by updating any Name reference
-        String id = usereTagData.getKey();
-        Name name = allNames.getById(id);
-        if (usereTagData.getValue()==null) {
-            allNames.getById(id).tagName(user, Name.NameTag.untagged);
+    private static void setMemberNameTag(Member member, Name name, NameTag tag){
+        if (tag==null) {
+            member.tagName(name, untagged);
         }
         else {
-            allNames.getById(id).tagName(user, (String) usereTagData.getValue());
+            member.tagName(name, tag);
         }
-        updateListsWithName(name);
-        Log.w("tag", id);
-//        Log.w("tag", lovedNames.get(id).userTags.get(Settings.getCurrentUser()).toString());
+
     }
 
-    private static boolean updateListsWithName(Name name){
-        NameTag tag = name.getTag();
-        NameList relevantList = tagListMap.get(tag);
-        Log.w("update", tag.toString());
-        Log.w("update", relevantList.toString());
-        Log.w("update", Boolean.toString(tagListMap.get(NameTag.untagged).isEmpty()));
-        for (Map.Entry<NameTag, NameList> list : tagListMap.entrySet()){
-            Boolean removed = list.getValue().remove(name);
+    private static boolean updateListsWithTags(Name name, Member m){
+        // since all names in lists are references,
+        // all lists should be updated by updating any Name reference
+        NameTag tag = m.getTag(name);
+        NameList relevantList = tag.nameList;
+
+        for (NameTag t : NameTag.values()){
+            Boolean removed = t.nameList.remove(name);
             if (removed)
-                Log.d("NameTagger", String.format("removed %s from %s list", name.name, list.getKey()));
+                Log.d("NameTagger", String.format("removed %s from %s list", name.name, t));
         }
 
         relevantList.add(name);
@@ -264,12 +208,12 @@ public class NameTagger2 {
         untaggedNamesView.setName(ngen.getNextUntaggedName());
 
         // update partner related lists
-        if (name.isUnanimouslyPositive()){
+        if (Settings.getFamily().isUnanimouslyPositive(name)){
             matchedNames.add(name);
             return true;
         }
 
-        if (tag.equals(untagged) && name.isPositiveForAnyPartner()){
+        if (tag.equals(untagged) && Settings.getFamily().isPositiveForSomeone(name)){
             untaggedPartnerPositiveNames.add(name);
         }
         return false;

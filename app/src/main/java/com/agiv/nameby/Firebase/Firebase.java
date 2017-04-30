@@ -1,6 +1,9 @@
 package com.agiv.nameby.Firebase;
 
+import android.util.Log;
+
 import com.agiv.nameby.NameList;
+import com.agiv.nameby.NameTagger2;
 import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
@@ -20,6 +23,66 @@ import com.google.firebase.database.ValueEventListener;
 public class Firebase {
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
+    public static ValueEventListener initTagListener(final Member member) {
+        final ValueEventListener tagsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String nameId = dataSnapshot.getKey();
+                String tag = (String) dataSnapshot.getValue();
+                NameTagger2.initTag(member, nameId, tag);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        return tagsListener;
+    }
+
+    public static void initNameTagListeners(){
+        DatabaseReference namesRef = database.getReference("names");
+
+        final ChildEventListener namesListener = new ChildEventListener(){
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String id = dataSnapshot.getKey();
+                Name name = dataSnapshot.getValue(Name.class);
+                name.setId(id);
+                NameTagger2.initName(name);
+                for (Member m : Settings.getFamily().familyMembers) {
+                    DatabaseReference userTagsRef = database.getReference("users/" + m.id + "/tags");
+                    userTagsRef.child(id).addListenerForSingleValueEvent(initTagListener(m));
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        namesRef.addChildEventListener(namesListener);
+
+
+    }
+
     public static void initFamilyListener(final String familyId) {
         DatabaseReference ref = database.getReference("families/" + familyId);
 
@@ -28,8 +91,9 @@ public class Firebase {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Family family = dataSnapshot.getValue(Family.class);
                 family.setId(familyId);
-                initFamilyMemberListener(family);
                 Settings.setFamily(family);
+                initFamilyMemberListener(family);
+
             }
 
             @Override
@@ -74,7 +138,7 @@ public class Firebase {
     }
 
 
-    private static void initMemberListener(String memberId, final Family family) {
+    private static void initMemberListener(final String memberId, final Family family) {
         DatabaseReference ref = database.getReference("users/" + memberId);
         ValueEventListener memberListener = new ValueEventListener() {
             @Override
@@ -82,8 +146,21 @@ public class Firebase {
                 GenericTypeIndicator<Member> t = new GenericTypeIndicator<Member>() {
                 };
                 Member member = dataSnapshot.getValue(t);
+                member.setId(memberId);
+                Member existingMember = family.getMember(memberId);
+                if (existingMember != null) {
+                    existingMember.updateDetails(member);
+                    return;
+                }
                 family.addMember(member);
-                System.out.println(family.familyMembers);
+
+                if (memberId.equals(Settings.getMemberId())){
+                    Settings.setMember(member);
+                }
+                DatabaseReference userTagsRef = database.getReference("users/" + member.id + "/tags");
+                for (String nameId : NameTagger2.getNameIds()) {
+                    userTagsRef.child(nameId).addListenerForSingleValueEvent(initTagListener(member));
+                }
             }
 
             @Override

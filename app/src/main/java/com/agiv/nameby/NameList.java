@@ -2,11 +2,22 @@ package com.agiv.nameby;
 
 import com.agiv.nameby.entities.Name;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Noa Agiv on 2/28/2017.
  */
 
 public class NameList extends UniqueList<Name> {
+
+    public List<String> getIds(){
+        List<String> ids = new ArrayList<>();
+        for (Name name : this){
+            ids.add(name.id);
+        }
+        return ids;
+    }
 
     public static UniqueList.ListCondition validNameFilter = new UniqueList.ListCondition<Name>() {
         @Override

@@ -14,21 +14,7 @@ public class Name {
     public String name;
     public String gender;
     public int popularity;
-    public Map<String, NameTag> userTags = new HashMap<>();
-
-    public enum NameTag{
-        untagged,
-        loved,
-        unloved,
-        maybe;
-
-
-        public static boolean isTagPositive(NameTag tag){
-            return tag.equals(NameTag.loved) || tag.equals(NameTag.maybe);
-        }
-    }
-
-
+//    public Map<String, NameTag> userTags = new HashMap<>();
 
     public Name(String name, String gender, int popularity){
       this.name = name;
@@ -64,49 +50,11 @@ public class Name {
     }
 
 
-    public void tagName(String tag) {
-        NameTag tagEnum = NameTag.valueOf(tag);
-        userTags.put(Settings.currentUser, tagEnum);
-    }
-
-    public void tagName(NameTag tag) {
-        userTags.put(Settings.currentUser, tag);
-    }
-
-    public void tagName(String user, String tag) {
-        NameTag tagEnum = NameTag.valueOf(tag);
-        userTags.put(user, tagEnum);
-    }
-
-    public void tagName(String user, NameTag tag) {
-       userTags.put(user, tag);
-    }
-
-    public NameTag getTag() {
-        return userTags.get(Settings.getCurrentUser());
-    }
-
-    public boolean isUnanimouslyPositive() {
-        for (NameTag tag : userTags.values()) {
-            if (!NameTag.isTagPositive(tag))
-                return false;
-        }
-        return true;
-    }
-
-    public boolean isPositiveForAnyPartner() {
-        for (NameTag tag : userTags.values()) {
-            if (NameTag.isTagPositive(tag))
-                return true;
-        }
-        return false;
-    }
 
 
-
-    public NameTag getTag(String user) {
-        return userTags.get(user);
-    }
+//    public NameTag getTag(String user) {
+//        return userTags.get(user);
+//    }
 
 //    public void setLovedByPartner(){
 //        lovedByPartner = true;
