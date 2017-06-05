@@ -1,43 +1,57 @@
 package com.agiv.nameby;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.fragments.RandomTagger;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.data.DataBufferObserver;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
-import static com.agiv.nameby.Settings.setIsHelpScreenSeen;
 //import static com.agiv.nameby.NameTagger.*;
 import static com.agiv.nameby.NameTagger2.*;
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private GoogleApiClient client;
     private FloatingActionButton addNameButton;
@@ -47,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     Intent helpIntent;
     private TextView userName;
     private TabLayout.Tab matchTab;
+    public static Context context;
 
     private enum ViewName{
         lovedNames,
@@ -57,48 +72,169 @@ public class MainActivity extends AppCompatActivity {
 
     private Map<ViewName, View> views;
 
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private LinearLayout mDrawerLinear;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+
+    public enum MenuItem {
+        triage(R.string.triage_tab, new RandomTagger()),
+        loved(R.string.loved_tab, new RandomTagger()),
+        unloved(R.string.unloved_tab, new RandomTagger()),
+        matches(R.string.name_matches, new RandomTagger());
+
+        MenuItem(int name, Fragment fragment){
+            this.name = name;
+            this.fragment = fragment;
+        }
+        private Context context = MainActivity.context;
+        private int name;
+        private Fragment fragment;
+
+        @Override
+        public String toString() {
+            return context.getResources().getString(name);
+        }
+    }
+    private void createDrawer(Bundle savedInstanceState){
+        MenuItem[] mPlanetTitles = MenuItem.values();
+        mTitle = mDrawerTitle = getTitle();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_menu);
+        mDrawerLinear = (LinearLayout) findViewById(R.id.left_drawer);
+
+        // set a custom shadow that overlays the main content when the drawer opens
+//        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        // set up the drawer's list view with items and click listener
+        mDrawerList.setAdapter(new ArrayAdapter<MenuItem>(this,
+                R.layout.drawer_list_item, mPlanetTitles));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        mDrawerToggle = new android.support.v7.app.ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        ) {
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(mTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        if (savedInstanceState == null) {
+            selectItem(0);
+        }
+    }
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    private void selectItem(int position) {
+//        // update the main content by replacing fragments
+//        Fragment fragment = new PlanetFragment();
+////        Bundle args = new Bundle();
+////        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+////        fragment.setArguments(args);
+//
+//        FragmentManager fragmentManager = getFragmentManager();
+//        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+//
+//        // update selected item and title, then close the drawer
+//        mDrawerList.setItemChecked(position, true);
+////        setTitle(mPlanetTitles[position]);
+//        mDrawerLayout.closeDrawer(mDrawerList);
+
+        MenuItem selected = MenuItem.values()[position];
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, selected.fragment)
+                .commit();
+        mDrawerList.setItemChecked(position, true);
+        setTitle(selected.toString());
+        mDrawerLayout.closeDrawer(mDrawerLinear);
+
+    }
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
-        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
-        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
-        Log.d("view", "initiating data");
-//        Member noa = new Member("1", "נעה");
-//        Settings.setMember(noa);
-        Settings.setMemberId("1");
-        NameTagger2.initData(MainActivity.this, this, matchTab);
+        this.context = getApplicationContext();
+//        setContentView(R.layout.activity_main);
 
-        Log.d("view", "setting UI");
-        views = new HashMap<ViewName, View>() {{
-            put(ViewName.lovedNames, getLovedNamesListView());
-            put(ViewName.unlovedNames, getUnlovedNamesListView());
-            put(ViewName.untaggedNames, getUntaggedNamesView());
-            put(ViewName.matchedNames, getMatchedNamesListView());
-        }};
-        setTabs();
-        setAddButton();
-        getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
-        getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
-        getMatchedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
+        setContentView(R.layout.drawer_layout);
+//        FragmentManager fragmentManager = getFragmentManager();
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.content_frame, new RandomTagger())
+//                .commit();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        userName = (TextView) findViewById(R.id.user_name);
-        userName.setText(getString(R.string.user_name) + " : " + Settings.getCurrentUser());
-        userName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchUser();
-            }
-            });
-        toolbar.setLogo(R.drawable.icon);
-        setSupportActionBar(toolbar);
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
+//        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
+//        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
+//        Log.d("view", "initiating data");
+//        Settings.setMemberId("1");
+//        NameTagger2.initData(MainActivity.this, this, matchTab);
+//
+//        Log.d("view", "setting UI");
+//        views = new HashMap<ViewName, View>() {{
+//            put(ViewName.lovedNames, getLovedNamesListView());
+//            put(ViewName.unlovedNames, getUnlovedNamesListView());
+//            put(ViewName.untaggedNames, getUntaggedNamesView());
+//            put(ViewName.matchedNames, getMatchedNamesListView());
+//        }};
+//        setTabs();
+//        setAddButton();
+//        getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
+//        getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
+//        getMatchedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
+//
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        userName = (TextView) findViewById(R.id.user_name);
+//        userName.setText(getString(R.string.user_name) + " : " + Settings.getCurrentUser());
+//        userName.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                switchUser();
+//            }
+//            });
+//        toolbar.setLogo(R.drawable.icon);
+//        setSupportActionBar(toolbar);
+//
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        switchToView(ViewName.untaggedNames);
+        createDrawer(savedInstanceState);
+//        switchToView(ViewName.untaggedNames);
     }
 
     private void switchUser() {
@@ -250,37 +386,57 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        // Pass the event to ActionBarDrawerToggle, if it returns
+//        // true, then it has handled the app icon touch event
+//        if (mDrawerToggle.onOptionsItemSelected(item)) {
+//            return true;
+//            return true;
+//        }
+//        // Handle your other action bar items...
+//
+//        return super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.sex_settings) {
-            Settings.unsetGender();
-            startActivity(sexChooseIntent);
-            return true;
-        }
-        if (id == R.id.family_settings) {
-            Settings.setFamilyMembersEdited(false);
-            startActivity(familyMembersIntent);
-            return true;
-        }
-        if (id == R.id.change_user){
-            switchUser();
-        }
-        if (id == R.id.help){
-            setIsHelpScreenSeen(false);
-            startActivity(helpIntent);
-        }
-
-        return super.onOptionsItemSelected(item);
+//        if (id == R.id.sex_settings) {
+//            Settings.unsetGender();
+//            startActivity(sexChooseIntent);
+//            return true;
+//        }
+//        if (id == R.id.family_settings) {
+//            Settings.setFamilyMembersEdited(false);
+//            startActivity(familyMembersIntent);
+//            return true;
+//        }
+//        if (id == R.id.change_user){
+//            switchUser();
+//        }
+//        if (id == R.id.help){
+//            setIsHelpScreenSeen(false);
+//            startActivity(helpIntent);
+//        }
+//
+//        return super.onOptionsItemSelected(item);
     }
 
     private void changeUserInit(){

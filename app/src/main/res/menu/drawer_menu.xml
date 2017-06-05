@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_subheader"
+        android:title="@string/choose_female">
+        <menu>
+            <item
+                android:id="@+id/navigation_sub_item_1"
+                android:icon="@drawable/love"
+                android:title="@string/name_matches"/>
+            <item
+                android:id="@+id/navigation_sub_item_2"
+                android:icon="@drawable/dislove"
+                android:title="@string/unloved_tab"/>
+        </menu>
+    </item>
+</menu>
