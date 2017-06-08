@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/lists_menu"
+        android:checkableBehavior="single">
+
+            <item
+                android:id="@+id/triage_menu_item"
+                android:icon="@drawable/love"
+                android:title="@string/triage_tab"/>
+            <item
+                android:id="@+id/matches_menu_item"
+                android:icon="@drawable/love"
+                android:title="@string/name_matches"/>
+            <item
+                android:id="@+id/loved_menu_item"
+                android:icon="@drawable/love"
+                android:title="@string/loved_tab"/>
+            <item
+                android:id="@+id/unloved_menu_item"
+                android:icon="@drawable/dislove"
+                android:title="@string/unloved_tab"/>
+
+    </group>
+    <group
+        android:id="@+id/settings_menu"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/settings_menu_item"
+            android:icon="@drawable/love"
+            android:title="@string/settings"/>
+    </group>
+
+</menu>

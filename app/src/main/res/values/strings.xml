@@ -33,6 +33,8 @@
     <string name="nevigation_help_text3">אהובים : כאן נשמרים השמות שאהבתם. לחצו על העפרון כדי להעביר לרשימת הלא אהובים. \n\nלא אהובים : כאן נשמרים השמות שלא אהבתם. לחצו על העפרון כדי להעביר לרשימת השמות האהובים.\n\nהתאמות : כאן האפליקציה תשמור שמות ששניכם אהבתם. כשתמצא התאמה, תשמעו צליל מיוחד, ושם הכרטיסיה יהפוך לאייקון של לב ורוד.</string>
     <string name="drawer_open">לתפריט</string>
     <string name="drawer_close">סגור תפריט</string>
+    <string name="lists">רשימות</string>
+    <string name="settings">הגדרות</string>
 
 </resources>
 

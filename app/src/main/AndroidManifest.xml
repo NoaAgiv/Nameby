@@ -8,7 +8,7 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.AppCompat.Light">
         <activity
             android:name="com.agiv.nameby.WelcomeScreen"
             android:label="@string/app_name"
@@ -39,7 +39,7 @@
         <activity
             android:name="com.agiv.nameby.MainActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
