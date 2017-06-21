@@ -1,11 +1,11 @@
 package com.agiv.nameby.entities;
 
+import android.content.Context;
 import android.util.Log;
-import android.view.View;
 import android.widget.Adapter;
 
 import com.agiv.nameby.NameList;
-import com.agiv.nameby.Settings;
+import com.agiv.nameby.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,21 +41,39 @@ public class Member {
     }
 
     public enum NameTag{
-        untagged(untaggedNames, untaggedAdapter),
-        loved(lovedNames, lovedAdapter),
-        unloved(unlovedNames, unlovedAdapter),
-        maybe(maybeNames, maybeAdapter);
+        untagged(R.string.untagged, untaggedNames, untaggedAdapter),
+        loved(R.string.loved, lovedNames, lovedAdapter, R.drawable.love),
+        unloved(R.string.unloved, unlovedNames, unlovedAdapter, R.drawable.dislove),
+        maybe(R.string.maybe, maybeNames, maybeAdapter, R.drawable.next);
 
+        public int displayName;
         public NameList nameList;
         public Adapter adapter;
+        public Integer imageResId;
 
-        NameTag(NameList nameList, Adapter adapter){
+        NameTag(int displayName, NameList nameList, Adapter adapter){
+            this.displayName = displayName;
             this.nameList = nameList;
             this.adapter = adapter;
+            this.imageResId = 0;
+        }
+
+        NameTag(int displayName, NameList nameList, Adapter adapter, int imageResId){
+            this(displayName, nameList, adapter);
+            this.imageResId = imageResId;
         }
 
         public static boolean isTagPositive(NameTag tag){
             return tag.equals(NameTag.loved) || tag.equals(NameTag.maybe);
+        }
+
+        public static NameTag getTag(Context context, String displayName){
+            for (NameTag tag : values()){
+                if (displayName.equals(context.getString(tag.displayName))){
+                    return tag;
+                }
+            }
+            return null;
         }
     }
 

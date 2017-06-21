@@ -27,7 +27,7 @@ public class NameTaggerViewContainer extends View{
     private ImageView disloveButton;
 
 
-    public NameTaggerViewContainer(Context context, TextView textView, Activity activity) {
+    public NameTaggerViewContainer(Context context, TextView textView, Activity activity, View randomTaggerLayout) {
         super(context);
         loveSound = MediaPlayer.create(context, R.raw.c_tone);
         unlikeSound = MediaPlayer.create(context, R.raw.a_tone);
@@ -45,8 +45,8 @@ public class NameTaggerViewContainer extends View{
         });
 
 
-        loveButton = (ImageView) activity.findViewById(R.id.love_image);
-        disloveButton = (ImageView) activity.findViewById(R.id.dislove_image);
+        loveButton = (ImageView) randomTaggerLayout.findViewById(R.id.love_image);
+        disloveButton = (ImageView) randomTaggerLayout.findViewById(R.id.dislove_image);
 
         loveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +74,7 @@ public class NameTaggerViewContainer extends View{
     public final void setName(Name name){
         currentName = name;
         textView.setText(name.name);
+        System.out.println(currentName.name);
     }
 
     public TextView getTextView() {

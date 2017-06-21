@@ -133,7 +133,7 @@
 //
 ////        matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
 //
-////        matchedAdapter = new SimpleListViewAdapter(matchedNames, context);
+////        matchedAdapter = new SearchableAdapter(matchedNames, context);
 //        matchedNamesListView.setAdapter(matchedAdapter);
 //
 ////        updateMatchedNames();

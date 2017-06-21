@@ -1,15 +1,10 @@
 package com.agiv.nameby;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
@@ -17,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,34 +23,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.fragments.ListsFragment;
 import com.agiv.nameby.fragments.RandomTagger;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.data.DataBufferObserver;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
 
 import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
 //import static com.agiv.nameby.NameTagger.*;
 import static com.agiv.nameby.NameTagger2.*;
+
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -67,6 +59,10 @@ public class MainActivity extends AppCompatActivity
     private TextView userName;
     private TabLayout.Tab matchTab;
     public static Context context;
+    private static View listsLayout;
+    private static View randomTaggerLayout;
+    private RandomTagger randomTagger;
+    private ListsFragment listFrag;
 
     private enum ViewName{
         lovedNames,
@@ -90,21 +86,23 @@ public class MainActivity extends AppCompatActivity
         this.context = getApplicationContext();
 
 //        setContentView(R.layout.activity_main);
+//        listsLayout = View.inflate(this, R.layout.content_main, null);
+//        randomTaggerLayout = View.inflate(this, R.layout.random_tagger, null);
+        listFrag = new ListsFragment();
+        randomTagger  = new RandomTagger();
 
         setContentView(R.layout.drawer_layout);
-//        FragmentManager fragmentManager = getFragmentManager();
-//        fragmentManager.beginTransaction()
-//                .replace(R.id.content_frame, new RandomTagger())
-//                .commit();
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
 //        sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
 //        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
 //        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
 //        Log.d("view", "initiating data");
 //        Settings.setMemberId("1");
-        NameTagger2.initData(MainActivity.this, this, matchTab);
-//
+        NameTagger2.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
+
 //        Log.d("view", "setting UI");
 //        views = new HashMap<ViewName, View>() {{
 //            put(ViewName.lovedNames, getLovedNamesListView());
@@ -286,17 +284,30 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (id == R.id.triage_menu_item) {
+            fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
-        if (id == R.id.choose_sex_buttons) {
-            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
+        }else if (id == R.id.loved_menu_item) {
+            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+            listFrag.filterByTag(getResources().getString(R.string.loved));
 
+        } else if (id == R.id.matches_menu_item) {
+            System.out.println("matchs");
+            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+            listFrag.filterByTag(getResources().getString(R.string.matches));
 
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
+        } else if (id == R.id.all_names_menu_item) {
+            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+            listFrag.filterByTag(getResources().getString(R.string.all));
         }
-        return false;
+
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+
     }
 
 
@@ -389,16 +400,16 @@ public class MainActivity extends AppCompatActivity
     private void setTabs(){
         TabLayout allTabs = (TabLayout) findViewById(R.id.tabs);
         allTabs.addTab(allTabs.newTab().setText(R.string.triage_tab), true);
-        allTabs.addTab(allTabs.newTab().setText(R.string.loved_tab));
-        allTabs.addTab(allTabs.newTab().setText(R.string.unloved_tab));
-        allTabs.addTab(allTabs.newTab().setText(R.string.name_matches));
+        allTabs.addTab(allTabs.newTab().setText(R.string.loved));
+        allTabs.addTab(allTabs.newTab().setText(R.string.unloved));
+        allTabs.addTab(allTabs.newTab().setText(R.string.matches));
         matchTab = allTabs.getTabAt(3);
         allTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 String tabName = tab.getText().toString();
                 ViewName selectedView = null;
-                if (tabName.equals(getString(R.string.loved_tab))) {
+                if (tabName.equals(getString(R.string.loved))) {
                     Collections.sort(lovedNames, new Comparator<Name>() {
                         @Override
                         public int compare(Name s, Name t1) {
@@ -407,7 +418,7 @@ public class MainActivity extends AppCompatActivity
                     });
                     getLovedAdapter().notifyDataSetChanged();
                     selectedView = ViewName.lovedNames;
-                } else if (tabName.equals(getString(R.string.unloved_tab))) {
+                } else if (tabName.equals(getString(R.string.unloved))) {
                     Collections.sort(unlovedNames, new Comparator<Name>() {
                         @Override
                         public int compare(Name s, Name t1) {
@@ -524,7 +535,7 @@ public class MainActivity extends AppCompatActivity
 
     private void changeUserInit(){
         try {
-            NameTagger2.initData(MainActivity.this, this, matchTab);
+            NameTagger2.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
         }
         catch (Exception e){
             System.out.println(e);

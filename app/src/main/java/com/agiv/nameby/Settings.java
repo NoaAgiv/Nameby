@@ -23,7 +23,7 @@ public class Settings {
     static boolean familyMembersEdited = false;
     static boolean helpScreenSeen = false;
 
-    static String memberId;
+    static String memberId = "0";
     static Member member;
     static String familyId = "1";
     static Family family;

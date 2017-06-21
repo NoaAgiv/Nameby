@@ -3,7 +3,9 @@ package com.agiv.nameby;
 import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -13,6 +15,8 @@ import com.agiv.nameby.entities.Member;
 import static com.agiv.nameby.entities.Member.NameTag.*;
 import static com.agiv.nameby.entities.Member.NameTag;
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.fragments.ListsFragment;
+import com.agiv.nameby.fragments.RandomTagger;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -55,11 +59,16 @@ public class NameTagger2 {
     // Helpers
     private static NameGenerator ngen;
 
+    private static NameList nameList = new NameList();
+    private static ListsFragment listFrag;
 
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab){
+    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger){
         Log.w("view", "a");
+        NameTagger2.listFrag = listsFragment;
+        System.out.println("init data " +  nameList);
+        listsFragment.setNames(nameList, context);
         NameTagger2.context = context;
         NameTagger2.activity = activity;
 //        matchTab = matchTab;
@@ -67,8 +76,8 @@ public class NameTagger2 {
         Firebase.initFamilyListener(Settings.getFamilyId());
 //        System.out.println("init family " + Settings.getFamily().familyMembers);
         Firebase.initNameTagListeners();
-        initViewAdapters();
-        initUntaggedArea();
+//        initViewAdapters();
+        initUntaggedArea(randomTaggerLayout, randomTagger);
 
 
 
@@ -83,6 +92,10 @@ public class NameTagger2 {
 
     public static void initName(Name name){
         allNames.addIf(name, NameList.validNameFilter);
+
+        nameList.addIf(name, NameList.validNameFilter);
+        listFrag.notifyChange();
+        System.out.println("init name " + nameList.toString());
         femaleNames.addIf(name, NameList.femaleFilter);
         maleNames.addIf(name, NameList.maleFilter);
     }
@@ -92,11 +105,12 @@ public class NameTagger2 {
     }
 
     public static void initTag(Member member, String nameId, String tagStr){
+        System.out.println("hiush");
         Member.NameTag tag = untagged;
         if (tagStr!=null) {
             tag = Member.NameTag.valueOf(tagStr);
         }
-        Name name = allNames.getById(nameId);
+        Name name = nameList.getById(nameId);
 
         setMemberNameTag(member, name, tag);
         if (member.equals(Settings.getMember())) {
@@ -104,54 +118,56 @@ public class NameTagger2 {
         }
     }
 
-    private static void initUntaggedArea(){
+    private static void initUntaggedArea(View randomTaggerLayout, RandomTagger randomTagger){
         ngen = new NameGenerator(untaggedNames, untaggedPartnerPositiveNames, new NamePreferences());
-        untaggedNamesView = new NameTaggerViewContainer(context, (TextView) activity.findViewById(R.id.untagged_names_view), activity);
-        untaggedNamesView.setName(ngen.getNextUntaggedName());
-
-
-    }
-
-    private static void initViewAdapters() {
-
-        lovedNamesListView = (ListView) activity.findViewById(R.id.loved_names);
-
-        final SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
-            @Override
-            public void switchLists(Name name) {
-                markNameUnloved(name);
-            }
-        };
-
-        lovedAdapter = new EditableListViewAdapter(lovedToUnlovedSwitch, lovedNames, activity,
-                activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.edit_unlove);
-
-        lovedNamesListView.setAdapter(lovedAdapter);
-
-
-        unlovedNamesListView = (ListView) activity.findViewById(R.id.unloved_names);
-
-        SwitchListsCallBack unlovedToLovedSwitch = new SwitchListsCallBack() {
-            @Override
-            public void switchLists(Name name) {
-                markNameLoved(name);
-            }
-        };
-
-        unlovedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, unlovedNames, activity,
-                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.edit_love);
-        unlovedNamesListView.setAdapter(unlovedAdapter);
-
-        matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
-
-        matchedAdapter = new SimpleListViewAdapter(matchedNames, context);
-        matchedNamesListView.setAdapter(matchedAdapter);
-
-//        updateMatchedNames();
+//        untaggedNamesView = new NameTaggerViewContainer(context, (TextView) randomTaggerLayout.findViewById(R.id.untagged_names_view), activity, randomTaggerLayout);
+        randomTagger.setName(ngen.getNextUntaggedName());
+//        untaggedNamesView.setName(ngen.getNextUntaggedName());
 
 
 
     }
+
+//    private static void initViewAdapters() {
+//
+//        lovedNamesListView = (ListView) listsLayout.findViewById(R.id.loved_names);
+//
+//        final SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
+//            @Override
+//            public void switchLists(Name name) {
+//                markNameUnloved(name);
+//            }
+//        };
+//
+//        lovedAdapter = new EditableListViewAdapter(lovedToUnlovedSwitch, lovedNames, activity,
+//                activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.edit_unlove);
+//
+//        lovedNamesListView.setAdapter(lovedAdapter);
+//
+//
+//        unlovedNamesListView = (ListView) listsLayout.findViewById(R.id.unloved_names);
+//
+//        SwitchListsCallBack unlovedToLovedSwitch = new SwitchListsCallBack() {
+//            @Override
+//            public void switchLists(Name name) {
+//                markNameLoved(name);
+//            }
+//        };
+//
+//        unlovedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, unlovedNames, activity,
+//                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.edit_love);
+//        unlovedNamesListView.setAdapter(unlovedAdapter);
+//
+//        matchedNamesListView = (ListView) listsLayout.findViewById(R.id.matched_names);
+//
+//        matchedAdapter = new SearchableAdapter(matchedNames, context);
+//        matchedNamesListView.setAdapter(matchedAdapter);
+//
+////        updateMatchedNames();
+//
+//
+//
+//    }
 
     public static void saveNameTag(Name name, Member member){
         DatabaseReference tagsRef = database.getReference("users/" + member.id + "/tags");
@@ -191,7 +207,14 @@ public class NameTagger2 {
 
     }
 
-    private static boolean updateListsWithTags(Name name, Member m){
+    private static boolean updateListsWithTags(Name name, Member m) {
+        NameTag tag = m.getTag(name);
+        nameList.add(name);
+        System.out.println("num of names:" + nameList.size());
+        return true; // TODO: change to teturn if anonymasely loved
+    }
+
+    private static boolean updateListsWithTags2(Name name, Member m){
         // since all names in lists are references,
         // all lists should be updated by updating any Name reference
         NameTag tag = m.getTag(name);

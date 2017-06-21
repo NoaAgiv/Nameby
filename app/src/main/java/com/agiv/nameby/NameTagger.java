@@ -252,7 +252,7 @@
 //        matchedNamesListView = (ListView) activity.findViewById(R.id.matched_names);
 //
 //        // TODO: change to a regular ListAdapter below
-//        matchedAdapter = new SimpleListViewAdapter(matchedNames, context);
+//        matchedAdapter = new SearchableAdapter(matchedNames, context);
 //        matchedNamesListView.setAdapter(matchedAdapter);
 //
 //        updateMatchedNames();

@@ -5,10 +5,13 @@
     <string name="menu_change_user_settings">החלף משתמש</string>
     <string name="menu_family_settings">הגדר משפחה</string>
     <string name="help">עזרה</string>
-    <string name="loved_tab">אהובים</string>
-    <string name="unloved_tab">לא אהובים</string>
+    <string name="loved">אהובים</string>
+    <string name="unloved">לא אהובים</string>
+    <string name="untagged">לא מתוייגים</string>
+    <string name="all_names">כל השמות</string>
+    <string name="maybe">אפשר לשקול</string>
     <string name="triage_tab">מיון</string>
-    <string name="name_matches">התאמות</string>
+    <string name="matches">התאמות</string>
     <string name="mark_loved_dialog_title">סימון שם כאהוב</string>
     <string name="mark_loved_dialog_body">האם להעביר את השם מרשימת הלא אהובים לרשימת האהובים?</string>
     <string name="mark_unloved_dialog_title">סימון שם כלא אהוב</string>
@@ -35,6 +38,11 @@
     <string name="drawer_close">סגור תפריט</string>
     <string name="lists">רשימות</string>
     <string name="settings">הגדרות</string>
+    <string name="search">חיפוש</string>
+    <string name="name">שם</string>
+    <string name="tag">תיוג:</string>
+    <string name="all">כולם</string>
+    <string name="names">שמות</string>
 
 </resources>
 
