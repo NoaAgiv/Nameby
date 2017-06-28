@@ -100,14 +100,14 @@ public class MainActivity extends AppCompatActivity
 //        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
 //        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
 //        Log.d("view", "initiating data");
-//        Settings.setMemberId("1");
+        Settings.setMemberId("0");
         NameTagger2.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
 
 //        Log.d("view", "setting UI");
 //        views = new HashMap<ViewName, View>() {{
 //            put(ViewName.lovedNames, getLovedNamesListView());
 //            put(ViewName.unlovedNames, getUnlovedNamesListView());
-//            put(ViewName.untaggedNames, getUntaggedNamesView());
+//            put(ViewName.names, getUntaggedNamesView());
 //            put(ViewName.matchedNames, getMatchedNamesListView());
 //        }};
 //        setTabs();
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity
 //        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         createDrawer();
-//        switchToView(ViewName.untaggedNames);
+//        switchToView(ViewName.names);
     }
 
 
@@ -293,7 +293,6 @@ public class MainActivity extends AppCompatActivity
             listFrag.filterByTag(getResources().getString(R.string.loved));
 
         } else if (id == R.id.matches_menu_item) {
-            System.out.println("matchs");
             fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
             listFrag.filterByTag(getResources().getString(R.string.matches));
 

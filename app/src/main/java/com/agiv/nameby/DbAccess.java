@@ -39,14 +39,14 @@ public class DbAccess {
 
     public void initialDbPopulate() throws IOException {
         // Check if the database exists before copying
-        boolean initialiseDatabase = context.getDatabasePath("untaggedNames.db").exists();
+        boolean initialiseDatabase = context.getDatabasePath("names.db").exists();
         if (initialiseDatabase == false) {
 
             // Open the .db file in your assets directory
             InputStream is = context.getAssets().open("databases/names.db");
 
             // Copy the database into the destination
-            OutputStream os = new FileOutputStream(context.getDatabasePath("untaggedNames.db"));
+            OutputStream os = new FileOutputStream(context.getDatabasePath("names.db"));
             byte[] buffer = new byte[1024];
             int length;
             while ((length = is.read(buffer)) > 0){
@@ -95,7 +95,7 @@ public class DbAccess {
      * @return a List of quotes
      */
     public ArrayList<Name> getNames() {
-        Cursor cursor = database.rawQuery("SELECT name, gender, popularity FROM untaggedNames where gender = \"" + Settings.getGenderString() + "\"", null);
+        Cursor cursor = database.rawQuery("SELECT name, gender, popularity FROM names where gender = \"" + Settings.getGenderString() + "\"", null);
 
         ArrayList<Name> list = populateNameList(cursor);
         cursor.close();
@@ -123,8 +123,8 @@ public class DbAccess {
     private ArrayList<Name> getNames(String user, boolean loved) {
         int loved_int = loved? 1 : 0;
         String query =
-                "SELECT untaggedNames.name, untaggedNames.gender, untaggedNames.popularity from untaggedNames " +
-                "JOIN names_users on untaggedNames.id = names_users.name_id " +
+                "SELECT names.name, names.gender, names.popularity from names " +
+                "JOIN names_users on names.id = names_users.name_id " +
                 "JOIN users on users.id = names_users.user_id " +
                 "WHERE gender =\"" + Settings.getGenderString() + "\"" +
                         "and users.name = \"" + user + "\" " +
@@ -188,7 +188,7 @@ public class DbAccess {
         int user_id = cursor.getInt(0);
 
         int name_id;
-        cursor = database.rawQuery("SELECT id FROM untaggedNames WHERE gender = \""+ Settings.getGenderString() +"\" and name = \""+ name + "\"", null);
+        cursor = database.rawQuery("SELECT id FROM names WHERE gender = \""+ Settings.getGenderString() +"\" and name = \""+ name + "\"", null);
         if (cursor.getCount() == 0){ //name does not exist
             ContentValues nameTableValues = new ContentValues();
             nameTableValues.put(NameContract.NameEntry.TABLE_NAMES_NAME, name.name);

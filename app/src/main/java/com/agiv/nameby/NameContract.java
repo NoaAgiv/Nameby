@@ -15,7 +15,7 @@ public class NameContract {
         public static final String TABLE_NAMES_IS_LIKED = "is_liked";
 
 
-        public static final String TABLE_NAMES = "untaggedNames";
+        public static final String TABLE_NAMES = "names";
         public static final String TABLE_NAMES_NAME = "name";
         public static final String TABLE_NAMES_INSERTED_BY = "inserted_by";
         public static final String TABLE_NAMES_DATE_INSERTED = "data_inserted";

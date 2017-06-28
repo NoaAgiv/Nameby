@@ -58,7 +58,7 @@ public class NameTagger2 {
 
     // Helpers
     private static NameGenerator ngen;
-
+    private static RandomTagger randomTagger;
     private static NameList nameList = new NameList();
     private static ListsFragment listFrag;
 
@@ -66,8 +66,8 @@ public class NameTagger2 {
 
     public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger){
         Log.w("view", "a");
+        NameTagger2.randomTagger = randomTagger;
         NameTagger2.listFrag = listsFragment;
-        System.out.println("init data " +  nameList);
         listsFragment.setNames(nameList, context);
         NameTagger2.context = context;
         NameTagger2.activity = activity;
@@ -77,7 +77,7 @@ public class NameTagger2 {
 //        System.out.println("init family " + Settings.getFamily().familyMembers);
         Firebase.initNameTagListeners();
 //        initViewAdapters();
-        initUntaggedArea(randomTaggerLayout, randomTagger);
+        initUntaggedArea(randomTaggerLayout);
 
 
 
@@ -95,7 +95,7 @@ public class NameTagger2 {
 
         nameList.addIf(name, NameList.validNameFilter);
         listFrag.notifyChange();
-        System.out.println("init name " + nameList.toString());
+
         femaleNames.addIf(name, NameList.femaleFilter);
         maleNames.addIf(name, NameList.maleFilter);
     }
@@ -105,21 +105,22 @@ public class NameTagger2 {
     }
 
     public static void initTag(Member member, String nameId, String tagStr){
-        System.out.println("hiush");
+
         Member.NameTag tag = untagged;
         if (tagStr!=null) {
             tag = Member.NameTag.valueOf(tagStr);
         }
         Name name = nameList.getById(nameId);
-
         setMemberNameTag(member, name, tag);
         if (member.equals(Settings.getMember())) {
             updateListsWithTags(name, member);
         }
+        if (tag.equals(NameTag.untagged) && ngen.allNamesTagged()) // update triage view with the single new untagged name
+            randomTagger.setName(ngen.getNextUntaggedName());
     }
 
-    private static void initUntaggedArea(View randomTaggerLayout, RandomTagger randomTagger){
-        ngen = new NameGenerator(untaggedNames, untaggedPartnerPositiveNames, new NamePreferences());
+    private static void initUntaggedArea(View randomTaggerLayout){
+        ngen = new NameGenerator(nameList, new NamePreferences());
 //        untaggedNamesView = new NameTaggerViewContainer(context, (TextView) randomTaggerLayout.findViewById(R.id.untagged_names_view), activity, randomTaggerLayout);
         randomTagger.setName(ngen.getNextUntaggedName());
 //        untaggedNamesView.setName(ngen.getNextUntaggedName());
@@ -210,7 +211,6 @@ public class NameTagger2 {
     private static boolean updateListsWithTags(Name name, Member m) {
         NameTag tag = m.getTag(name);
         nameList.add(name);
-        System.out.println("num of names:" + nameList.size());
         return true; // TODO: change to teturn if anonymasely loved
     }
 

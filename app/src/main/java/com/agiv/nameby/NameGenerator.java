@@ -12,49 +12,79 @@ import java.util.Random;
 
 public class NameGenerator {
     private static final Random rgenerator = new Random();
-    NameList untaggedNames;
-    NameList untaggedPartnerPositiveNames;
+    NameList names;
     NamePreferences pref;
     private static Name END_OF_LIST = new Name("Congrats! You tagged all the names!","f", 0);
+    private boolean allTagged = true;
 
-    public NameGenerator(NameList names, NameList PartnerPositiveNames, NamePreferences pref) {
-        this.untaggedNames = names;
-        this.untaggedPartnerPositiveNames = names;
+    public NameGenerator(NameList names, NamePreferences pref) {
+        System.out.println("nameS! " + names);
+        this.names = names;
         this.pref = pref;
     }
 
+    public boolean allNamesTagged(){
+        return allTagged;
+    }
+
     public Name getNextUntaggedName() {
-        if (untaggedNames.isEmpty())
+        if (names.isEmpty()) {
+            System.out.println(names);
+            allTagged = true;
             return END_OF_LIST;
+        }
         else{
-            if (getFromPartnerLovedNamesRandomChoice())
-                return getRandomFromPartnerLovedNames();
-            else
-                return getRandomFromUntaggedPopularityBias();
+            allTagged = false;
+
+            NameList familyLoved = filteredNames(
+                    NameList.fullyInitiatedFilter,
+                    NameList.untaggedFilter,
+                    NameList.someFamilyMembersLovedFilter);
+            System.out.println("partner list " + familyLoved);
+            if (getFromPartnerLovedNamesRandomChoice(familyLoved))
+                return getRandomFromPartnerLovedNames(familyLoved);
+
+            else {
+                NameList untagged = filteredNames(
+                        NameList.fullyInitiatedFilter,
+                        NameList.untaggedFilter
+                        );
+
+                if (untagged.isEmpty()) {
+                    allTagged = true;
+                    return END_OF_LIST;
+                }
+                System.out.println("untagged list " + untagged);
+                return getRandomFromUntaggedPopularityBias(untagged);
+            }
         }
     }
 
-    private Name getRandomFromUntaggedPopularityBias(){
-        Collections.sort(untaggedNames, new Comparator<Name>() {
+    private Name getRandomFromUntaggedPopularityBias(NameList untagged){
+
+        Collections.sort(untagged, new Comparator<Name>() {
             @Override
             public int compare(Name name1, Name name) {
                 return name1.popularity - name.popularity;
             }
         });
-        return untaggedNames.get(rgenerator.nextInt(Math.min(10,untaggedNames.size())));
+        System.out.println("and now?" + untagged.size());
+        return untagged.get(rgenerator.nextInt(Math.min(10, untagged.size())));
     }
 
-    private Name getRandomFromPartnerLovedNames(){
-        return untaggedPartnerPositiveNames.get(rgenerator.nextInt(untaggedPartnerPositiveNames.size()));
+    private Name getRandomFromPartnerLovedNames(NameList familyLoved){
+        return familyLoved.get(rgenerator.nextInt(familyLoved.size()));
     }
 
-    private boolean getFromPartnerLovedNamesRandomChoice(){
-        if (untaggedPartnerPositiveNames.isEmpty()) return false;
+    private boolean getFromPartnerLovedNamesRandomChoice(NameList familyLoved){
+        if (familyLoved.isEmpty()) return false;
         int rnd = rgenerator.nextInt(100);
-        if (rnd < 20)
-            return false;
-        else
-            return true;
+        return (rnd >= 20);
     }
 
+    private NameList filteredNames(UniqueList.ListCondition<Name> ... conds){
+        NameList filtered = new NameList();
+        filtered.conditionalAddAll(names, conds);
+        return filtered;
+    }
 }

@@ -30,7 +30,6 @@ public class Firebase {
                 String nameId = dataSnapshot.getKey();
                 String tag = (String) dataSnapshot.getValue();
                 NameTagger2.initTag(member, nameId, tag);
-
             }
 
             @Override

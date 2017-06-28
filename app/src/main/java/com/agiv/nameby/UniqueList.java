@@ -31,19 +31,19 @@ public class UniqueList<T> extends ArrayList<T> {
         return null;
     }
 
-    public void conditionalAddAll(Collection<T> collection, ListCondition<T> listCond){
+    public void conditionalAddAll(Collection<T> collection, ListCondition<T> ... listConds){
         for (T obj : collection) {
-            if (listCond.apply(obj)) {
-                this.add(obj);
-            }
+            addIf(obj, listConds);
         }
     }
 
-    public void addIf(T obj, ListCondition<T> listCond){
-        if (listCond.apply(obj)) {
-            this.add(obj);
+    public void addIf(T obj, ListCondition<T> ... listConds){
+        for (ListCondition cond : listConds) {
+            if (!cond.apply(obj))
+                return;
         }
 
+        this.add(obj);
     }
 
     public interface ListCondition<T>{

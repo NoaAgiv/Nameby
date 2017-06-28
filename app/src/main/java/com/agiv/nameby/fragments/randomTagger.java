@@ -41,7 +41,6 @@ public class RandomTagger extends Fragment {
         currentName = name;
         if (textView != null)
             textView.setText(name.name);
-        System.out.println(currentName.name);
     }
 
     @Override

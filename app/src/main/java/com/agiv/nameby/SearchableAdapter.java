@@ -197,7 +197,6 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
                 return performNameFiltering(stringConstraint.substring(5));
             }
             else if (stringConstraint.startsWith("tag.")){
-                System.out.println(stringConstraint.substring(4));
                 return performTagFiltering(stringConstraint.substring(4));
             }
             return null;

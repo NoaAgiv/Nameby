@@ -96,5 +96,12 @@ public class Name {
         return Integer.valueOf(id);
     }
 
-
+    @Override
+    public String toString() {
+        return "Name{" +
+                name  +
+                "(" + gender + '\'' +
+                ") #" + popularity +
+                '}';
+    }
 }

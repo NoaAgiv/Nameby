@@ -79,6 +79,7 @@ public class Member {
 
     public void tagName(Name name, NameTag tag) {
         nameTags.put(name.id, tag);
+        System.out.println("set" + name.name + tag + nameTags.get(name.id));
     }
 
     public void tagName(Name name, String tag) {
@@ -86,6 +87,7 @@ public class Member {
     }
 
     public NameTag getTag(Name name) {
+        System.out.println("get" + name.name +  nameTags.get(name.id));
         return nameTags.get(name.id);
     }
 

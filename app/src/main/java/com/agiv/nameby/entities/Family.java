@@ -35,7 +35,7 @@ public class Family {
 
     public boolean isUnanimouslyPositive(Name name) {
         for (Member member : familyMembers) {
-            if (member.isPositiveTag(name))
+            if (!member.isPositiveTag(name))
                 return false;
         }
         return true;
@@ -47,6 +47,17 @@ public class Family {
                 return true;
         }
         return false;
+    }
+
+    public boolean isFullyInitiated(Name name) {
+        for (Member member : familyMembers) {
+            System.out.println(name.name);
+            if (member.getTag(name)==null) {
+                System.out.println("untagged" + name.name);
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

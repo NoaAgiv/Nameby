@@ -41,29 +41,21 @@ public class ListsFragment extends Fragment {
     private String selectedTag = "all";
 
     public void setNames(NameList names, Context context){
-        System.out.println("set names context " + getContext());
         this.names = names;
-        System.out.println("aa "  +  names);
         if (adapter == null) {
             adapter = new SearchableAdapter(context, names);
         }
         if (nameList != null) {
-            System.out.println("no worries2");
             nameList.setAdapter(adapter);
         }
-        System.out.println("aa "  +  names);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        System.out.println("on create");
-        System.out.println("aa "  +  names);
         layout = inflater.inflate(R.layout.name_lists, container, false);
         nameList = (ListView) layout.findViewById(R.id.loved_names);
-        System.out.println("names " + names);
         if (names != null){
-            System.out.println("no worries");
             adapter = new SearchableAdapter(getContext(), names);
             searchTextBox = (EditText) layout.findViewById(R.id.searchBox);
             setSearchTextWatcher();

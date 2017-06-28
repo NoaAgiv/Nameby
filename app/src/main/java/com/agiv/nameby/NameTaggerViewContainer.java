@@ -74,7 +74,6 @@ public class NameTaggerViewContainer extends View{
     public final void setName(Name name){
         currentName = name;
         textView.setText(name.name);
-        System.out.println(currentName.name);
     }
 
     public TextView getTextView() {

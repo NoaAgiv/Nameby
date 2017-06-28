@@ -1,5 +1,6 @@
 package com.agiv.nameby;
 
+import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
 
 import java.util.ArrayList;
@@ -40,6 +41,27 @@ public class NameList extends UniqueList<Name> {
         }
     };
 
+    public static UniqueList.ListCondition untaggedFilter = new UniqueList.ListCondition<Name>() {
+        @Override
+        public boolean apply(Name name) {
+            return Settings.getMember().getTag(name).equals(Member.NameTag.untagged);
+        }
+    };
+
+    public static UniqueList.ListCondition someFamilyMembersLovedFilter = new UniqueList.ListCondition<Name>() {
+        @Override
+        public boolean apply(Name name) {
+            return Settings.getFamily().isPositiveForSomeone(name);
+        }
+    };
+
+    public static UniqueList.ListCondition fullyInitiatedFilter = new UniqueList.ListCondition<Name>() {
+        @Override
+        public boolean apply(Name name) {
+            return Settings.getFamily().isFullyInitiated(name);
+        }
+    };
+
     public static class IdCondition implements ListCondition<Name>{
         String id;
 
@@ -55,4 +77,5 @@ public class NameList extends UniqueList<Name> {
     public Name getById(String id){
         return this.firstSatisfies(new NameList.IdCondition(id));
     }
+
 }
