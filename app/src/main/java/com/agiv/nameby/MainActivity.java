@@ -44,7 +44,7 @@ import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
 //import static com.agiv.nameby.NameTagger.*;
-import static com.agiv.nameby.NameTagger2.*;
+import static com.agiv.nameby.NameTagger.*;
 
 
 public class MainActivity extends AppCompatActivity
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity
 //        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
 //        Log.d("view", "initiating data");
         Settings.setMemberId("0");
-        NameTagger2.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
+        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
 
 //        Log.d("view", "setting UI");
 //        views = new HashMap<ViewName, View>() {{
@@ -534,7 +534,7 @@ public class MainActivity extends AppCompatActivity
 
     private void changeUserInit(){
         try {
-            NameTagger2.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
+            NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
         }
         catch (Exception e){
             System.out.println(e);

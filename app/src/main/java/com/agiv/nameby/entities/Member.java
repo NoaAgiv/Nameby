@@ -9,7 +9,7 @@ import com.agiv.nameby.R;
 
 import java.util.HashMap;
 import java.util.Map;
-import static com.agiv.nameby.NameTagger2.*;
+import static com.agiv.nameby.NameTagger.*;
 /**
  * Created by Noa Agiv on 4/16/2017.
  */

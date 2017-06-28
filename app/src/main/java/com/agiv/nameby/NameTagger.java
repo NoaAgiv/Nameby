@@ -3,12 +3,10 @@ package com.agiv.nameby;
 import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.agiv.nameby.Firebase.Firebase;
 import com.agiv.nameby.entities.Member;
@@ -26,7 +24,7 @@ import java.util.List;
  * Created by Noa Agiv on 3/11/2017.
  */
 
-public class NameTagger2 {
+public class NameTagger {
     // Context
 //    public static TabLayout.Tab matchTab;
     public static Context context;
@@ -66,11 +64,11 @@ public class NameTagger2 {
 
     public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger){
         Log.w("view", "a");
-        NameTagger2.randomTagger = randomTagger;
-        NameTagger2.listFrag = listsFragment;
+        NameTagger.randomTagger = randomTagger;
+        NameTagger.listFrag = listsFragment;
         listsFragment.setNames(nameList, context);
-        NameTagger2.context = context;
-        NameTagger2.activity = activity;
+        NameTagger.context = context;
+        NameTagger.activity = activity;
 //        matchTab = matchTab;
 //        FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG);
         Firebase.initFamilyListener(Settings.getFamilyId());

@@ -1,9 +1,6 @@
 package com.agiv.nameby.Firebase;
 
-import android.util.Log;
-
-import com.agiv.nameby.NameList;
-import com.agiv.nameby.NameTagger2;
+import com.agiv.nameby.NameTagger;
 import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
@@ -29,7 +26,7 @@ public class Firebase {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String nameId = dataSnapshot.getKey();
                 String tag = (String) dataSnapshot.getValue();
-                NameTagger2.initTag(member, nameId, tag);
+                NameTagger.initTag(member, nameId, tag);
             }
 
             @Override
@@ -48,7 +45,7 @@ public class Firebase {
                 String id = dataSnapshot.getKey();
                 Name name = dataSnapshot.getValue(Name.class);
                 name.setId(id);
-                NameTagger2.initName(name);
+                NameTagger.initName(name);
                 for (Member m : Settings.getFamily().familyMembers) {
                     DatabaseReference userTagsRef = database.getReference("users/" + m.id + "/tags");
                     userTagsRef.child(id).addListenerForSingleValueEvent(initTagListener(m));
@@ -157,7 +154,7 @@ public class Firebase {
                     Settings.setMember(member);
                 }
                 DatabaseReference userTagsRef = database.getReference("users/" + member.id + "/tags");
-                for (String nameId : NameTagger2.getNameIds()) {
+                for (String nameId : NameTagger.getNameIds()) {
                     userTagsRef.child(nameId).addListenerForSingleValueEvent(initTagListener(member));
                 }
             }

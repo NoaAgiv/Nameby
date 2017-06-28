@@ -11,8 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.agiv.nameby.NameTagger2;
-import com.agiv.nameby.NameTaggerViewContainer;
+import com.agiv.nameby.NameTagger;
 import com.agiv.nameby.OnSwipeTouchListener;
 import com.agiv.nameby.R;
 import com.agiv.nameby.entities.Name;
@@ -77,7 +76,7 @@ public class RandomTagger extends Fragment {
 
     public void swipeRight(){
         Log.d("swipe right", currentName.name);
-        boolean isMatch = NameTagger2.markNameLoved(currentName);
+        boolean isMatch = NameTagger.markNameLoved(currentName);
         if (isMatch)
             matchSound.start();
         else
@@ -87,7 +86,7 @@ public class RandomTagger extends Fragment {
 
     public void swipeLeft(){
         unlikeSound.start();
-        NameTagger2.markNameUnloved(currentName);
+        NameTagger.markNameUnloved(currentName);
 //        emphesize_animation(disloveButton);
     }
 }

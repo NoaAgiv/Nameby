@@ -86,7 +86,7 @@ public class NameTaggerViewContainer extends View{
 
     public void swipeRight(){
         Log.d("swipe right", getCurrentName().name);
-        boolean isMatch = NameTagger2.markNameLoved(getCurrentName());
+        boolean isMatch = NameTagger.markNameLoved(getCurrentName());
         if (isMatch)
             matchSound.start();
         else
@@ -96,7 +96,7 @@ public class NameTaggerViewContainer extends View{
 
     public void swipeLeft(){
         unlikeSound.start();
-        NameTagger2.markNameUnloved(getCurrentName());
+        NameTagger.markNameUnloved(getCurrentName());
 //        emphesize_animation(disloveButton);
     }
 

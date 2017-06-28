@@ -21,11 +21,11 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
     String dialogBody = "";
     String dialogTitle = "";
     int buttonImage = 0;
-    NameTagger2.SwitchListsCallBack switchLists;
+    NameTagger.SwitchListsCallBack switchLists;
 
 
 
-    public EditableListViewAdapter(NameTagger2.SwitchListsCallBack switchLists, ArrayList<Name> list,
+    public EditableListViewAdapter(NameTagger.SwitchListsCallBack switchLists, ArrayList<Name> list,
                                    Context context, String dialogTitle, String dialogBody, int buttonImage) {
         this.list = list;
         this.switchLists = switchLists;
