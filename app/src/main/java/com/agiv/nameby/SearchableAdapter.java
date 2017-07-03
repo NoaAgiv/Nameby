@@ -132,35 +132,23 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
     private class NameFilter extends Filter {
 
         protected FilterResults performTagFiltering(String constraint) {
-            int count = list.size();
-            final ArrayList<Name> nlist = new ArrayList<>(count);
+
+            final NameList filtered = new NameList();
 
             if (constraint.equals(context.getString(R.string.all))){
-                for (Name name : list){
-                    nlist.add(name);
-                }
+                filtered.conditionalAddAll(list, NameList.identityFilter);
             }
             else if (constraint.equals(context.getString(R.string.matches))){
-                for (Name name : list){
-                    if (Settings.getFamily().isUnanimouslyPositive(name)){
-                        nlist.add(name);
-                    }
-                }
+                filtered.conditionalAddAll(list, NameList.unanimouslyPositiveFilter);
             }
             else{
                 Member.NameTag tag = Member.NameTag.getTag(context, constraint);
-                for (Name name : list){
-                    if (Settings.member.getTag(name).equals(tag)){
-                        nlist.add(name);
-                    }
-                }
+                filtered.conditionalAddAll(list, new NameList.tagFilter(tag));
             }
 
-
             FilterResults results = new FilterResults();
-
-            results.values = nlist;
-            results.count = nlist.size();
+            results.values = filtered;
+            results.count = filtered.size();
 
             return results;
         }

@@ -18,7 +18,6 @@ public class NameGenerator {
     private boolean allTagged = true;
 
     public NameGenerator(NameList names, NamePreferences pref) {
-        System.out.println("nameS! " + names);
         this.names = names;
         this.pref = pref;
     }

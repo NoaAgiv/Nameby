@@ -29,6 +29,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.fragments.FamilyFragment;
 import com.agiv.nameby.fragments.ListsFragment;
 import com.agiv.nameby.fragments.RandomTagger;
 import com.google.android.gms.appindexing.Action;
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private static View randomTaggerLayout;
     private RandomTagger randomTagger;
     private ListsFragment listFrag;
+    private FamilyFragment familyFragment;
 
     private enum ViewName{
         lovedNames,
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity
 //        randomTaggerLayout = View.inflate(this, R.layout.random_tagger, null);
         listFrag = new ListsFragment();
         randomTagger  = new RandomTagger();
+        familyFragment = new FamilyFragment();
 
         setContentView(R.layout.drawer_layout);
 
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity
 //        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
 //        Log.d("view", "initiating data");
         Settings.setMemberId("0");
-        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
+        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment);
 
 //        Log.d("view", "setting UI");
 //        views = new HashMap<ViewName, View>() {{
@@ -299,6 +302,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.all_names_menu_item) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
             listFrag.filterByTag(getResources().getString(R.string.all));
+
+        } else if (id == R.id.family_menu_item) {
+            fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
         }
 
 
@@ -381,6 +387,7 @@ public class MainActivity extends AppCompatActivity
                                 for (String name : untaggedNames) {
 //                                    addName(name);
                                 }
+                                getLovedAdapter().notifyDataSetChanged();
                                 getLovedAdapter().notifyDataSetChanged();
                                 dialog.dismiss();
                             }
@@ -534,7 +541,7 @@ public class MainActivity extends AppCompatActivity
 
     private void changeUserInit(){
         try {
-            NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger);
+            NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment);
         }
         catch (Exception e){
             System.out.println(e);

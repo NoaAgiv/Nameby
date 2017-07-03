@@ -59,13 +59,27 @@ public class RandomTagger extends Fragment {
 
         textView.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
             public void onSwipeRight() {
-                swipeRight();
+                tagLoved();
             }
             public void onSwipeLeft() {
-                swipeLeft();
+                tagUnloved();
             }
-
         });
+
+        loveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tagLoved();
+            }
+        });
+
+        disloveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tagUnloved();
+            }
+        });
+
 
         return layout;
     }
@@ -74,7 +88,7 @@ public class RandomTagger extends Fragment {
         return layout;
     }
 
-    public void swipeRight(){
+    public void tagLoved(){
         Log.d("swipe right", currentName.name);
         boolean isMatch = NameTagger.markNameLoved(currentName);
         if (isMatch)
@@ -82,9 +96,10 @@ public class RandomTagger extends Fragment {
         else
             loveSound.start();
 //        emphesize_animation(loveButton);
+
     }
 
-    public void swipeLeft(){
+    public void tagUnloved(){
         unlikeSound.start();
         NameTagger.markNameUnloved(currentName);
 //        emphesize_animation(disloveButton);

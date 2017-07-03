@@ -13,6 +13,7 @@ import com.agiv.nameby.entities.Member;
 import static com.agiv.nameby.entities.Member.NameTag.*;
 import static com.agiv.nameby.entities.Member.NameTag;
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.fragments.FamilyFragment;
 import com.agiv.nameby.fragments.ListsFragment;
 import com.agiv.nameby.fragments.RandomTagger;
 import com.google.firebase.database.DatabaseReference;
@@ -62,7 +63,7 @@ public class NameTagger {
 
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger){
+    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger, FamilyFragment familyFragment){
         Log.w("view", "a");
         NameTagger.randomTagger = randomTagger;
         NameTagger.listFrag = listsFragment;
@@ -138,7 +139,7 @@ public class NameTagger {
 //            }
 //        };
 //
-//        lovedAdapter = new EditableListViewAdapter(lovedToUnlovedSwitch, lovedNames, activity,
+//        lovedAdapter = new EditableListViewAdapterold(lovedToUnlovedSwitch, lovedNames, activity,
 //                activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.edit_unlove);
 //
 //        lovedNamesListView.setAdapter(lovedAdapter);
@@ -153,7 +154,7 @@ public class NameTagger {
 //            }
 //        };
 //
-//        unlovedAdapter = new EditableListViewAdapter(unlovedToLovedSwitch, unlovedNames, activity,
+//        unlovedAdapter = new EditableListViewAdapterold(unlovedToLovedSwitch, unlovedNames, activity,
 //                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.edit_love);
 //        unlovedNamesListView.setAdapter(unlovedAdapter);
 //
@@ -209,6 +210,7 @@ public class NameTagger {
     private static boolean updateListsWithTags(Name name, Member m) {
         NameTag tag = m.getTag(name);
         nameList.add(name);
+        randomTagger.setName(ngen.getNextUntaggedName());
         return true; // TODO: change to teturn if anonymasely loved
     }
 

@@ -5,6 +5,7 @@ import com.agiv.nameby.entities.Name;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Noa Agiv on 2/28/2017.
@@ -55,12 +56,39 @@ public class NameList extends UniqueList<Name> {
         }
     };
 
+    public static UniqueList.ListCondition unanimouslyPositiveFilter = new UniqueList.ListCondition<Name>() {
+        @Override
+        public boolean apply(Name name) {
+            return Settings.getFamily().isUnanimouslyPositive(name);
+        }
+    };
+
     public static UniqueList.ListCondition fullyInitiatedFilter = new UniqueList.ListCondition<Name>() {
         @Override
         public boolean apply(Name name) {
             return Settings.getFamily().isFullyInitiated(name);
         }
     };
+
+    public static UniqueList.ListCondition identityFilter = new UniqueList.ListCondition<Name>() {
+        @Override
+        public boolean apply(Name name) {
+            return true;
+        }
+    };
+
+    public static class tagFilter implements ListCondition<Name>{
+        Member.NameTag tag;
+
+        public tagFilter(Member.NameTag tag){
+            this.tag = tag;
+        }
+        @Override
+        public boolean apply(Name name){
+            return tag.equals(Settings.getMember().getTag(name));
+        }
+    }
+
 
     public static class IdCondition implements ListCondition<Name>{
         String id;

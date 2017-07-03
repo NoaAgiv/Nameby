@@ -3,7 +3,7 @@
     <string name="user_name">משתמש</string>
     <string name="menu_sex_settings">החלף מין</string>
     <string name="menu_change_user_settings">החלף משתמש</string>
-    <string name="menu_family_settings">הגדר משפחה</string>
+    <string name="menu_family_settings">הגדרות משפחה</string>
     <string name="help">עזרה</string>
     <string name="loved">אהובים</string>
     <string name="unloved">לא אהובים</string>
@@ -16,8 +16,8 @@
     <string name="mark_loved_dialog_body">האם להעביר את השם מרשימת הלא אהובים לרשימת האהובים?</string>
     <string name="mark_unloved_dialog_title">סימון שם כלא אהוב</string>
     <string name="mark_unloved_dialog_body">האם להעביר את השם מרשימת האהובים לרשימת הלא אהובים?</string>
-    <string name="mark_approve_button">העבר</string>
-    <string name="cancel_button">בטל</string>
+    <string name="mark_approve_button">אישור</string>
+    <string name="cancel_button">ביטול</string>
     <string name="add_dialog_title">הוספת שמות</string>
     <string name="add_dialog_body">הקלידו פה שמות מופרדים בשורה חדשה. השמות יועברו אוטומטית לרשימת השמות האהובים</string>
     <string name="error_dialog_title">שגיאה</string>
@@ -43,6 +43,13 @@
     <string name="tag">תיוג:</string>
     <string name="all">כולם</string>
     <string name="names">שמות</string>
+    <string name="end_of_names">סיימת לתייג הכל!</string>
+    <string name="family">משפחת</string>
+    <string name="remove">הסרה</string>
+    <string name="remove_confirm_body">אישור הסרה</string>
+    <string name="change_family_name">שינוי שם משפחה</string>
+    <string name="change_family_name_body">הזנת שם המשפחה:</string>
+    <string name="error_set_family_name">שם המשפחה שהוזן אינו תקין, יש להשתמש באותיות וברווחים בלבד.</string>
 
 </resources>
 

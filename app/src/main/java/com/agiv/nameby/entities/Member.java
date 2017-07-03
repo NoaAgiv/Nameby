@@ -99,15 +99,16 @@ public class Member {
         String old = member.toString();
         setName(member.name);
         setEmail(member.email);
-        Log.i("Member", String.format("updated $s to $s", old, member));
+        Log.i("Member", String.format("updated %s to %s", old, member));
     }
 
     @Override
     public String toString() {
-        return "Member{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return name + "\n" + email;
+//        return "Member{" +
+//                "id='" + id + '\'' +
+//                ", name='" + name + '\'' +
+//                ", email='" + email + '\'' +
+//                '}';
     }
 }

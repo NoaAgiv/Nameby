@@ -1,4 +1,4 @@
-package com.agiv.nameby;
+package com.agiv.nameby.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,28 +11,45 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.agiv.nameby.NameTagger;
+import com.agiv.nameby.R;
 import com.agiv.nameby.entities.Name;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 
 public class EditableListViewAdapter extends BaseAdapter implements ListAdapter {
-    private ArrayList<Name> list = new ArrayList<Name>();
+    private List<?> list = new ArrayList<Object>();
     private Context context;
     String dialogBody = "";
     String dialogTitle = "";
     int buttonImage = 0;
-    NameTagger.SwitchListsCallBack switchLists;
+    RemoveItemCallback removeItemCallback;
 
 
+    public static abstract class RemoveItemCallback {
+        public void remove(Object obj){}
+    }
 
-    public EditableListViewAdapter(NameTagger.SwitchListsCallBack switchLists, ArrayList<Name> list,
-                                   Context context, String dialogTitle, String dialogBody, int buttonImage) {
+
+    public EditableListViewAdapter(RemoveItemCallback removeItemCallback, List<?> list,
+                                   Context context) {
+        this(removeItemCallback, list,
+                context, context.getString(R.string.remove),
+                context.getString(R.string.remove_confirm_body),
+                R.drawable.edit_unlove);
+    }
+
+    public EditableListViewAdapter(RemoveItemCallback removeItem, List<?> list,
+                                   Context context, String dialogTitle, String dialogBody, int removeButtonImage) {
         this.list = list;
-        this.switchLists = switchLists;
+        this.removeItemCallback = removeItem;
         this.context = context;
         this.dialogBody = dialogBody;
         this.dialogTitle = dialogTitle;
-        this.buttonImage = buttonImage;
+        this.buttonImage = removeButtonImage;
     }
 
     @Override
@@ -47,9 +64,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
 
     @Override
     public long getItemId(int pos) {
-//        return list.get(pos).getId();
         return 0;
-        //just return 0 if your list items do not have an Id variable.
     }
 
     @Override
@@ -60,19 +75,17 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
             view = inflater.inflate(R.layout.editable_row, null);
         }
 
-        //Handle TextView and display string from your list
         TextView listItemText = (TextView)view.findViewById(R.id.list_item_string);
-        listItemText.setText(list.get(position).name);
+        listItemText.setText(list.get(position).toString());
 
-        //Handle buttons and add onClickListeners
         ImageButton changeButton = (ImageButton)view.findViewById(R.id.changeButton);
         changeButton.setImageResource(buttonImage);
 
         changeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                final Name name = list.get(position);
-                String specificDialogBody = String.format("%s\n%s", dialogBody, name.name);
+                final Object item = list.get(position);
+                String specificDialogBody = String.format("%s\n%s", dialogBody, item);
                 new AlertDialog.Builder(context)
                         .setTitle(dialogTitle)
                         .setMessage(specificDialogBody)
@@ -80,7 +93,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
                         .setPositiveButton(R.string.mark_approve_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                switchLists.switchLists(name);
+                                removeItemCallback.remove(item);
                                 notifyDataSetChanged();
                                 dialog.dismiss();
                             }

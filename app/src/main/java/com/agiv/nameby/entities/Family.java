@@ -2,9 +2,12 @@ package com.agiv.nameby.entities;
 
 import android.util.Log;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Created by Noa Agiv on 4/16/2017.
@@ -16,6 +19,8 @@ public class Family {
     public String gender;
     private List<String> members; // has no meaning, just for POJO conversion to work
     public List<Member> familyMembers = new ArrayList<>(); //must not be called members as the json key
+    Pattern namePattern = Pattern.compile("[\\u0590-\\u05FF \\\\p{Graph} \\\\s]+", Pattern.UNICODE_CASE);
+    final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     public void setId(String id) {
         this.id = id;
@@ -57,6 +62,16 @@ public class Family {
                 return false;
             }
         }
+        return true;
+    }
+
+    public boolean setName(String name) {
+        if (!namePattern.matcher(name).matches())
+            return false;
+
+        this.name = name;
+        DatabaseReference familyNameRef = database.getReference("families/" + this.id + "/name");
+        familyNameRef.setValue(name);
         return true;
     }
 

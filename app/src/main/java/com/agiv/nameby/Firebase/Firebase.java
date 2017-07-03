@@ -5,6 +5,7 @@ import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.fragments.FamilyFragment;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -89,6 +90,7 @@ public class Firebase {
                 family.setId(familyId);
                 Settings.setFamily(family);
                 initFamilyMemberListener(family);
+//                familyFragment.setFamily(family);
 
             }
 

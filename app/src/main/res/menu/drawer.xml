@@ -34,6 +34,11 @@
             android:id="@+id/settings_menu_item"
             android:icon="@drawable/love"
             android:title="@string/settings"/>
+
+        <item
+            android:id="@+id/family_menu_item"
+            android:icon="@drawable/love"
+            android:title="@string/menu_family_settings"/>
     </group>
 
 </menu>
