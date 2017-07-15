@@ -6,9 +6,13 @@ import android.widget.Adapter;
 
 import com.agiv.nameby.NameList;
 import com.agiv.nameby.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
+
 import static com.agiv.nameby.NameTagger.*;
 /**
  * Created by Noa Agiv on 4/16/2017.
@@ -19,25 +23,50 @@ public class Member {
     public String name;
     public String email;
     public Map<String, NameTag> nameTags = new HashMap<>();
+    final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     public Member() {
     }
 
-    public Member(String id, String name) {
-        this.id = id;
-        this.name = name;
+    public Member(String name, String email) {
+        if (!this.setName(name))
+            throw new InvalidParameterException(context.getString(R.string.error_set_name));
+        if (!this.setEmail(email))
+            throw new InvalidParameterException(context.getString(R.string.error_set_email));
+
+
+    }
+
+    public static boolean isValidEmailAddress(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void save() {
+        DatabaseReference membersRef = database.getReference("users");
+        DatabaseReference newMemberRef = membersRef.push();
+        setId(newMemberRef.getKey());
+        newMemberRef.setValue(this);
+        DatabaseReference emailsRef = database.getReference("allUserEmails").child(email);
+
     }
 
-    public void setEmail(String email) {
+    public boolean setName(String name) {
+        if (!Name.namePattern.matcher(name).matches())
+            return false;
+
+        this.name = name;
+        return true;
+    }
+
+    public boolean setEmail(String email) {
+        if (!isValidEmailAddress(email))
+            return false;
         this.email = email;
+        return true;
     }
 
     public enum NameTag{

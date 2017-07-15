@@ -21,6 +21,11 @@ import com.google.firebase.database.ValueEventListener;
 public class Firebase {
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
+    public static String getMemebrIdByEmail(final String email){
+        DatabaseReference namesRef = database.getReference("allUserEmails");
+        return "a";
+    }
+
     public static ValueEventListener initTagListener(final Member member) {
         final ValueEventListener tagsListener = new ValueEventListener() {
             @Override

@@ -49,7 +49,10 @@
     <string name="remove_confirm_body">אישור הסרה</string>
     <string name="change_family_name">שינוי שם משפחה</string>
     <string name="change_family_name_body">הזנת שם המשפחה:</string>
-    <string name="error_set_family_name">שם המשפחה שהוזן אינו תקין, יש להשתמש באותיות וברווחים בלבד.</string>
+    <string name="error_set_name">השם שהוזן אינו תקין, יש להשתמש באותיות וברווחים בלבד.</string>
+    <string name="error_set_email">כתובת המייל שהוזנה אינה חוקית</string>
+    <string name="email">אימייל</string>
+    <string name="add_family_member_title">הוספת בן משפחה</string>
 
 </resources>
 

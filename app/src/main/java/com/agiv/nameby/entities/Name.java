@@ -4,6 +4,7 @@ import com.agiv.nameby.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created by Noa Agiv on 1/9/2017.
@@ -15,6 +16,9 @@ public class Name {
     public String gender;
     public int popularity;
 //    public Map<String, NameTag> userTags = new HashMap<>();
+
+
+    public static Pattern namePattern = Pattern.compile("[\\u0590-\\u05FF \\\\p{Graph} \\\\s]+", Pattern.UNICODE_CASE);
 
     public Name(String name, String gender, int popularity){
       this.name = name;

@@ -19,7 +19,6 @@ public class Family {
     public String gender;
     private List<String> members; // has no meaning, just for POJO conversion to work
     public List<Member> familyMembers = new ArrayList<>(); //must not be called members as the json key
-    Pattern namePattern = Pattern.compile("[\\u0590-\\u05FF \\\\p{Graph} \\\\s]+", Pattern.UNICODE_CASE);
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     public void setId(String id) {
@@ -36,6 +35,22 @@ public class Family {
     public void addMember(Member member) {
         familyMembers.add(member);
         Log.i("Family",String.format("added %s to %s", member, this));
+    }
+
+    public void addSaveMember(Member member) {
+        familyMembers.add(member);
+        DatabaseReference familyMembersRef = database.getReference("families/" + this.id + "/members");
+        DatabaseReference familyMemberRef = familyMembersRef.child(String.valueOf(member.id));
+
+        familyMemberRef.setValue(true);
+        Log.i("Family",String.format("added %s to %s", member, this));
+    }
+
+    public void removeSaveMember(Member member) {
+        familyMembers.remove(member);
+        DatabaseReference familyMembersRef = database.getReference("families/" + this.id + "/members");
+        familyMembersRef.child(String.valueOf(member.id)).removeValue();
+        Log.i("Family",String.format("removed %s from %s", member, this));
     }
 
     public boolean isUnanimouslyPositive(Name name) {
@@ -66,7 +81,7 @@ public class Family {
     }
 
     public boolean setName(String name) {
-        if (!namePattern.matcher(name).matches())
+        if (!Name.namePattern.matcher(name).matches())
             return false;
 
         this.name = name;
