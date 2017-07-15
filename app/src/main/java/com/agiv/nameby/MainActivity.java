@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,7 +37,12 @@ import com.agiv.nameby.fragments.RandomTagger;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity
     private RandomTagger randomTagger;
     private ListsFragment listFrag;
     private FamilyFragment familyFragment;
+    private static int RC_SIGN_IN = 100;
 
     private enum ViewName{
         lovedNames,
@@ -81,11 +89,25 @@ public class MainActivity extends AppCompatActivity
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-
+    private GoogleApiClient mGoogleApiClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         this.context = getApplicationContext();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this /* FragmentActivity */, (GoogleApiClient.OnConnectionFailedListener) this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
 
 //        setContentView(R.layout.activity_main);
 //        listsLayout = View.inflate(this, R.layout.content_main, null);
@@ -585,5 +607,38 @@ public class MainActivity extends AppCompatActivity
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d("Authentication", "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            System.out.println(acct.getDisplayName());
+            TextView nameView = (TextView) findViewById(R.id.googleAccountDisplayName);
+            TextView emailView = (TextView) findViewById(R.id.googleAccountEmail);
+            ImageView imageView = (ImageView) findViewById(R.id.googleAccountImage);
+            nameView.setText(acct.getDisplayName());
+            emailView.setText(acct.getEmail());
+            Picasso.with(this).load(acct.getPhotoUrl()).into(imageView);
+            imageView.setMaxHeight(1);
+//            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+//            updateUI(true);
+        } else {
+            // Signed out, show unauthenticated UI.
+//            updateUI(false);
+        }
+    }
+
 }
 
