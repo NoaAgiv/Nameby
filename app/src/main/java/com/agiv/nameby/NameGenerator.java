@@ -14,7 +14,7 @@ public class NameGenerator {
     private static final Random rgenerator = new Random();
     NameList names;
     NamePreferences pref;
-    private static Name END_OF_LIST = new Name("Congrats! You tagged all the names!","f", 0);
+    public static Name END_OF_LIST = new Name("Congrats! You tagged all the names!","f", 0);
     private boolean allTagged = true;
 
     public NameGenerator(NameList names, NamePreferences pref) {
@@ -27,8 +27,9 @@ public class NameGenerator {
     }
 
     public Name getNextUntaggedName() {
+//        System.out.println("member is now:"+Settings.getMember());
+        System.out.println(allTagged);
         if (names.isEmpty()) {
-            System.out.println(names);
             allTagged = true;
             return END_OF_LIST;
         }
@@ -39,7 +40,6 @@ public class NameGenerator {
                     NameList.fullyInitiatedFilter,
                     NameList.untaggedFilter,
                     NameList.someFamilyMembersLovedFilter);
-            System.out.println("partner list " + familyLoved);
             if (getFromPartnerLovedNamesRandomChoice(familyLoved))
                 return getRandomFromPartnerLovedNames(familyLoved);
 
@@ -53,7 +53,6 @@ public class NameGenerator {
                     allTagged = true;
                     return END_OF_LIST;
                 }
-                System.out.println("untagged list " + untagged);
                 return getRandomFromUntaggedPopularityBias(untagged);
             }
         }
@@ -67,7 +66,6 @@ public class NameGenerator {
                 return name1.popularity - name.popularity;
             }
         });
-        System.out.println("and now?" + untagged.size());
         return untagged.get(rgenerator.nextInt(Math.min(10, untagged.size())));
     }
 

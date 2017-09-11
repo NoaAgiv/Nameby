@@ -53,6 +53,8 @@
     <string name="error_set_email">כתובת המייל שהוזנה אינה חוקית</string>
     <string name="email">אימייל</string>
     <string name="add_family_member_title">הוספת בן משפחה</string>
+    <string name="switch_user">החלפת משתמש</string>
+    <string name="match_massage">יש לנו התאמה! </string>
 
 </resources>
 

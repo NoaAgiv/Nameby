@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.agiv.nameby.Firebase.Firebase;
+import com.agiv.nameby.Firebase.FirebaseDb;
 import com.agiv.nameby.entities.Member;
 import static com.agiv.nameby.entities.Member.NameTag.*;
 import static com.agiv.nameby.entities.Member.NameTag;
@@ -72,9 +72,9 @@ public class NameTagger {
         NameTagger.activity = activity;
 //        matchTab = matchTab;
 //        FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG);
-        Firebase.initFamilyListener(Settings.getFamilyId());
+        FirebaseDb.initFamilyListener(Settings.getFamilyId());
 //        System.out.println("init family " + Settings.getFamily().familyMembers);
-        Firebase.initNameTagListeners();
+        FirebaseDb.initNameTagListeners();
 //        initViewAdapters();
         initUntaggedArea(randomTaggerLayout);
 
@@ -198,6 +198,11 @@ public class NameTagger {
 
 
     private static void setMemberNameTag(Member member, Name name, NameTag tag){
+        System.identityHashCode(member);
+        System.out.println(member.nameTags);
+
+        System.identityHashCode(Settings.getMember());
+        System.out.println(Settings.getMember().nameTags);
         if (tag==null) {
             member.tagName(name, untagged);
         }
@@ -211,7 +216,7 @@ public class NameTagger {
         NameTag tag = m.getTag(name);
         nameList.add(name);
         randomTagger.setName(ngen.getNextUntaggedName());
-        return true; // TODO: change to teturn if anonymasely loved
+        return Settings.getFamily().isUnanimouslyPositive(name);
     }
 
     private static boolean updateListsWithTags2(Name name, Member m){

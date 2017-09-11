@@ -36,10 +36,21 @@
         android:text="name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    <TextView
-        android:id="@+id/googleAccountEmail"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="mail.address@gmail.com" />
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/googleAccountEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="mail.address@gmail.com" />
 
+        <ImageButton
+            android:id="@+id/switchAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:src="@drawable/boy"/>
+    </LinearLayout>
 </LinearLayout>

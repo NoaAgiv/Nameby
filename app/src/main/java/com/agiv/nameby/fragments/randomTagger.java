@@ -1,6 +1,7 @@
 package com.agiv.nameby.fragments;
 
 
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,10 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.agiv.nameby.NameGenerator;
 import com.agiv.nameby.NameTagger;
 import com.agiv.nameby.OnSwipeTouchListener;
 import com.agiv.nameby.R;
+import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Name;
 
 /**
@@ -69,14 +73,17 @@ public class RandomTagger extends Fragment {
         loveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tagLoved();
+                Settings.getFamily().sendNotification("yo", "man");
+                if (!currentName.equals(NameGenerator.END_OF_LIST))
+                    tagLoved();
             }
         });
 
         disloveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tagUnloved();
+                if (!currentName.equals(NameGenerator.END_OF_LIST))
+                    tagUnloved();
             }
         });
 
@@ -90,9 +97,13 @@ public class RandomTagger extends Fragment {
 
     public void tagLoved(){
         Log.d("swipe right", currentName.name);
+        String name = currentName.name; // markNameLoved calls setName, so I need to save the name here
         boolean isMatch = NameTagger.markNameLoved(currentName);
-        if (isMatch)
+        if (isMatch) {
             matchSound.start();
+            Toast.makeText(getActivity(), getString(R.string.match_massage) + " " + name,
+                    Toast.LENGTH_LONG).show();
+        }
         else
             loveSound.start();
 //        emphesize_animation(loveButton);

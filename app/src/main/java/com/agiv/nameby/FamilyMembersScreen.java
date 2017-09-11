@@ -32,7 +32,6 @@ public class FamilyMembersScreen extends AppCompatActivity {
 
     private GoogleApiClient client;
     private List<String> users;
-    private DbAccess databaseAccess;
     private Intent mainIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,16 +84,16 @@ public class FamilyMembersScreen extends AppCompatActivity {
 
     private void setUsersAndContinue(String greenName, String yellowName){
         Settings.setFamilyMembersEdited(true);
-        if (!greenName.equals(users.get(0))){
-            databaseAccess.open();
-            databaseAccess.editUserName(users.get(0), greenName);
-            databaseAccess.close();
-        }
-        if (!yellowName.equals(users.get(1))){
-            databaseAccess.open();
-            databaseAccess.editUserName(users.get(1), yellowName);
-            databaseAccess.close();
-        }
+//        if (!greenName.equals(users.get(0))){
+//            databaseAccess.open();
+//            databaseAccess.editUserName(users.get(0), greenName);
+//            databaseAccess.close();
+//        }
+//        if (!yellowName.equals(users.get(1))){
+//            databaseAccess.open();
+//            databaseAccess.editUserName(users.get(1), yellowName);
+//            databaseAccess.close();
+//        }
         Settings.setGreenUser(greenName);
         Settings.setYellowUser(yellowName);
         Settings.setCurrentUser(greenName);

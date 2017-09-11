@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -34,7 +35,7 @@ public class FamilyFragment extends Fragment {
 
     private View layout;
     private Family family;
-    private ListAdapter adapter;
+    private EditableListViewAdapter adapter;
     private ListView memberList;
 
     RemoveItemCallback removeCallback = new RemoveItemCallback() {
@@ -62,6 +63,12 @@ public class FamilyFragment extends Fragment {
         }
         return layout;
     }
+//
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        adapter.notifyDataSetChanged();
+//    }
 
     public void setAddMemberButton(){
         final FloatingActionButton bt = (FloatingActionButton) layout.findViewById(R.id.add_family_member);
@@ -93,6 +100,7 @@ public class FamilyFragment extends Fragment {
                             member = new Member(name, email);
                             member.save();
                             family.addSaveMember(member);
+                            adapter.notifyDataSetChanged();
                         }catch (InvalidParameterException e) {
                             showErrorAlert(e.getMessage());
                         }

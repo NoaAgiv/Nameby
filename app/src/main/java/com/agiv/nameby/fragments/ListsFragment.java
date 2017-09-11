@@ -86,7 +86,6 @@ public class ListsFragment extends Fragment {
         tagFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println("filter" + i);
                 adapter.getFilter().filter("tag." + ((TextView) view).getText().toString());
             }
 

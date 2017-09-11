@@ -22,6 +22,7 @@ public class Member {
     public String id;
     public String name;
     public String email;
+    public String family;
     public Map<String, NameTag> nameTags = new HashMap<>();
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -41,17 +42,22 @@ public class Member {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
+    public String getFamily() {
+        return family;
+    }
+
+    public void setFamily(String family) {
+        this.family = family;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
 
     public void save() {
         DatabaseReference membersRef = database.getReference("users");
-        DatabaseReference newMemberRef = membersRef.push();
-        setId(newMemberRef.getKey());
-        newMemberRef.setValue(this);
-        DatabaseReference emailsRef = database.getReference("allUserEmails").child(email);
-
+        setId(Member.generateId(email));
+        membersRef.child(id).setValue(this);
     }
 
     public boolean setName(String name) {
@@ -93,7 +99,7 @@ public class Member {
         }
 
         public static boolean isTagPositive(NameTag tag){
-            return tag.equals(NameTag.loved) || tag.equals(NameTag.maybe);
+            return tag != null && (tag.equals(NameTag.loved) || tag.equals(NameTag.maybe));
         }
 
         public static NameTag getTag(Context context, String displayName){
@@ -107,8 +113,8 @@ public class Member {
     }
 
     public void tagName(Name name, NameTag tag) {
+        System.out.println("tagging");
         nameTags.put(name.id, tag);
-        System.out.println("set" + name.name + tag + nameTags.get(name.id));
     }
 
     public void tagName(Name name, String tag) {
@@ -116,11 +122,11 @@ public class Member {
     }
 
     public NameTag getTag(Name name) {
-        System.out.println("get" + name.name +  nameTags.get(name.id));
         return nameTags.get(name.id);
     }
 
     public boolean isPositiveTag(Name name) {
+        System.out.println("hi" + nameTags);
         return NameTag.isTagPositive(getTag(name));
     }
 
@@ -131,9 +137,13 @@ public class Member {
         Log.i("Member", String.format("updated %s to %s", old, member));
     }
 
+    public static String generateId(String email){
+        return email.replace(".", "").replace("@", "");
+    }
+
     @Override
     public String toString() {
-        return name + "\n" + email;
+        return name + ": " + email;
 //        return "Member{" +
 //                "id='" + id + '\'' +
 //                ", name='" + name + '\'' +

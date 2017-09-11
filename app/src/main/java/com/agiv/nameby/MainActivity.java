@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.agiv.nameby.Firebase.FirebaseDb;
 import com.agiv.nameby.entities.Name;
 import com.agiv.nameby.fragments.FamilyFragment;
 import com.agiv.nameby.fragments.ListsFragment;
@@ -41,6 +43,7 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.squareup.picasso.Picasso;
 
@@ -53,7 +56,6 @@ import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
 //import static com.agiv.nameby.NameTagger.*;
 import static com.agiv.nameby.NameTagger.*;
-
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -96,18 +98,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         this.context = getApplicationContext();
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .enableAutoManage(this /* FragmentActivity */, (GoogleApiClient.OnConnectionFailedListener) this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-
 
 //        setContentView(R.layout.activity_main);
 //        listsLayout = View.inflate(this, R.layout.content_main, null);
@@ -117,6 +107,8 @@ public class MainActivity extends AppCompatActivity
         familyFragment = new FamilyFragment();
 
         setContentView(R.layout.drawer_layout);
+        createDrawer();
+        signIn();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
@@ -125,8 +117,8 @@ public class MainActivity extends AppCompatActivity
 //        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
 //        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
 //        Log.d("view", "initiating data");
-        Settings.setMemberId("0");
-        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment);
+
+//        Settings.setMemberId("0");
 
 //        Log.d("view", "setting UI");
 //        views = new HashMap<ViewName, View>() {{
@@ -156,7 +148,7 @@ public class MainActivity extends AppCompatActivity
 //        // ATTENTION: This was auto-generated to implement the App Indexing API.
 //        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-        createDrawer();
+
 //        switchToView(ViewName.names);
     }
 
@@ -617,14 +609,58 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
+        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment);
     }
+
+    private void signIn(){
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        GoogleApiClient.OnConnectionFailedListener  a = new GoogleApiClient.OnConnectionFailedListener() {
+            @Override
+            public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+            }
+        };
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, a)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void setSwitchUserButton(){
+        ImageButton switchAccount = (ImageButton) findViewById(R.id.switchAccount);
+        switchAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                signOut();
+//                mGoogleApiClient.clearDefaultAccountAndReconnect();
+
+                signIn();
+            }
+        });
+
+
+
+    }
+
+    private void signOut(){
+        mGoogleApiClient.clearDefaultAccountAndReconnect();
+//        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+//        Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient);
+        mGoogleApiClient.disconnect();
+    }
+
 
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d("Authentication", "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            System.out.println(acct.getDisplayName());
             TextView nameView = (TextView) findViewById(R.id.googleAccountDisplayName);
             TextView emailView = (TextView) findViewById(R.id.googleAccountEmail);
             ImageView imageView = (ImageView) findViewById(R.id.googleAccountImage);
@@ -632,6 +668,8 @@ public class MainActivity extends AppCompatActivity
             emailView.setText(acct.getEmail());
             Picasso.with(this).load(acct.getPhotoUrl()).into(imageView);
             imageView.setMaxHeight(1);
+            FirebaseDb.setMemberAndFamily(emailView.getText().toString());
+            setSwitchUserButton();
 //            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
 //            updateUI(true);
         } else {

@@ -4,10 +4,14 @@ import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Noa Agiv on 4/16/2017.
@@ -20,9 +24,24 @@ public class Family {
     private List<String> members; // has no meaning, just for POJO conversion to work
     public List<Member> familyMembers = new ArrayList<>(); //must not be called members as the json key
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private String notificationTopic;
 
     public void setId(String id) {
         this.id = id;
+        this.notificationTopic = "Family_" + id;
+    }
+
+    private void subscribeToNotifications(){
+        FirebaseMessaging.getInstance().subscribeToTopic(notificationTopic);
+        System.out.println("subscribed to topic " + notificationTopic);
+    }
+
+    public void sendNotification(String title, String message){
+        Map<String, String> data = new HashMap<>();
+        data.put("title", title);
+        data.put("message", message);
+        data.put("topic", notificationTopic);
+        database.getReference("messages").push().setValue(data);
     }
 
     public Member getMember(String memberId){
@@ -33,17 +52,23 @@ public class Family {
         return null;
     }
     public void addMember(Member member) {
+        for (Member m : familyMembers){
+            if (m.id.equals(member.id)) { //same email as well
+                m.setName(member.name);
+                return;
+            }
+        }
         familyMembers.add(member);
+        subscribeToNotifications();
         Log.i("Family",String.format("added %s to %s", member, this));
     }
 
     public void addSaveMember(Member member) {
-        familyMembers.add(member);
+        addMember(member);
         DatabaseReference familyMembersRef = database.getReference("families/" + this.id + "/members");
         DatabaseReference familyMemberRef = familyMembersRef.child(String.valueOf(member.id));
 
         familyMemberRef.setValue(true);
-        Log.i("Family",String.format("added %s to %s", member, this));
     }
 
     public void removeSaveMember(Member member) {
@@ -71,9 +96,7 @@ public class Family {
 
     public boolean isFullyInitiated(Name name) {
         for (Member member : familyMembers) {
-            System.out.println(name.name);
             if (member.getTag(name)==null) {
-                System.out.println("untagged" + name.name);
                 return false;
             }
         }
