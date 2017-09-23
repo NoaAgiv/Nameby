@@ -73,7 +73,6 @@ public class RandomTagger extends Fragment {
         loveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Settings.getFamily().sendNotification("yo", "man");
                 if (!currentName.equals(NameGenerator.END_OF_LIST))
                     tagLoved();
             }
@@ -103,6 +102,7 @@ public class RandomTagger extends Fragment {
             matchSound.start();
             Toast.makeText(getActivity(), getString(R.string.match_massage) + " " + name,
                     Toast.LENGTH_LONG).show();
+            Settings.getFamily().sendNotification(getString(R.string.nameby_notif_title), getString(R.string.match_notif_body));
         }
         else
             loveSound.start();

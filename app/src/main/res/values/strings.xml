@@ -55,6 +55,8 @@
     <string name="add_family_member_title">הוספת בן משפחה</string>
     <string name="switch_user">החלפת משתמש</string>
     <string name="match_massage">יש לנו התאמה! </string>
+    <string name="match_notif_body">יש לנו התאמה! אתם אוהבים את אותו השם</string>
+    <string name="nameby_notif_title">ניימבי</string>
 
 </resources>
 

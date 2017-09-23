@@ -1,6 +1,10 @@
 package com.agiv.nameby;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,6 +143,9 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
                 filtered.conditionalAddAll(list, NameList.identityFilter);
             }
             else if (constraint.equals(context.getString(R.string.matches))){
+                BottomNavigationItemView matchesMenuItem = (BottomNavigationItemView) ((Activity) context).findViewById(R.id.menu_matches);
+                matchesMenuItem.setSelected(false); // this will set the new match icon off
+                System.out.println("in in searchable adapter how you doing");
                 filtered.conditionalAddAll(list, NameList.unanimouslyPositiveFilter);
             }
             else{

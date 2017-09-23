@@ -1,19 +1,25 @@
 package com.agiv.nameby;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ListFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -51,6 +57,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
+import static com.agiv.nameby.Firebase.NotificationService.MATCH_NOTIFICATION;
 import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
@@ -75,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     private ListsFragment listFrag;
     private FamilyFragment familyFragment;
     private static int RC_SIGN_IN = 100;
+    FragmentManager fragmentManager = getSupportFragmentManager();
 
     private enum ViewName{
         lovedNames,
@@ -92,6 +100,35 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private GoogleApiClient mGoogleApiClient;
+
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            System.out.println("any recieve at all?");
+            String message = intent.getStringExtra("key");
+            final BottomNavigationItemView menuMatchesItem = (BottomNavigationItemView) findViewById(R.id.menu_matches);
+
+            switch (intent.getAction()) {
+                case MATCH_NOTIFICATION:
+                    Log.d("Receiver", "main thread: got match notification");
+                    menuMatchesItem.setSelected(true); // set to selected state to change icon
+                    break;
+
+            }
+        }
+    };
+    @Override
+    protected void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
+    }
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -108,70 +145,18 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.drawer_layout);
         createDrawer();
+        createQuickMenu();
         signIn();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
-//        sexChooseIntent = new Intent(getBaseContext(), ChooseSexScreen.class);
-//        familyMembersIntent = new Intent(getBaseContext(), FamilyMembersScreen.class);
-//        helpIntent = new Intent(getBaseContext(), WelcomeScreen.class);
-//        Log.d("view", "initiating data");
-
-//        Settings.setMemberId("0");
-
-//        Log.d("view", "setting UI");
-//        views = new HashMap<ViewName, View>() {{
-//            put(ViewName.lovedNames, getLovedNamesListView());
-//            put(ViewName.unlovedNames, getUnlovedNamesListView());
-//            put(ViewName.names, getUntaggedNamesView());
-//            put(ViewName.matchedNames, getMatchedNamesListView());
-//        }};
-//        setTabs();
-//        setAddButton();
-//        getLovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
-//        getUnlovedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
-//        getMatchedNamesListView().setOnScrollListener(listScrollMoveButtonListener);
-//
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        userName = (TextView) findViewById(R.id.user_name);
-//        userName.setText(getString(R.string.user_name) + " : " + Settings.getCurrentUser());
-//        userName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                switchUser();
-//            }
-//            });
-//        toolbar.setLogo(R.drawable.icon);
-//        setSupportActionBar(toolbar);
-//
 //        // ATTENTION: This was auto-generated to implement the App Indexing API.
 //        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-//        switchToView(ViewName.names);
     }
 
-
-//    public enum MenuItem {
-//        triage(R.string.triage_tab, new RandomTagger()),
-//        loved(R.string.loved_tab, new RandomTagger()),
-//        unloved(R.string.unloved_tab, new RandomTagger()),
-//        matches(R.string.name_matches, new RandomTagger());
-//
-//        MenuItem(int name, Fragment fragment){
-//            this.name = name;
-//            this.fragment = fragment;
-//        }
-//        private Context context = MainActivity.context;
-//        private int name;
-//        private Fragment fragment;
-//
-//        @Override
-//        public String toString() {
-//            return context.getResources().getString(name);
-//        }
-//    }
 
     private void createDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -185,83 +170,34 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
-//    private void createDrawer_old(Bundle savedInstanceState){
-//        MenuItem[] mPlanetTitles = MenuItem.values();
-//        mTitle = mDrawerTitle = getTitle();
-//        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        mDrawerList = (ListView) findViewById(R.id.left_drawer_menu);
-//        mDrawerLinear = (LinearLayout) findViewById(R.id.left_drawer);
-//
-//        // set a custom shadow that overlays the main content when the drawer opens
-////        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-//        // set up the drawer's list view with items and click listener
-//        mDrawerList.setAdapter(new ArrayAdapter<MenuItem>(this,
-//                R.layout.drawer_list_item, mPlanetTitles));
-//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-//
-//        // enable ActionBar app icon to behave as action to toggle nav drawer
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-//        getActionBar().setHomeButtonEnabled(true);
-//
-//        // ActionBarDrawerToggle ties together the the proper interactions
-//        // between the sliding drawer and the action bar app icon
-//        mDrawerToggle = new android.support.v7.app.ActionBarDrawerToggle(
-//                this,                  /* host Activity */
-//                mDrawerLayout,         /* DrawerLayout object */
-//                R.string.drawer_open,  /* "open drawer" description for accessibility */
-//                R.string.drawer_close  /* "close drawer" description for accessibility */
-//        ) {
-//            public void onDrawerClosed(View view) {
-//                getActionBar().setTitle(mTitle);
-//                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-//            }
-//
-//            public void onDrawerOpened(View drawerView) {
-//                getActionBar().setTitle(mDrawerTitle);
-//                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-//            }
-//        };
-//        mDrawerLayout.setDrawerListener(mDrawerToggle);
-//
-//        if (savedInstanceState == null) {
-//            selectItem(0);
-//        }
-//    }
-//    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-//        @Override
-//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//            selectItem(position);
-//        }
-//    }
-//
-//    private void selectItem(int position) {
-////        // update the main content by replacing fragments
-////        Fragment fragment = new PlanetFragment();
-//////        Bundle args = new Bundle();
-//////        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-//////        fragment.setArguments(args);
-////
-////        FragmentManager fragmentManager = getFragmentManager();
-////        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-////
-////        // update selected item and title, then close the drawer
-////        mDrawerList.setItemChecked(position, true);
-//////        setTitle(mPlanetTitles[position]);
-////        mDrawerLayout.closeDrawer(mDrawerList);
-//
-//        MenuItem selected = MenuItem.values()[position];
-//        FragmentManager fragmentManager = getFragmentManager();
-//        fragmentManager.beginTransaction()
-//                .replace(R.id.content_frame, selected.fragment)
-//                .commit();
-//        mDrawerList.setItemChecked(position, true);
-//        setTitle(selected.toString());
-//        mDrawerLayout.closeDrawer(mDrawerLinear);
-//
-//    }
+    private void createQuickMenu() {
+        final BottomNavigationView bottomMenu = (BottomNavigationView) findViewById(R.id.quick_menu);
+        bottomMenu.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        System.out.println("on nav item selected");
 
+                        switch (item.getItemId()) {
+                            case R.id.menu_matches:
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+                                listFrag.filterByTag(getResources().getString(R.string.matches));
+                                break;
+                            case R.id.menu_triage:
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
+                                break;
+                            case R.id.menu_lists:
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+                                listFrag.filterByTag(getResources().getString(R.string.all));
+                                break;
+                        }
+                        return true;
+                    }
+                });
+    }
 
 
     @Override
@@ -278,6 +214,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.drawer, menu);
+        getMenuInflater().inflate(R.menu.quick_menu, menu);
         return true;
     }
 
@@ -301,7 +238,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        System.out.println("hi an option was chosen " + item.getItemId());
         if (id == R.id.triage_menu_item) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
@@ -330,25 +267,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
-
-
-
-
-//    @Override
-//    protected void onPostCreate(Bundle savedInstanceState) {
-//        super.onPostCreate(savedInstanceState);
-//        // Sync the toggle state after onRestoreInstanceState has occurred.
-//        mDrawerToggle.syncState();
-//    }
-//
-//    @Override
-//    public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//        mDrawerToggle.onConfigurationChanged(newConfig);
-//    }
-//
 
     private void switchUser() {
         changeUser();
@@ -417,66 +335,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void setTabs(){
-        TabLayout allTabs = (TabLayout) findViewById(R.id.tabs);
-        allTabs.addTab(allTabs.newTab().setText(R.string.triage_tab), true);
-        allTabs.addTab(allTabs.newTab().setText(R.string.loved));
-        allTabs.addTab(allTabs.newTab().setText(R.string.unloved));
-        allTabs.addTab(allTabs.newTab().setText(R.string.matches));
-        matchTab = allTabs.getTabAt(3);
-        allTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                String tabName = tab.getText().toString();
-                ViewName selectedView = null;
-                if (tabName.equals(getString(R.string.loved))) {
-                    Collections.sort(lovedNames, new Comparator<Name>() {
-                        @Override
-                        public int compare(Name s, Name t1) {
-                            return s.name.compareTo(t1.name);
-                        }
-                    });
-                    getLovedAdapter().notifyDataSetChanged();
-                    selectedView = ViewName.lovedNames;
-                } else if (tabName.equals(getString(R.string.unloved))) {
-                    Collections.sort(unlovedNames, new Comparator<Name>() {
-                        @Override
-                        public int compare(Name s, Name t1) {
-                            return s.name.compareTo(t1.name);
-                        }
-                    });
-                    getUnlovedAdapter().notifyDataSetChanged();
-                    selectedView = ViewName.unlovedNames;
-                } else if (tabName.equals(getString(R.string.triage_tab))) {
-                    selectedView = ViewName.untaggedNames;
-                }
-                else if (tab.getPosition() == 3 ){ //matches
-//                    setMatchTabCount(-1);
-                    Settings.setCurrentUserUnseenMatches(0);
-//                    updateMatchedNames();
-                    Collections.sort(matchedNames, new Comparator<Name>() {
-                        @Override
-                        public int compare(Name s, Name t1) {
-                            return s.name.compareTo(t1.name);
-                        }
-                    });
-                    selectedView = ViewName.matchedNames;
-                }
-                switchToView(selectedView);
-
-            }
-
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
-    }
-
     private void switchToView(ViewName viewName) {
         View requestedView = views.get(viewName);
         for (View view : views.values()){
@@ -486,72 +344,8 @@ public class MainActivity extends AppCompatActivity
             else
                 view.setVisibility(View.VISIBLE);
         }
-//        getLovedNamesListView().setVisibility(View.GONE);
-//        getUnlovedNamesListView().setVisibility(View.GONE);
-//        getMatchedNamesListView().setVisibility(View.GONE);
-//        getUntaggedNamesView().setVisibility(View.GONE);
-//        selectedView.setVisibility(View.VISIBLE);
-//        if (selectedView.equals(getUntaggedNamesView())){
-//            getLoveImage().setVisibility(View.VISIBLE);
-//            getDisloveButton().setVisibility(View.VISIBLE);
-//        }
+
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-////        getMenuInflater().inflate(R.menu.menu_main, menu);
-//
-//        return true;
-//    }
-
-//    @Override
-//    public boolean onOptionsItemSelected(android.view.MenuItem item) {
-////        // Handle action bar item clicks here. The action bar will
-////        // automatically handle clicks on the Home/Up button, so long
-////        // as you specify a parent activity in AndroidManifest.xml.
-////        int id = item.getItemId();
-////
-////        // Pass the event to ActionBarDrawerToggle, if it returns
-////        // true, then it has handled the app icon touch event
-////        if (mDrawerToggle.onOptionsItemSelected(item)) {
-////            return true;
-////            return true;
-////        }
-////        // Handle your other action bar items...
-////
-////        return super.onOptionsItemSelected(item);
-//
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                mDrawerLayout.openDrawer(GravityCompat.START);
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-
-
-        //noinspection SimplifiableIfStatement
-//        if (id == R.id.sex_settings) {
-//            Settings.unsetGender();
-//            startActivity(sexChooseIntent);
-//            return true;
-//        }
-//        if (id == R.id.family_settings) {
-//            Settings.setFamilyMembersEdited(false);
-//            startActivity(familyMembersIntent);
-//            return true;
-//        }
-//        if (id == R.id.change_user){
-//            switchUser();
-//        }
-//        if (id == R.id.help){
-//            setIsHelpScreenSeen(false);
-//            startActivity(helpIntent);
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     private void changeUserInit(){
         try {
@@ -588,6 +382,9 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
         AppIndex.AppIndexApi.start(client, getIndexApiAction());
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter(MATCH_NOTIFICATION));
     }
 
     @Override
@@ -598,6 +395,7 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
