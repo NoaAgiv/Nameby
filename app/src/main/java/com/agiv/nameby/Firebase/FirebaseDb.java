@@ -29,7 +29,6 @@ public class FirebaseDb {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String nameId = dataSnapshot.getKey();
                 String tag = (String) dataSnapshot.getValue();
-                System.out.println("member " + member + ", tag " + tag);
                 NameTagger.initTag(member, nameId, tag);
             }
 
@@ -153,7 +152,6 @@ public class FirebaseDb {
                     existingMember.updateDetails(member);
                     return;
                 }
-                System.out.println("??? what " + Settings.getMember() + " " + member);
                 if (member.id.equals(Settings.getMember().id)) {
                     member = Settings.getMember();
                 }
@@ -179,7 +177,6 @@ public class FirebaseDb {
     }
 
     public static void setMemberAndFamily(String email){
-        System.out.println("users/" + Member.generateId(email));
         DatabaseReference ref = database.getReference("users/" + Member.generateId(email));
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -187,9 +184,7 @@ public class FirebaseDb {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 GenericTypeIndicator<Member> t = new GenericTypeIndicator<Member>() {
                 };
-                System.out.println(dataSnapshot.getValue());
                 Member member = dataSnapshot.getValue(t);
-                System.out.println(member);
                 Settings.setMember(member);
                 Settings.setFamilyId(member.family);
 

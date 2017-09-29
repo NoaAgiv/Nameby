@@ -15,6 +15,7 @@ import static com.agiv.nameby.entities.Member.NameTag;
 import com.agiv.nameby.entities.Name;
 import com.agiv.nameby.fragments.FamilyFragment;
 import com.agiv.nameby.fragments.ListsFragment;
+import com.agiv.nameby.fragments.NameAdditionFragment;
 import com.agiv.nameby.fragments.RandomTagger;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -60,14 +61,17 @@ public class NameTagger {
     private static RandomTagger randomTagger;
     private static NameList nameList = new NameList();
     private static ListsFragment listFrag;
+    private static NameAdditionFragment nameAdditionFragment;
 
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger, FamilyFragment familyFragment){
+    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger, FamilyFragment familyFragment, NameAdditionFragment nameAdditionFragment){
         Log.w("view", "a");
         NameTagger.randomTagger = randomTagger;
         NameTagger.listFrag = listsFragment;
+        NameTagger.nameAdditionFragment = nameAdditionFragment;
         listsFragment.setNames(nameList, context);
+        nameAdditionFragment.setNames(nameList);
         NameTagger.context = context;
         NameTagger.activity = activity;
 //        matchTab = matchTab;
@@ -199,10 +203,8 @@ public class NameTagger {
 
     private static void setMemberNameTag(Member member, Name name, NameTag tag){
         System.identityHashCode(member);
-        System.out.println(member.nameTags);
 
         System.identityHashCode(Settings.getMember());
-        System.out.println(Settings.getMember().nameTags);
         if (tag==null) {
             member.tagName(name, untagged);
         }

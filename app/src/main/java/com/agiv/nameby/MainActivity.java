@@ -41,6 +41,7 @@ import com.agiv.nameby.Firebase.FirebaseDb;
 import com.agiv.nameby.entities.Name;
 import com.agiv.nameby.fragments.FamilyFragment;
 import com.agiv.nameby.fragments.ListsFragment;
+import com.agiv.nameby.fragments.NameAdditionFragment;
 import com.agiv.nameby.fragments.RandomTagger;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity
     private RandomTagger randomTagger;
     private ListsFragment listFrag;
     private FamilyFragment familyFragment;
+    private NameAdditionFragment nameAdditionFragment;
+
     private static int RC_SIGN_IN = 100;
     FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -106,7 +109,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            System.out.println("any recieve at all?");
             String message = intent.getStringExtra("key");
             final BottomNavigationItemView menuMatchesItem = (BottomNavigationItemView) findViewById(R.id.menu_matches);
 
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity
         listFrag = new ListsFragment();
         randomTagger  = new RandomTagger();
         familyFragment = new FamilyFragment();
+        nameAdditionFragment = new NameAdditionFragment();
 
         setContentView(R.layout.drawer_layout);
         createDrawer();
@@ -179,8 +182,6 @@ public class MainActivity extends AppCompatActivity
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        System.out.println("on nav item selected");
-
                         switch (item.getItemId()) {
                             case R.id.menu_matches:
                                 fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
@@ -238,7 +239,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        System.out.println("hi an option was chosen " + item.getItemId());
         if (id == R.id.triage_menu_item) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
@@ -254,9 +254,13 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
             listFrag.filterByTag(getResources().getString(R.string.all));
 
+        } else if (id == R.id.add_names_menu_item) {
+            fragmentManager.beginTransaction().replace(R.id.content_frame, nameAdditionFragment).commit();
+
         } else if (id == R.id.family_menu_item) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
         }
+
 
 
 
@@ -349,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 
     private void changeUserInit(){
         try {
-            NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment);
+            NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
         }
         catch (Exception e){
             System.out.println(e);
@@ -407,7 +411,7 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
-        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment);
+        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
     }
 
     private void signIn(){

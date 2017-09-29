@@ -129,7 +129,7 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
         ImageButton tagImg;
     }
 
-    public Filter getFilter() {
+    public Filter  getFilter() {
         return mFilter;
     }
 
@@ -145,7 +145,6 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
             else if (constraint.equals(context.getString(R.string.matches))){
                 BottomNavigationItemView matchesMenuItem = (BottomNavigationItemView) ((Activity) context).findViewById(R.id.menu_matches);
                 matchesMenuItem.setSelected(false); // this will set the new match icon off
-                System.out.println("in in searchable adapter how you doing");
                 filtered.conditionalAddAll(list, NameList.unanimouslyPositiveFilter);
             }
             else{

@@ -14,7 +14,7 @@ public class NameGenerator {
     private static final Random rgenerator = new Random();
     NameList names;
     NamePreferences pref;
-    public static Name END_OF_LIST = new Name("Congrats! You tagged all the names!","f", 0);
+    public static Name END_OF_LIST = new Name("תייגת את כל השמות","f", 0);
     private boolean allTagged = true;
 
     public NameGenerator(NameList names, NamePreferences pref) {
@@ -28,7 +28,6 @@ public class NameGenerator {
 
     public Name getNextUntaggedName() {
 //        System.out.println("member is now:"+Settings.getMember());
-        System.out.println(allTagged);
         if (names.isEmpty()) {
             allTagged = true;
             return END_OF_LIST;

@@ -1,10 +1,17 @@
 package com.agiv.nameby.entities;
 
+import com.agiv.nameby.NameGenerator;
+import com.agiv.nameby.R;
 import com.agiv.nameby.Settings;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static com.agiv.nameby.NameTagger.context;
 
 /**
  * Created by Noa Agiv on 1/9/2017.
@@ -15,15 +22,33 @@ public class Name {
     public String name;
     public String gender;
     public int popularity;
-//    public Map<String, NameTag> userTags = new HashMap<>();
+    final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
 
     public static Pattern namePattern = Pattern.compile("[\\u0590-\\u05FF \\\\p{Graph} \\\\s]+", Pattern.UNICODE_CASE);
 
     public Name(String name, String gender, int popularity){
-      this.name = name;
-      this.gender = gender;
+      if (!setName(name))
+          throw new InvalidParameterException(context.getString(R.string.error_set_name) + " " + name);
+      if (gender.equals("f") || gender.equals("m")) {
+          this.gender = gender;
+      } else
+      {
+          throw new InvalidParameterException("no such gender : " + gender);
+      }
       this.popularity = popularity;
+    }
+
+    public Name(String name, String gender){
+        if (!setName(name))
+            throw new InvalidParameterException(context.getString(R.string.error_set_name));
+        if (gender.equals("f") || gender.equals("m")) {
+            this.gender = gender;
+        } else
+        {
+            throw new InvalidParameterException("no such gender : " + gender);
+        }
+        this.popularity = 500;
     }
 
     public void setId(String id) {
@@ -33,11 +58,11 @@ public class Name {
     public Name() {
     }
 
-    public boolean isFemale(){
+    public boolean female(){
         return gender.equals("f");
     }
 
-    public boolean isMale(){
+    public boolean male(){
         return gender.equals("m");
     }
 
@@ -49,10 +74,26 @@ public class Name {
         this.popularity = popularity;
     }
 
-    public void setName(String name) {
+    public boolean setName(String name) {
+        if (!Name.namePattern.matcher(name).matches())
+            return false;
+
         this.name = name;
+        return true;
     }
 
+    public void save() {
+        DatabaseReference membersRef = database.getReference("names");
+        id = membersRef.push().getKey();
+        System.out.println(this);
+        membersRef.child(id).setValue(this);
+    }
+
+    public void increasePopularity(int addition){
+        setPopularity(popularity + addition);
+        DatabaseReference membersRef = database.getReference("names");
+        membersRef.child(id).setValue(this);
+    }
 
 
 
@@ -78,7 +119,7 @@ public class Name {
 //        }
 //    }
 
-    public boolean isNameComplete(){
+    public boolean nameIsComplete(){
         // when a new name is added, its field might be added one by one,
         // resulting in temporarily missing fields
         return name != null && gender != null;
@@ -89,16 +130,35 @@ public class Name {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Name name = (Name) o;
+        Name name1 = (Name) o;
 
-        return id == name.id;
+        if (name != null ? !name.equals(name1.name) : name1.name != null) return false;
+        return gender != null ? gender.equals(name1.gender) : name1.gender == null;
 
     }
 
     @Override
     public int hashCode() {
-        return Integer.valueOf(id);
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (gender != null ? gender.hashCode() : 0);
+        return result;
     }
+
+    //    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//
+//        Name name = (Name) o;
+//
+//        return id == name.id;
+//
+//    }
+
+//    @Override
+//    public int hashCode() {
+//        return Integer.valueOf(id);
+//    }
 
     @Override
     public String toString() {

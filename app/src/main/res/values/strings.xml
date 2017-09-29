@@ -9,6 +9,7 @@
     <string name="unloved">לא אהובים</string>
     <string name="untagged">לא מתוייגים</string>
     <string name="all_names">כל השמות</string>
+    <string name="add_names">הוספת שמות</string>
     <string name="maybe">אפשר לשקול</string>
     <string name="triage_tab">מיון</string>
     <string name="matches">התאמות</string>
@@ -22,9 +23,11 @@
     <string name="add_dialog_body">הקלידו פה שמות מופרדים בשורה חדשה. השמות יועברו אוטומטית לרשימת השמות האהובים</string>
     <string name="error_dialog_title">שגיאה</string>
     <string name="error_set_usernames_dialog_body">בחרתם בשמות זהים למשתמשים השונים או שאחד משמות המשתמשים ריק. אנא הזינו שמות משתמש שונים בכל שפה שתבחרו</string>
-    <string name="add_approve_button">הוסף</string>
+    <string name="add_approve_button">הוספה</string>
     <string name="choose_female">בת</string>
     <string name="choose_male">בן</string>
+    <string name="name_was_added">השם נוסף בהצלחה:</string>
+
     <string name="choose_sex_settings">למי אתם מצפים?</string>
     <string name="edit_family_members_settings">איך קוראים לכם?</string>
     <string name="skip">דלגו על ההסבר</string>
@@ -41,6 +44,7 @@
     <string name="search">חיפוש</string>
     <string name="name">שם</string>
     <string name="tag">תיוג:</string>
+    <string name="add_to">הוספה ל:</string>
     <string name="all">כולם</string>
     <string name="names">שמות</string>
     <string name="end_of_names">סיימת לתייג הכל!</string>

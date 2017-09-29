@@ -5,7 +5,6 @@ import com.agiv.nameby.entities.Name;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Noa Agiv on 2/28/2017.
@@ -24,28 +23,27 @@ public class NameList extends UniqueList<Name> {
     public static UniqueList.ListCondition validNameFilter = new UniqueList.ListCondition<Name>() {
         @Override
         public boolean apply(Name name) {
-            return  name.isNameComplete();
+            return  name.nameIsComplete();
         }
     };
 
     public static UniqueList.ListCondition femaleFilter = new UniqueList.ListCondition<Name>() {
         @Override
         public boolean apply(Name name) {
-            return  name.isNameComplete() && name.isFemale();
+            return  name.nameIsComplete() && name.female();
         }
     };
 
     public static UniqueList.ListCondition maleFilter = new UniqueList.ListCondition<Name>() {
         @Override
         public boolean apply(Name name) {
-            return name.isNameComplete() && name.isMale();
+            return name.nameIsComplete() && name.male();
         }
     };
 
     public static UniqueList.ListCondition untaggedFilter = new UniqueList.ListCondition<Name>() {
         @Override
         public boolean apply(Name name) {
-            System.out.println("well"+ Settings.getMember().nameTags);
             return Settings.getMember().getTag(name).equals(Member.NameTag.untagged);
         }
     };
@@ -103,8 +101,24 @@ public class NameList extends UniqueList<Name> {
         }
     }
 
+    public static class NameCondition implements ListCondition<Name>{
+        String nameStr;
+
+        public NameCondition(String nameStr){
+            this.nameStr = nameStr;
+        }
+        @Override
+        public boolean apply(Name name){
+            return name.name.equals(nameStr);
+        }
+    }
+
     public Name getById(String id){
         return this.firstSatisfies(new NameList.IdCondition(id));
+    }
+
+    public Name get(String name){
+        return this.firstSatisfies(new NameList.NameCondition(name));
     }
 
 }

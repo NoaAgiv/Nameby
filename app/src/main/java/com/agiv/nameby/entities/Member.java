@@ -113,7 +113,6 @@ public class Member {
     }
 
     public void tagName(Name name, NameTag tag) {
-        System.out.println("tagging");
         nameTags.put(name.id, tag);
     }
 
@@ -126,7 +125,6 @@ public class Member {
     }
 
     public boolean isPositiveTag(Name name) {
-        System.out.println("hi" + nameTags);
         return NameTag.isTagPositive(getTag(name));
     }
 

@@ -23,6 +23,11 @@
                         android:icon="@drawable/dislove"
                         android:title="@string/all_names"/>
 
+                    <item
+                        android:id="@+id/add_names_menu_item"
+                        android:icon="@drawable/dislove"
+                        android:title="@string/add_names"/>
+
             </group>
         </menu>
     </item>

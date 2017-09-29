@@ -14,21 +14,27 @@
         android:textStyle="bold"
         android:text="@string/name"/>
 
-    <Spinner
-        android:id="@+id/filter_by_tag"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:drawSelectorOnTop="true"
-        android:textAlignment="gravity"
-        android:spinnerMode="dropdown"/>
+        android:id="@+id/filter_by_tag_rel_layout"
+        android:background="@drawable/rect" >
+        <Spinner
+            android:id="@+id/filter_by_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:drawSelectorOnTop="true"
+            android:textAlignment="center"
+            android:spinnerMode="dropdown"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:layout_toRightOf="@id/filter_by_tag"
+        android:layout_toRightOf="@id/filter_by_tag_rel_layout"
         android:textSize="18sp"
         android:textStyle="bold"
         android:text="@string/tag"/>
