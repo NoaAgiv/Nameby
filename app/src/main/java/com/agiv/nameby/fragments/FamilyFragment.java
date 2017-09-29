@@ -21,6 +21,7 @@ import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.utils.EditableListViewAdapter;
+import com.agiv.nameby.utils.ErrorHandler;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -102,7 +103,7 @@ public class FamilyFragment extends Fragment {
                             family.addSaveMember(member);
                             adapter.notifyDataSetChanged();
                         }catch (InvalidParameterException e) {
-                            showErrorAlert(e.getMessage());
+                            ErrorHandler.showErrorAlert(e.getMessage(), getContext());
                         }
                         dialog.dismiss();
                     }
@@ -134,7 +135,7 @@ public class FamilyFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (!family.setName(input.getText().toString())){
-                                    showErrorAlert(R.string.error_set_name);
+                                    ErrorHandler.showErrorAlert(R.string.error_set_name, getContext());
                                 }
                                 familyName.setText(getResources().getString(R.string.family) + " " + family.name);
                                 dialog.dismiss();
@@ -149,41 +150,5 @@ public class FamilyFragment extends Fragment {
                         .show();
             }});
     }
-
-
-
-    private void showErrorAlert(String error){
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.error_dialog_title)
-                .setMessage(error)
-                .setCancelable(false)
-                .setPositiveButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                    }
-                })
-                .show();
-    }
-    private void showErrorAlert(int error){
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.error_dialog_title)
-                .setMessage(error)
-                .setCancelable(false)
-                .setPositiveButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                    }
-                })
-                .show();
-    }
-
-
-
-
-
 
 }

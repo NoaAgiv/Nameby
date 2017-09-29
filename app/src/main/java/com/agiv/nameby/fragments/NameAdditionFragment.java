@@ -28,7 +28,9 @@ import com.agiv.nameby.SearchableAdapter;
 import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.utils.ErrorHandler;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,20 +70,26 @@ public class NameAdditionFragment extends Fragment {
             public void onClick(View view) {
                 TextView textView = (TextView) layout.findViewById(R.id.name_input);
                 String nameStr = textView.getText().toString();
-                Name name = new Name(nameStr, selectedGender);
+                try {
+                    Name name = new Name(nameStr, selectedGender);
+                    if (names.contains(name)){
+                        names.get(nameStr).increasePopularity(1);
+                    }
+                    else{
+//                    names.add(name);
+                        NameTagger.initName(name);
+                        name.save();
+                    }
+                    Settings.getMember().tagName(names.get(nameStr), textToTag(selectedTag));
+                    NameTagger.saveNameTag(name, Settings.getMember());
+                    textView.setText("");
+                    Toast.makeText(getActivity(), getString(R.string.name_was_added) + " " + nameStr,
+                            Toast.LENGTH_LONG).show();
 
-                if (names.contains(name)){
-                    names.get(nameStr).increasePopularity(1);
+                }catch (InvalidParameterException e) {
+                    ErrorHandler.showErrorAlert(e.getMessage(), getContext());
                 }
-                else{
-                    names.add(name);
-                    name.save();
-                }
-                Settings.getMember().tagName(names.get(nameStr), textToTag(selectedTag));
-                NameTagger.saveNameTag(name, Settings.getMember());
-                textView.setText("");
-                Toast.makeText(getActivity(), getString(R.string.name_was_added) + " " + nameStr,
-                        Toast.LENGTH_LONG).show();
+
             }
         });
     }
