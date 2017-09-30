@@ -45,6 +45,7 @@
     <string name="name">שם</string>
     <string name="tag">תיוג:</string>
     <string name="add_to">הוספה ל:</string>
+    <string name="expecting">מצפים ל:</string>
     <string name="all">כולם</string>
     <string name="names">שמות</string>
     <string name="end_of_names">סיימת לתייג הכל!</string>

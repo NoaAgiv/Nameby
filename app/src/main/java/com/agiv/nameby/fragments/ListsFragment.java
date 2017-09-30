@@ -99,7 +99,7 @@ public class ListsFragment extends Fragment {
         }
         String[] items = new String[tagOptions.size()];
         items = tagOptions.toArray(items);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, items);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_item, items);
         tagFilterSpinner.setAdapter(spinnerAdapter);
         tagFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

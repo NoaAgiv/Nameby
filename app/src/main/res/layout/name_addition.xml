@@ -55,7 +55,8 @@
                     android:layout_alignParentLeft="true"
                     android:drawSelectorOnTop="true"
                     android:layout_gravity="right"
-
+                    android:textSize="18sp"
+                    android:textColor="@color/textColorBright"
                     android:textAlignment="gravity"
                     android:spinnerMode="dropdown"/>
             </RelativeLayout>
@@ -80,6 +81,7 @@
             <RadioButton android:id="@+id/radio_female"
                 android:layout_width="wrap_content"
                 android:layout_gravity="right"
+                android:buttonTint="@color/colorAccent"
                 android:layout_height="wrap_content"
                 android:text="@string/choose_female"/>
         </RadioGroup>

@@ -33,7 +33,6 @@ import com.agiv.nameby.utils.ErrorHandler;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * Created by Noa Agiv on 6/13/2017.
  */
@@ -145,7 +144,7 @@ public class NameAdditionFragment extends Fragment {
         }
         String[] items = new String[tagOptions.size()];
         items = tagOptions.toArray(items);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, items);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), R.layout.spinner_item, items);
         tagChoiceSpinner.setAdapter(spinnerAdapter);
         tagChoiceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

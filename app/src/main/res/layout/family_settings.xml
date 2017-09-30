@@ -16,6 +16,47 @@
         android:paddingTop="20dp"
         android:drawableLeft="@android:drawable/ic_menu_edit"
          />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/gender_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="right"
+            android:text="@string/expecting"/>
+
+        <RadioGroup
+            android:id="@+id/gender_radio"
+            android:paddingTop="7dp"
+            android:layout_toLeftOf="@id/gender_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/radio_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:buttonTint="@color/colorAccent"
+                android:textSize="18sp"
+                android:textColor="@color/textColorBright"
+                android:text="@string/choose_male"/>
+            <RadioButton android:id="@+id/radio_female"
+                android:layout_width="wrap_content"
+                android:layout_gravity="right"
+                android:buttonTint="@color/colorAccent"
+                android:textSize="18sp"
+                android:textColor="@color/textColorBright"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_female"/>
+        </RadioGroup>
+
+    </RelativeLayout>
 
     <View
         android:layout_width="match_parent"
