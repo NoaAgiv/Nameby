@@ -45,9 +45,9 @@ public class ListsFragment extends Fragment {
 
     public void setNames(NameList names, Context context){
         this.names = names;
-        if (adapter == null) {
+//        if (adapter == null) {
             adapter = new SearchableAdapter(context, names);
-        }
+//        }
         if (nameList != null) {
             nameList.setAdapter(adapter);
         }
@@ -83,7 +83,9 @@ public class ListsFragment extends Fragment {
     }
 
     public void notifyChange(){
-        adapter.notifyDataSetChanged();
+        if (adapter!=null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
 

@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.agiv.nameby.R;
@@ -61,6 +63,7 @@ public class FamilyFragment extends Fragment {
             memberList.setAdapter(adapter);
             setFamilyNameBox();
             setAddMemberButton();
+            setGenderRadioButtons();
         }
         return layout;
     }
@@ -70,6 +73,25 @@ public class FamilyFragment extends Fragment {
 //        super.onStart();
 //        adapter.notifyDataSetChanged();
 //    }
+    public void setGenderRadioButtons(){
+
+        final RadioGroup genderRadio = (RadioGroup) layout.findViewById(R.id.gender_radio);
+
+        int selectedGenderID = Settings.getGender().equals(Settings.Gender.FEMALE)?
+                R.id.radio_female : R.id.radio_male;
+
+        genderRadio.check(selectedGenderID);
+        genderRadio.callOnClick();
+
+        genderRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int selectedId) {
+                RadioButton radioButton = (RadioButton) layout.findViewById(selectedId);
+                Settings.Gender selectedGender = Settings.Gender.fromText(radioButton.getText().toString(), getResources());
+                Settings.setGender(selectedGender);
+            }
+        });
+    }
 
     public void setAddMemberButton(){
         final FloatingActionButton bt = (FloatingActionButton) layout.findViewById(R.id.add_family_member);

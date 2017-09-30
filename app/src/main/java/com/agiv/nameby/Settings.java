@@ -1,9 +1,12 @@
 package com.agiv.nameby;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by Noa Agiv on 12/31/2016.
@@ -27,10 +30,35 @@ public class Settings {
     static Member member;
     static String familyId = "1";
     static Family family;
+    final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     public enum Gender {
         FEMALE,
-        MALE
+        MALE;
+
+        public static String fromTextToString(String text, Resources r){
+            return text.equals(r.getString(R.string.choose_female))?
+                    "f" :
+                    "m";
+        }
+
+        public static Gender fromText(String text, Resources r){
+            return text.equals(r.getString(R.string.choose_female))?
+                    FEMALE :
+                    MALE;
+        }
+
+        public static String toOneLetter(Gender gender){
+            return gender.equals(FEMALE)?
+                    "f" :
+                    "m";
+        }
+
+        public static Gender fromOneLetter(String oneLetter){
+            return oneLetter.equals("f")?
+                    FEMALE :
+                    MALE;
+        }
     }
 
     public static Family getFamily() {
@@ -135,27 +163,21 @@ public class Settings {
     }
 
     public static Gender getGender() {
-        return sharedPref.getInt("gender", -1)==-1 ? null : Gender.values()[sharedPref.getInt("gender", -1)];
+        return gender==null? Gender.FEMALE : gender;
+//        return sharedPref.getInt("gender", -1)==-1 ? null : Gender.values()[sharedPref.getInt("gender", -1)];
     }
 
-    public static String getGenderString() {
-        if (getGender().equals(Gender.FEMALE))
-            return "f";
-        else
-            return "m";
+    public static void setGender(String gender) {
+        setGender(Gender.fromOneLetter(gender));
     }
-
     public static void setGender(Gender gender) {
         Settings.gender = gender;
-        editor.putInt("gender", gender.ordinal());
-        editor.commit();
+        DatabaseReference familyRef = database.getReference("families");
+        familyRef.child(getFamilyId()).child("gender").setValue(Gender.toOneLetter(gender));
+        NameTagger.updateListsByGender();
+//        editor.putInt("gender", gender.ordinal());
+//        editor.commit();
 
-    }
-
-    public static void unsetGender() {
-        editor.putInt("gender", -1);
-        editor.commit();
-        Settings.gender = null;
     }
 
     public static String getMemberId(){

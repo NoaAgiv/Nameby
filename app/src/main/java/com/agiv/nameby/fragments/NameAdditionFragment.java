@@ -1,20 +1,14 @@
 package com.agiv.nameby.fragments;
 
 
-import android.content.Context;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -24,7 +18,6 @@ import android.widget.Toast;
 import com.agiv.nameby.NameList;
 import com.agiv.nameby.NameTagger;
 import com.agiv.nameby.R;
-import com.agiv.nameby.SearchableAdapter;
 import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
@@ -76,10 +69,10 @@ public class NameAdditionFragment extends Fragment {
                     }
                     else{
 //                    names.add(name);
-                        NameTagger.initName(name);
+                        NameTagger.updateListsWithName(name);
                         name.save();
                     }
-                    Settings.getMember().tagName(names.get(nameStr), textToTag(selectedTag));
+                    Settings.getMember().tagName(names.get(nameStr), Member.NameTag.fromDisplayText(selectedTag, getResources()));
                     NameTagger.saveNameTag(name, Settings.getMember());
                     textView.setText("");
                     Toast.makeText(getActivity(), getString(R.string.name_was_added) + " " + nameStr,
@@ -87,32 +80,14 @@ public class NameAdditionFragment extends Fragment {
 
                 }catch (InvalidParameterException e) {
                     ErrorHandler.showErrorAlert(e.getMessage(), getContext());
-
                 }
+
 
             }
         });
     }
-    private String textToGender(String text){
-        return text.equals(getResources().getString(R.string.choose_female))?
-                "f" :
-                "m";
-
-    }
-
-    private Member.NameTag textToTag(String text){
-        return text.equals(getResources().getString(R.string.loved))?
-                    Member.NameTag.loved:
-                text.equals(getResources().getString(R.string.unloved))?
-                        Member.NameTag.unloved:
-                        text.equals(getResources().getString(R.string.maybe))?
-                                Member.NameTag.maybe:
-                                Member.NameTag.untagged;
 
 
-
-
-    }
     public void setGenderRadioButtons(){
 
         final RadioGroup genderRadio = (RadioGroup) layout.findViewById(R.id.gender_radio);
@@ -126,10 +101,8 @@ public class NameAdditionFragment extends Fragment {
         genderRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int selectedId) {
-                System.out.println("im here");
                 RadioButton radioButton = (RadioButton) layout.findViewById(selectedId);
-                selectedGender = textToGender(radioButton.getText().toString());
-                System.out.println(selectedGender);
+                selectedGender = Settings.Gender.fromTextToString(radioButton.getText().toString(), getResources());
             }
         });
     }

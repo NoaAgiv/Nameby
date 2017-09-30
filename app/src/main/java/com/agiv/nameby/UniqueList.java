@@ -42,7 +42,6 @@ public class UniqueList<T> extends ArrayList<T> {
             if (!cond.apply(obj))
                 return;
         }
-
         this.add(obj);
     }
 

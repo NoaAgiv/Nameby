@@ -1,6 +1,7 @@
 package com.agiv.nameby.entities;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 import android.widget.Adapter;
 
@@ -109,6 +110,22 @@ public class Member {
                 }
             }
             return null;
+        }
+
+        public static NameTag fromDisplayText(String dispText, Resources r) throws RuntimeException{
+            for (NameTag tag : values()){
+                if (dispText.equals(r.getString(tag.displayName)))
+                    return tag;
+            }
+            throw new RuntimeException("no such tag display name " + dispText);
+//            return text.equals(r.getString(R.string.loved))?
+//                    Member.NameTag.loved:
+//                    text.equals(r.getString(R.string.unloved))?
+//                            Member.NameTag.unloved:
+//                            text.equals(r.getString(R.string.maybe))?
+//                                    Member.NameTag.maybe:
+//                                    Member.NameTag.untagged;
+
         }
     }
 

@@ -2,7 +2,6 @@ package com.agiv.nameby;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.design.widget.TabLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -61,46 +60,40 @@ public class NameTagger {
     private static RandomTagger randomTagger;
     private static NameList nameList = new NameList();
     private static ListsFragment listFrag;
-    private static NameAdditionFragment nameAdditionFragment;
 
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-    public static void initData(Context context, Activity activity, TabLayout.Tab matchTab, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger, FamilyFragment familyFragment, NameAdditionFragment nameAdditionFragment){
-        Log.w("view", "a");
+    public static void initData(Context context, Activity activity, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger, FamilyFragment familyFragment, NameAdditionFragment nameAdditionFragment){
         NameTagger.randomTagger = randomTagger;
         NameTagger.listFrag = listsFragment;
-        NameTagger.nameAdditionFragment = nameAdditionFragment;
         listsFragment.setNames(nameList, context);
-        nameAdditionFragment.setNames(nameList);
+        nameAdditionFragment.setNames(allNames);
         NameTagger.context = context;
         NameTagger.activity = activity;
-//        matchTab = matchTab;
-//        FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG);
         FirebaseDb.initFamilyListener(Settings.getFamilyId());
-//        System.out.println("init family " + Settings.getFamily().familyMembers);
         FirebaseDb.initNameTagListeners();
-//        initViewAdapters();
-        initUntaggedArea(randomTaggerLayout);
-
-
-
-//        setListAdapters();
-        int unseenMatchesCount = Settings.getCurrentUserUnseenMatches();
-//        setMatchTabCount(unseenMatchesCount);
-//        loveSound = MediaPlayer.create(context, R.raw.c_tone);
-//        unlikeSound = MediaPlayer.create(context, R.raw.a_tone);
-//        matchSound = MediaPlayer.create(context, R.raw.pin_drop_match);
-
+        initUntaggedArea();
     }
 
-    public static void initName(Name name){
+    public static void updateListsWithName(Name name){
         allNames.addIf(name, NameList.validNameFilter);
 
-        nameList.addIf(name, NameList.validNameFilter);
-        listFrag.notifyChange();
-
-        femaleNames.addIf(name, NameList.femaleFilter);
+//        nameList.addIf(name, NameList.validNameFilter);
         maleNames.addIf(name, NameList.maleFilter);
+        femaleNames.addIf(name, NameList.femaleFilter);
+        updateListsByGender();
+
+        listFrag.notifyChange();
+    }
+
+    public static void updateListsByGender(){
+        nameList = Settings.getGender().equals(Settings.Gender.FEMALE)?
+                femaleNames :
+                maleNames;
+        if (listFrag!=null)
+            listFrag.setNames(nameList, context);
+        if (ngen!=null)
+            initUntaggedArea();
     }
 
     public static List<String> getNameIds(){
@@ -113,7 +106,7 @@ public class NameTagger {
         if (tagStr!=null) {
             tag = Member.NameTag.valueOf(tagStr);
         }
-        Name name = nameList.getById(nameId);
+        Name name = allNames.getById(nameId);
         setMemberNameTag(member, name, tag);
         if (member.equals(Settings.getMember())) {
             updateListsWithTags(name, member);
@@ -122,56 +115,11 @@ public class NameTagger {
             randomTagger.setName(ngen.getNextUntaggedName());
     }
 
-    private static void initUntaggedArea(View randomTaggerLayout){
+    private static void initUntaggedArea(){
         ngen = new NameGenerator(nameList, new NamePreferences());
-//        untaggedNamesView = new NameTaggerViewContainer(context, (TextView) randomTaggerLayout.findViewById(R.id.untagged_names_view), activity, randomTaggerLayout);
         randomTagger.setName(ngen.getNextUntaggedName());
-//        untaggedNamesView.setName(ngen.getNextUntaggedName());
-
-
-
     }
 
-//    private static void initViewAdapters() {
-//
-//        lovedNamesListView = (ListView) listsLayout.findViewById(R.id.loved_names);
-//
-//        final SwitchListsCallBack lovedToUnlovedSwitch = new SwitchListsCallBack() {
-//            @Override
-//            public void switchLists(Name name) {
-//                markNameUnloved(name);
-//            }
-//        };
-//
-//        lovedAdapter = new EditableListViewAdapterold(lovedToUnlovedSwitch, lovedNames, activity,
-//                activity.getString(R.string.mark_unloved_dialog_title), activity.getString(R.string.mark_unloved_dialog_body), R.drawable.edit_unlove);
-//
-//        lovedNamesListView.setAdapter(lovedAdapter);
-//
-//
-//        unlovedNamesListView = (ListView) listsLayout.findViewById(R.id.unloved_names);
-//
-//        SwitchListsCallBack unlovedToLovedSwitch = new SwitchListsCallBack() {
-//            @Override
-//            public void switchLists(Name name) {
-//                markNameLoved(name);
-//            }
-//        };
-//
-//        unlovedAdapter = new EditableListViewAdapterold(unlovedToLovedSwitch, unlovedNames, activity,
-//                activity.getString(R.string.mark_loved_dialog_title), activity.getString(R.string.mark_loved_dialog_body), R.drawable.edit_love);
-//        unlovedNamesListView.setAdapter(unlovedAdapter);
-//
-//        matchedNamesListView = (ListView) listsLayout.findViewById(R.id.matched_names);
-//
-//        matchedAdapter = new SearchableAdapter(matchedNames, context);
-//        matchedNamesListView.setAdapter(matchedAdapter);
-//
-////        updateMatchedNames();
-//
-//
-//
-//    }
 
     public static void saveNameTag(Name name, Member member){
         DatabaseReference tagsRef = database.getReference("users/" + member.id + "/tags");
@@ -216,7 +164,7 @@ public class NameTagger {
 
     private static boolean updateListsWithTags(Name name, Member m) {
         NameTag tag = m.getTag(name);
-        nameList.add(name);
+        updateListsWithName(name);
         randomTagger.setName(ngen.getNextUntaggedName());
         return Settings.getFamily().isUnanimouslyPositive(name);
     }

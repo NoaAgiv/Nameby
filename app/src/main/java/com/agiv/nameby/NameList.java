@@ -44,7 +44,14 @@ public class NameList extends UniqueList<Name> {
     public static UniqueList.ListCondition untaggedFilter = new UniqueList.ListCondition<Name>() {
         @Override
         public boolean apply(Name name) {
-            return Settings.getMember().getTag(name).equals(Member.NameTag.untagged);
+            Member member = Settings.getMember();
+            if (member==null)
+                return false;
+            Member.NameTag tag = member.getTag(name);
+            if (tag==null){
+                return false;
+            }
+            return tag.equals(Member.NameTag.untagged);
         }
     };
 

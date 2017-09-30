@@ -85,7 +85,6 @@ public class Name {
     public void save() {
         DatabaseReference membersRef = database.getReference("names");
         id = membersRef.push().getKey();
-        System.out.println(this);
         membersRef.child(id).setValue(this);
     }
 

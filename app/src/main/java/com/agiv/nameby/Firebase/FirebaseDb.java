@@ -5,7 +5,6 @@ import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
-import com.agiv.nameby.fragments.FamilyFragment;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,7 +12,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.Set;
 
 /**
  * Created by Noa Agiv on 4/16/2017.
@@ -48,7 +48,7 @@ public class FirebaseDb {
                 String id = dataSnapshot.getKey();
                 Name name = dataSnapshot.getValue(Name.class);
                 name.setId(id);
-                NameTagger.initName(name);
+                NameTagger.updateListsWithName(name);
                 for (Member m : Settings.getFamily().familyMembers) {
                     DatabaseReference userTagsRef = database.getReference("users/" + m.id + "/tags");
                     userTagsRef.child(id).addListenerForSingleValueEvent(initTagListener(m));
@@ -111,6 +111,7 @@ public class FirebaseDb {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String id = dataSnapshot.getKey();
+                Settings.setGender(family.gender);
                 initMemberListener(id, family);
             }
 
@@ -158,11 +159,6 @@ public class FirebaseDb {
 
                 family.addMember(member);
 
-//                System.out.println("wawawiwas   " + Settings.getMemberId() + "!=" + memberId);
-//                if (memberId.equals(Settings.getMemberId())){
-//                    System.out.println("wawawiwas" + Settings.getMemberId());
-//                    Settings.setMember(member);
-//                }
                 DatabaseReference userTagsRef = database.getReference("users/" + member.id + "/tags");
                 for (String nameId : NameTagger.getNameIds()) {
                     userTagsRef.child(nameId).addListenerForSingleValueEvent(initTagListener(member));
@@ -187,7 +183,6 @@ public class FirebaseDb {
                 Member member = dataSnapshot.getValue(t);
                 Settings.setMember(member);
                 Settings.setFamilyId(member.family);
-
             }
 
             @Override

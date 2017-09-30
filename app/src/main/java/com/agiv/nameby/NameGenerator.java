@@ -22,12 +22,16 @@ public class NameGenerator {
         this.pref = pref;
     }
 
+    public void setNames(NameList names){
+        this.names = names;
+
+    }
+
     public boolean allNamesTagged(){
         return allTagged;
     }
 
     public Name getNextUntaggedName() {
-//        System.out.println("member is now:"+Settings.getMember());
         if (names.isEmpty()) {
             allTagged = true;
             return END_OF_LIST;

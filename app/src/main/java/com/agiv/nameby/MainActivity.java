@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 
     private void changeUserInit(){
         try {
-            NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
+            NameTagger.initData(MainActivity.this, this, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
         }
         catch (Exception e){
             System.out.println(e);
@@ -411,7 +411,7 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
-        NameTagger.initData(MainActivity.this, this, matchTab, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
+        NameTagger.initData(MainActivity.this, this, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
     }
 
     private void signIn(){

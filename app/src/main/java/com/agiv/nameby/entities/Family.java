@@ -33,7 +33,6 @@ public class Family {
 
     private void subscribeToNotifications(){
         FirebaseMessaging.getInstance().subscribeToTopic(notificationTopic);
-        System.out.println("subscribed to topic " + notificationTopic);
     }
 
     public void sendNotification(String title, String message){
