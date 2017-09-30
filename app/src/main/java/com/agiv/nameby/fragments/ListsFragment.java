@@ -3,7 +3,10 @@ package com.agiv.nameby.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -61,13 +64,28 @@ public class ListsFragment extends Fragment {
             setSearchTextWatcher();
             nameList.setAdapter(adapter);
             setTagSpinner();
+            setAddButton();
         }
         return layout;
+    }
+
+    private void setAddButton() {
+        FloatingActionButton fb = (FloatingActionButton) layout.findViewById(R.id.add_button);
+        fb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, new NameAdditionFragment());
+                ft.commit();
+            }
+        });
+
     }
 
     public void notifyChange(){
         adapter.notifyDataSetChanged();
     }
+
 
     public void setTagSpinner(){
         tagFilterSpinner = (Spinner) layout.findViewById(R.id.filter_by_tag);

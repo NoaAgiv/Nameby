@@ -88,6 +88,7 @@ public class NameAdditionFragment extends Fragment {
 
                 }catch (InvalidParameterException e) {
                     ErrorHandler.showErrorAlert(e.getMessage(), getContext());
+
                 }
 
             }
@@ -121,16 +122,15 @@ public class NameAdditionFragment extends Fragment {
                 R.id.radio_female : R.id.radio_male;
 
         genderRadio.check(selectedGenderID);
+        genderRadio.callOnClick();
 
-        RadioButton radioButton = (RadioButton) layout.findViewById(selectedGenderID);
-        selectedGender = textToGender(radioButton.getText().toString());
-
-        genderRadio.setOnClickListener(new View.OnClickListener() {
+        genderRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                int selectedId = genderRadio.getCheckedRadioButtonId();
+            public void onCheckedChanged(RadioGroup radioGroup, int selectedId) {
+                System.out.println("im here");
                 RadioButton radioButton = (RadioButton) layout.findViewById(selectedId);
                 selectedGender = textToGender(radioButton.getText().toString());
+                System.out.println(selectedGender);
             }
         });
     }
