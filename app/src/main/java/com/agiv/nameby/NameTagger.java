@@ -129,16 +129,21 @@ public class NameTagger {
     }
 
     public static boolean markNameLoved(Name name){
-        Member member = Settings.getMember();
-        member.tagName(name, loved);
-        saveNameTag(name, member);
-        return updateListsWithTags(name, member);
+        return markNameTag(name, loved);
     }
 
     public static boolean markNameUnloved(Name name){
+       return markNameTag(name, unloved);
+    }
+
+    public static boolean markNameMaybe(Name name){
+        return markNameTag(name, maybe);
+    }
+
+    public static boolean markNameTag(Name name, NameTag tag){
 
         Member member = Settings.getMember();
-        member.tagName(name, unloved);
+        member.tagName(name, tag);
         saveNameTag(name, member);
         return updateListsWithTags(name, member);
     }

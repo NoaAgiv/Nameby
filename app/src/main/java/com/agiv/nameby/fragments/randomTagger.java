@@ -32,9 +32,11 @@ public class RandomTagger extends Fragment {
     public static MediaPlayer loveSound;
     public static MediaPlayer unlikeSound;
     public static MediaPlayer matchSound;
+    public static MediaPlayer maybeSound;
 
     private ImageView loveButton;
     private ImageView disloveButton;
+    private ImageView maybeButton;
 
 
     public RandomTagger() {
@@ -56,10 +58,12 @@ public class RandomTagger extends Fragment {
             setName(currentName);
         loveButton = (ImageView) layout.findViewById(R.id.love_image);
         disloveButton = (ImageView) layout.findViewById(R.id.dislove_image);
+        maybeButton = (ImageView) layout.findViewById(R.id.maybe_image);
 
         loveSound = MediaPlayer.create(getContext(), R.raw.c_tone);
         unlikeSound = MediaPlayer.create(getContext(), R.raw.a_tone);
         matchSound = MediaPlayer.create(getContext(), R.raw.pin_drop_match);
+        maybeSound = MediaPlayer.create(getContext(), R.raw.beep_love);
 
         textView.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
             public void onSwipeRight() {
@@ -67,6 +71,9 @@ public class RandomTagger extends Fragment {
             }
             public void onSwipeLeft() {
                 tagUnloved();
+            }
+            public void onSwipeBottom() {
+                tagMaybe();
             }
         });
 
@@ -86,6 +93,13 @@ public class RandomTagger extends Fragment {
             }
         });
 
+        maybeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!currentName.equals(NameGenerator.END_OF_LIST))
+                    tagMaybe();
+            }
+        });
 
         return layout;
     }
@@ -113,6 +127,12 @@ public class RandomTagger extends Fragment {
     public void tagUnloved(){
         unlikeSound.start();
         NameTagger.markNameUnloved(currentName);
+//        emphesize_animation(disloveButton);
+    }
+
+    public void tagMaybe(){
+        maybeSound.start();
+        NameTagger.markNameMaybe(currentName);
 //        emphesize_animation(disloveButton);
     }
 }

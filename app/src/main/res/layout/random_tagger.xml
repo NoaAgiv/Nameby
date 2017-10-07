@@ -21,22 +21,16 @@
 
     <!--</android.support.design.widget.AppBarLayout>-->
 
-    <TextView
-        android:id="@+id/untagged_names_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:textSize="40sp"
-        android:padding="32dp"
-        android:text="random name" />
-
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <TableLayout
         android:orientation="horizontal"
         android:id="@+id/untagged_table"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="70dp"
-        android:stretchColumns="1">
+        android:stretchColumns="1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="130dp">
         <TableRow>
             <ImageView
                 android:id="@+id/dislove_image"
@@ -53,6 +47,32 @@
                 android:background="@android:color/transparent"
                 android:src="@drawable/add_loved" />
         </TableRow>
+
+
     </TableLayout>
-    
+
+    <TextView
+        android:id="@+id/untagged_names_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:textSize="40sp"
+        android:padding="32dp"
+        android:text="שם"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="111dp" />
+
+    <ImageView
+        android:id="@+id/maybe_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:background="@android:color/transparent"
+        android:src="@drawable/arrow_up_float"
+        android:layout_alignTop="@+id/untagged_table"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="139dp" />
+
 </RelativeLayout>

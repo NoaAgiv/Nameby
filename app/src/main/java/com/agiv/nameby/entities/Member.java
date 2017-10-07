@@ -11,7 +11,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.agiv.nameby.NameTagger.*;
@@ -99,6 +102,12 @@ public class Member {
             this.imageResId = imageResId;
         }
 
+        public static List<NameTag> taggedValues(){
+            List<NameTag> values = new ArrayList<>();
+            values.addAll(Arrays.asList(values()));
+            values.remove(untagged);
+            return values;
+        }
 
         public static boolean isTagPositive(NameTag tag){
             return tag != null && (tag.equals(NameTag.loved) || tag.equals(NameTag.maybe));

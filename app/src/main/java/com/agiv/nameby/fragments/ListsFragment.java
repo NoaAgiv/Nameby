@@ -68,7 +68,7 @@ public class ListsFragment extends Fragment {
             ImageItems tagImages = new ImageItems();//{{
 //               add(new ImageArrayAdapater.ImageItem(Member.NameTag.loved, Mem ));
 //            }};
-            for (Member.NameTag tag : Member.NameTag.values()){
+            for (Member.NameTag tag : Member.NameTag.taggedValues()){
                 tagImages.add(new ImageItem(tag.imageResId, tag));
             }
 
