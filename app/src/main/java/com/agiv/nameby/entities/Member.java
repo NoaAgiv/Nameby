@@ -99,6 +99,7 @@ public class Member {
             this.imageResId = imageResId;
         }
 
+
         public static boolean isTagPositive(NameTag tag){
             return tag != null && (tag.equals(NameTag.loved) || tag.equals(NameTag.maybe));
         }

@@ -2,27 +2,30 @@ package com.agiv.nameby;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.support.design.internal.BottomNavigationItemView;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.utils.ImageArrayAdapater;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filterable {
-//    private ArrayList<Name> list = new ArrayList<Name>();
     private Context context;
 
     private List<Name> list = null;
@@ -30,50 +33,14 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
     private LayoutInflater mInflater;
     private NameFilter mFilter = new NameFilter();
     private TagFilter tagFilter = new TagFilter();
+    private ImageArrayAdapater itemTagAdapter;
 
-//    public SearchableAdapter(ArrayList<Name> list, Context context) {
-//        this.list = list;
-//        this.context = context;
-//    }
-
-//    @Override
-//    public int getCount() {
-//        return list.size();
-//    }
-//
-//    @Override
-//    public Object getItem(int pos) {
-//        return list.get(pos);
-//    }
-//
-//    @Override
-//    public long getItemId(int pos) {
-////        return list.get(pos).getId();
-//        return 0;
-//        //just return 0 if your list items do not have an Id variable.
-//    }
-
-//    @Override
-//    public View getView(final int position, View convertView, ViewGroup parent) {
-//        View view = convertView;
-//        if (view == null) {
-//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            view = inflater.inflate(R.layout.simple_row, null);
-//        }
-//
-//        //Handle TextView and display string from your list
-//        TextView listItemText = (TextView)view.findViewById(R.id.list_item_string);
-//        listItemText.setText(list.get(position).name);
-//
-//        return view;
-//    }
-
-
-    public SearchableAdapter(Context context, List<Name> list) {
+    public SearchableAdapter(Context context, List<Name> list, ImageArrayAdapater itemTagAdapter) {
         this.context = context;
         this.filteredList = list ;
         this.list = list ;
         mInflater = LayoutInflater.from(context);
+        this.itemTagAdapter = itemTagAdapter;
     }
 
     public int getCount() {
@@ -97,7 +64,7 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
         // to reinflate it. We only inflate a new View when the convertView supplied
         // by ListView is null.
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.simple_row, null);
+            convertView = mInflater.inflate(R.layout.list_item, null);
 
             // Creates a ViewHolder and store references to the two children views
             // we want to bind data to.
@@ -111,12 +78,19 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
         }
 
         // If weren't re-ordering this you could rely on what you set last time
-        holder.text.setText(filteredList.get(position).name);
-        holder.tagImg = (ImageButton) convertView.findViewById(R.id.tag);
+        Name name = filteredList.get(position);
+        holder.text.setText(name.name);
+//        holder.tagImg = (ImageButton) convertView.findViewById(R.id.tag);
+        holder.tagSpinner = (Spinner) convertView.findViewById(R.id.item_tag_spinner);
+
+        holder.tagSpinner.setAdapter(itemTagAdapter);
 
         Integer img = Settings.getMember().getTag(filteredList.get(position)).imageResId;
         if (img != null)
-            holder.tagImg.setImageResource(img);
+//            holder.tagImg.setImageResource(img);
+            holder.tagSpinner.setSelection(itemTagAdapter.getImagePosition(img));
+
+        setTagSpinner(name, holder.tagSpinner);
 
         // Bind the data efficiently with the holder.
 
@@ -126,9 +100,27 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
 
     static class ViewHolder {
         TextView text;
-        ImageButton tagImg;
+//        ImageButton tagImg;
+        Spinner tagSpinner;
     }
 
+
+    private void setTagSpinner(final Name name, final Spinner tagSpinner){
+        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+                Member.NameTag selectedTag = ((Member.NameTag) itemTagAdapter.get(pos));
+                Settings.getMember().tagName(name, selectedTag);
+                NameTagger.saveNameTag(name, Settings.getMember());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+    }
     public Filter  getFilter() {
         return mFilter;
     }

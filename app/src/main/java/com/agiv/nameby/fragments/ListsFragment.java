@@ -2,6 +2,7 @@ package com.agiv.nameby.fragments;
 
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,9 @@ import com.agiv.nameby.NameList;
 import com.agiv.nameby.R;
 import com.agiv.nameby.SearchableAdapter;
 import com.agiv.nameby.entities.Member;
+import com.agiv.nameby.utils.ImageArrayAdapater;
+import com.agiv.nameby.utils.ImageItem;
+import com.agiv.nameby.utils.ImageItems;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -42,11 +46,12 @@ public class ListsFragment extends Fragment {
     private Spinner tagFilterSpinner;
     private List<String> tagOptions;
     private String selectedTag = "all";
+    ImageArrayAdapater itemSpinnerAdapter;
 
     public void setNames(NameList names, Context context){
         this.names = names;
 //        if (adapter == null) {
-            adapter = new SearchableAdapter(context, names);
+            adapter = new SearchableAdapter(context, names, itemSpinnerAdapter);
 //        }
         if (nameList != null) {
             nameList.setAdapter(adapter);
@@ -59,15 +64,44 @@ public class ListsFragment extends Fragment {
         layout = inflater.inflate(R.layout.name_lists, container, false);
         nameList = (ListView) layout.findViewById(R.id.loved_names);
         if (names != null){
-            adapter = new SearchableAdapter(getContext(), names);
+            Integer tagImgs[] = {R.drawable.love, R.drawable.dislove, R.drawable.edit_unlove};
+            ImageItems tagImages = new ImageItems();//{{
+//               add(new ImageArrayAdapater.ImageItem(Member.NameTag.loved, Mem ));
+//            }};
+            for (Member.NameTag tag : Member.NameTag.values()){
+                tagImages.add(new ImageItem(tag.imageResId, tag));
+            }
+
+            itemSpinnerAdapter = new ImageArrayAdapater(getContext(), tagImages);
+            adapter = new SearchableAdapter(getContext(), names, itemSpinnerAdapter);
             searchTextBox = (EditText) layout.findViewById(R.id.searchBox);
             setSearchTextWatcher();
             nameList.setAdapter(adapter);
             setTagSpinner();
+//            setItemTagSpinner();
             setAddButton();
         }
         return layout;
     }
+
+//    private void setItemTagSpinner() {
+//        Spinner itemTagFilterSpinner = (Spinner) layout.findViewById(R.id.item_tag_spinner);
+//        Integer tagImgs[] = {R.drawable.love, R.drawable.dislove, R.drawable.edit_unlove};
+//        ImageArrayAdapater itemSpinnerAdapter = new ImageArrayAdapater(getContext(), tagImgs);
+//        itemTagFilterSpinner.setAdapter(itemSpinnerAdapter);
+//        itemTagFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+////                adapter.getFilter().filter("tag." + ((TextView) view).getText().toString());
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
+
+//    }
 
     private void setAddButton() {
         FloatingActionButton fb = (FloatingActionButton) layout.findViewById(R.id.add_button);
