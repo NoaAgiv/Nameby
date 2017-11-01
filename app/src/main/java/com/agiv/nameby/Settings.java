@@ -67,6 +67,7 @@ public class Settings {
 
     public static void setFamily(Family family) {
         Settings.family = family;
+        setFamilyId(family.id);
     }
 
     public static String getFamilyId() {

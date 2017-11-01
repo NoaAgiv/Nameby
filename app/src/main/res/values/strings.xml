@@ -28,6 +28,9 @@
     <string name="choose_male">בן</string>
     <string name="name_was_added">השם נוסף בהצלחה:</string>
 
+    <string name="default_member_name">השם שלך</string>
+    <string name="default_family_name">ישראלי</string>
+
     <string name="choose_sex_settings">למי אתם מצפים?</string>
     <string name="edit_family_members_settings">איך קוראים לכם?</string>
     <string name="skip">דלגו על ההסבר</string>
@@ -52,9 +55,9 @@
     <string name="family">משפחת</string>
     <string name="remove">הסרה</string>
     <string name="remove_confirm_body">אישור הסרה</string>
-    <string name="change_family_name">שינוי שם משפחה</string>
+    <string name="family_name">שם משפחה</string>
     <string name="change_family_name_body">הזנת שם המשפחה:</string>
-    <string name="error_set_name">השם שהוזן אינו תקין, יש להשתמש באותיות וברווחים בלבד.</string>
+    <string name="error_set_name">השם שהוזן אינו תקין, יש להשתמש באותיות עבריות וברווחים בלבד.</string>
     <string name="error_set_email">כתובת המייל שהוזנה אינה חוקית</string>
     <string name="email">אימייל</string>
     <string name="add_family_member_title">הוספת בן משפחה</string>
@@ -62,6 +65,8 @@
     <string name="match_massage">יש לנו התאמה! </string>
     <string name="match_notif_body">יש לנו התאמה! אתם אוהבים את אותו השם</string>
     <string name="nameby_notif_title">ניימבי</string>
+    <string name="cannot_delete_your_member">לא ניתן למחוק מהמשפחה את המשתמש שלך, רק משתמשים אחרים ניתנים למחיקה</string>
+
 
 </resources>
 

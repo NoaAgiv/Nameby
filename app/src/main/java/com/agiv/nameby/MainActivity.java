@@ -3,12 +3,9 @@ package com.agiv.nameby;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +15,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.ListFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -30,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.AbsListView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,7 +33,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.agiv.nameby.Firebase.FirebaseDb;
-import com.agiv.nameby.entities.Name;
+import com.agiv.nameby.entities.Family;
+import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.fragments.FamilyFragment;
 import com.agiv.nameby.fragments.ListsFragment;
 import com.agiv.nameby.fragments.NameAdditionFragment;
@@ -52,10 +48,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 
 import static com.agiv.nameby.Firebase.NotificationService.MATCH_NOTIFICATION;
@@ -63,7 +59,7 @@ import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
 //import static com.agiv.nameby.NameTagger.*;
-import static com.agiv.nameby.NameTagger.*;
+import static com.agiv.nameby.Settings.member;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -301,55 +297,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    private void setAddButton(){
-        addNameButton = (FloatingActionButton) findViewById(R.id.add_name_button);
-        addNameButton.getBackground().setColorFilter(Color.parseColor("#a64dff"), PorterDuff.Mode.MULTIPLY);
-
-        addNameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final EditText input = new EditText(MainActivity.this);
-
-
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.add_dialog_title)
-                        .setMessage(R.string.add_dialog_body)
-                        .setCancelable(false)
-                        .setView(input)
-                        .setPositiveButton(R.string.add_approve_button, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String[] untaggedNames = input.getText().toString().split("\n");
-                                for (String name : untaggedNames) {
-//                                    addName(name);
-                                }
-                                getLovedAdapter().notifyDataSetChanged();
-                                getLovedAdapter().notifyDataSetChanged();
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-            }
-        });
-    }
-
-    private void switchToView(ViewName viewName) {
-        View requestedView = views.get(viewName);
-        for (View view : views.values()){
-            Log.w("view", "switch");
-            if (!view.equals(requestedView))
-                view.setVisibility(View.GONE);
-            else
-                view.setVisibility(View.VISIBLE);
-        }
-
-    }
 
     private void changeUserInit(){
         try {
@@ -411,7 +358,8 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
-        NameTagger.initData(MainActivity.this, this, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
+        if (Settings.getMember()!=null)
+            NameTagger.initData(MainActivity.this, this, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
     }
 
     private void signIn(){
@@ -462,7 +410,7 @@ public class MainActivity extends AppCompatActivity
         Log.d("Authentication", "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
+            final GoogleSignInAccount acct = result.getSignInAccount();
             TextView nameView = (TextView) findViewById(R.id.googleAccountDisplayName);
             TextView emailView = (TextView) findViewById(R.id.googleAccountEmail);
             ImageView imageView = (ImageView) findViewById(R.id.googleAccountImage);
@@ -470,8 +418,36 @@ public class MainActivity extends AppCompatActivity
             emailView.setText(acct.getEmail());
             Picasso.with(this).load(acct.getPhotoUrl()).into(imageView);
             imageView.setMaxHeight(1);
-            FirebaseDb.setMemberAndFamily(emailView.getText().toString());
-            setSwitchUserButton();
+            Task<FirebaseDb.MemberInitiationState> tryGetMember = FirebaseDb.setMemberAndFamily(emailView.getText().toString());
+
+            tryGetMember.addOnCompleteListener(new OnCompleteListener<FirebaseDb.MemberInitiationState>() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if (task.getResult() == FirebaseDb.MemberInitiationState.SubscribedToFamily)
+                        return;
+
+                    Family family = Family.addSaveFamily(getResources().getString(R.string.default_family_name));
+                    Settings.setFamily(family);
+
+                    if (task.getResult() == FirebaseDb.MemberInitiationState.Unknown) {
+                        Log.i("sign in handler", "unknown member, creating a new one");
+                        Member member = new Member(getResources().getString(R.string.default_member_name), acct.getEmail());
+                        member.save();
+                        Settings.setMember(member);
+                        fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
+                    }
+                    Settings.getMember().setFamily(family.id);
+                    member.save();
+                    family.addSaveMember(member);
+
+                    familyFragment.resetFamily();
+                    fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
+
+                }
+            });
+
+
+//            setSwitchUserButton();
 //            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
 //            updateUI(true);
         } else {

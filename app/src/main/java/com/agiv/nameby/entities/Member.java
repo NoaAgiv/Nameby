@@ -38,6 +38,7 @@ public class Member {
             throw new InvalidParameterException(context.getString(R.string.error_set_name));
         if (!this.setEmail(email))
             throw new InvalidParameterException(context.getString(R.string.error_set_email));
+        setId(generateId(email));
 
 
     }

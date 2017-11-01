@@ -1,10 +1,17 @@
 package com.agiv.nameby.Firebase;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.agiv.nameby.NameTagger;
+import com.agiv.nameby.R;
 import com.agiv.nameby.Settings;
 import com.agiv.nameby.entities.Family;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,7 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Set;
 
 /**
  * Created by Noa Agiv on 4/16/2017.
@@ -111,6 +117,7 @@ public class FirebaseDb {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String id = dataSnapshot.getKey();
+                System.out.println("gender is " + family.gender);
                 Settings.setGender(family.gender);
                 initMemberListener(id, family);
             }
@@ -172,7 +179,47 @@ public class FirebaseDb {
         ref.addValueEventListener(memberListener);
     }
 
-    public static void setMemberAndFamily(String email){
+    public static Task<Boolean> removeMemberFromFamilyTask(final String memberId){
+        final TaskCompletionSource<Boolean> tcs = new TaskCompletionSource<>();
+
+        final ValueEventListener membersListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("listener called");
+                GenericTypeIndicator<Member> t = new GenericTypeIndicator<Member>() {
+                };
+                Member member = dataSnapshot.getValue(t);
+                System.out.println(member.getFamily());
+                if (member!= null && member.getFamily()!=null) {
+                    Log.i("family.addSaveMember", "removing member from his current family " + member.getFamily());
+                    DatabaseReference oldFamilyRef = database.getReference("families/" + member.getFamily() + "/members/");
+                    oldFamilyRef.child(member.id).removeValue();
+                }
+
+                tcs.setResult(true);
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        System.out.println("something happened" + memberId);
+
+        DatabaseReference ref = database.getReference("users/" + memberId);
+        ref.addListenerForSingleValueEvent(membersListener);
+        return tcs.getTask();
+    }
+
+    public enum MemberInitiationState{
+        Unknown,
+        Subscribed,
+        SubscribedToFamily;
+    }
+    public static Task<MemberInitiationState> setMemberAndFamily(String email){
+        final TaskCompletionSource<MemberInitiationState> tcs = new TaskCompletionSource<>();
+
         DatabaseReference ref = database.getReference("users/" + Member.generateId(email));
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -181,8 +228,20 @@ public class FirebaseDb {
                 GenericTypeIndicator<Member> t = new GenericTypeIndicator<Member>() {
                 };
                 Member member = dataSnapshot.getValue(t);
-                Settings.setMember(member);
-                Settings.setFamilyId(member.family);
+
+                if (member != null) {
+                    Settings.setMember(member);
+                    if (member.getFamily()!=null) {
+                        Settings.setFamilyId(member.family);
+                        tcs.setResult(MemberInitiationState.SubscribedToFamily);
+                    }
+                    else
+                        tcs.setResult(MemberInitiationState.Subscribed);
+
+                }
+                else {
+                    tcs.setResult(MemberInitiationState.Unknown);
+                }
             }
 
             @Override
@@ -190,6 +249,7 @@ public class FirebaseDb {
 
             }
         });
+        return tcs.getTask();
     }
 }
 

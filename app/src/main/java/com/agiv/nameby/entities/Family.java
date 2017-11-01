@@ -2,6 +2,7 @@ package com.agiv.nameby.entities;
 
 import android.util.Log;
 
+import com.agiv.nameby.Settings;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -62,11 +63,21 @@ public class Family {
         Log.i("Family",String.format("added %s to %s", member, this));
     }
 
+    public static Family addSaveFamily(String defaultFamilyName){
+        Family family = new Family();
+        family.gender = Settings.Gender.toOneLetter(Settings.Gender.FEMALE);
+        family.name = defaultFamilyName;
+        DatabaseReference familiesRef = database.getReference("families");
+        String id = familiesRef.push().getKey();
+        family.setId(id);
+        familiesRef.child(id).setValue(family);
+        return family;
+    }
+
     public void addSaveMember(Member member) {
         addMember(member);
         DatabaseReference familyMembersRef = database.getReference("families/" + this.id + "/members");
         DatabaseReference familyMemberRef = familyMembersRef.child(String.valueOf(member.id));
-
         familyMemberRef.setValue(true);
     }
 
