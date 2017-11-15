@@ -82,9 +82,9 @@ public class Member {
 
     public enum NameTag{
         untagged(R.string.untagged, untaggedNames, untaggedAdapter),
-        loved(R.string.loved, lovedNames, lovedAdapter, R.drawable.love),
-        unloved(R.string.unloved, unlovedNames, unlovedAdapter, R.drawable.dislove),
-        maybe(R.string.maybe, maybeNames, maybeAdapter, R.drawable.next);
+        loved(R.string.loved, lovedNames, lovedAdapter, R.drawable.love_icon),
+        unloved(R.string.unloved, unlovedNames, unlovedAdapter, R.drawable.unlove),
+        maybe(R.string.maybe, maybeNames, maybeAdapter, R.drawable.maybe);
 
         public int displayName;
         public NameList nameList;
@@ -176,4 +176,20 @@ public class Member {
 //                ", email='" + email + '\'' +
 //                '}';
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Member member = (Member) o;
+
+        return id.equals(member.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
 }

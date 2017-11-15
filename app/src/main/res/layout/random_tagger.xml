@@ -20,37 +20,6 @@
 
 
     <!--</android.support.design.widget.AppBarLayout>-->
-
-    <TableLayout
-        android:orientation="horizontal"
-        android:id="@+id/untagged_table"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:stretchColumns="1"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="130dp">
-        <TableRow>
-            <ImageView
-                android:id="@+id/dislove_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:src="@drawable/add_unloved" />
-
-            <ImageView
-                android:id="@+id/love_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:background="@android:color/transparent"
-                android:src="@drawable/add_loved" />
-        </TableRow>
-
-
-    </TableLayout>
-
     <TextView
         android:id="@+id/untagged_names_view"
         android:layout_width="match_parent"
@@ -64,13 +33,53 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="111dp" />
 
-    <ImageView
+    <TableLayout
+        android:orientation="horizontal"
+        android:id="@+id/untagged_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:stretchColumns="1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="130dp">
+        <TableRow>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/dislove_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:backgroundTint="@color/textColorBright"
+                android:layout_marginBottom="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:src="@drawable/unlove" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/love_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginBottom="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                app:backgroundTint="@color/textColorBright"
+                android:background="@android:color/transparent"
+                android:src="@drawable/love_icon" />
+        </TableRow>
+
+
+    </TableLayout>
+
+
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/maybe_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:background="@android:color/transparent"
-        android:src="@drawable/arrow_up_float"
+        android:src="@drawable/maybe"
+        app:fabSize="normal"
+        app:backgroundTint="@color/textColorBright"
         android:layout_alignTop="@+id/untagged_table"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="139dp" />

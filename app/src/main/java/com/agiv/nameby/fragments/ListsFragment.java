@@ -47,61 +47,44 @@ public class ListsFragment extends Fragment {
     private List<String> tagOptions;
     private String selectedTag = "all";
     ImageArrayAdapater itemSpinnerAdapter;
+    private NameAdditionFragment nameAdditionFragment;
 
-    public void setNames(NameList names, Context context){
+    public void setNames(NameList names, Context context, NameAdditionFragment nameAdditionFragment){
         this.names = names;
 //        if (adapter == null) {
-            adapter = new SearchableAdapter(context, names, itemSpinnerAdapter);
+            adapter = new SearchableAdapter(context, getActivity(), names, itemSpinnerAdapter);
 //        }
         if (nameList != null) {
             nameList.setAdapter(adapter);
         }
+        this.nameAdditionFragment = nameAdditionFragment;
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (layout!=null)
+            return layout;
         layout = inflater.inflate(R.layout.name_lists, container, false);
         nameList = (ListView) layout.findViewById(R.id.loved_names);
         if (names != null){
-            Integer tagImgs[] = {R.drawable.love, R.drawable.dislove, R.drawable.edit_unlove};
-            ImageItems tagImages = new ImageItems();//{{
-//               add(new ImageArrayAdapater.ImageItem(Member.NameTag.loved, Mem ));
-//            }};
+            ImageItems tagImages = new ImageItems();
             for (Member.NameTag tag : Member.NameTag.taggedValues()){
                 tagImages.add(new ImageItem(tag.imageResId, tag));
             }
-
             itemSpinnerAdapter = new ImageArrayAdapater(getContext(), tagImages);
-            adapter = new SearchableAdapter(getContext(), names, itemSpinnerAdapter);
+            adapter = new SearchableAdapter(getContext(), getActivity(), names, itemSpinnerAdapter);
+            nameList.setAdapter(adapter);
+
             searchTextBox = (EditText) layout.findViewById(R.id.searchBox);
             setSearchTextWatcher();
-            nameList.setAdapter(adapter);
+
             setTagSpinner();
-//            setItemTagSpinner();
             setAddButton();
         }
         return layout;
     }
-
-//    private void setItemTagSpinner() {
-//        Spinner itemTagFilterSpinner = (Spinner) layout.findViewById(R.id.item_tag_spinner);
-//        Integer tagImgs[] = {R.drawable.love, R.drawable.dislove, R.drawable.edit_unlove};
-//        ImageArrayAdapater itemSpinnerAdapter = new ImageArrayAdapater(getContext(), tagImgs);
-//        itemTagFilterSpinner.setAdapter(itemSpinnerAdapter);
-//        itemTagFilterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-////                adapter.getFilter().filter("tag." + ((TextView) view).getText().toString());
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
-
-//    }
 
     private void setAddButton() {
         FloatingActionButton fb = (FloatingActionButton) layout.findViewById(R.id.add_button);
@@ -109,7 +92,7 @@ public class ListsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 final FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, new NameAdditionFragment());
+                ft.replace(R.id.content_frame, nameAdditionFragment);
                 ft.commit();
             }
         });
@@ -188,9 +171,5 @@ public class ListsFragment extends Fragment {
         }
         tagFilterSpinner.setSelection(pos, true);
     }
-
-
-
-
 
 }

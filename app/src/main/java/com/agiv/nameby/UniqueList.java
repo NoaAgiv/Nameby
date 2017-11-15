@@ -2,6 +2,8 @@ package com.agiv.nameby;
 
 import android.util.Log;
 
+import com.agiv.nameby.entities.Name;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,9 +19,13 @@ import java.util.Map;
 public class UniqueList<T> extends ArrayList<T> {
     @Override
     public boolean add(T object){
-        if (this.contains(object))
-            this.remove(object);
-       return super.add(object);
+        int existsInIndex = this.indexOf(object);
+        if (existsInIndex >= 0) {
+            this.set(existsInIndex, object);
+            return true;
+        }
+        else
+            return super.add(object);
     };
 
     public T firstSatisfies(ListCondition<T> listCond){

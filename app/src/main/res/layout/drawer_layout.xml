@@ -19,14 +19,16 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
+            android:logo="@drawable/nameby_logo"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#a64dff"
+            android:background="@color/colorPrimary"
+
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
             <android.support.design.widget.BottomNavigationView
                 android:id="@+id/quick_menu"
-                android:background="#a64dff"
+                android:background="@color/colorAccent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"

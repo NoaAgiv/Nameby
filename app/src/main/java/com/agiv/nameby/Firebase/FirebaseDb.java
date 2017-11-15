@@ -57,7 +57,7 @@ public class FirebaseDb {
                 NameTagger.updateListsWithName(name);
                 for (Member m : Settings.getFamily().familyMembers) {
                     DatabaseReference userTagsRef = database.getReference("users/" + m.id + "/tags");
-                    userTagsRef.child(id).addListenerForSingleValueEvent(initTagListener(m));
+                    userTagsRef.child(id).addValueEventListener(initTagListener(m));
                 }
 
             }
@@ -117,7 +117,6 @@ public class FirebaseDb {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String id = dataSnapshot.getKey();
-                System.out.println("gender is " + family.gender);
                 Settings.setGender(family.gender);
                 initMemberListener(id, family);
             }
@@ -168,7 +167,7 @@ public class FirebaseDb {
 
                 DatabaseReference userTagsRef = database.getReference("users/" + member.id + "/tags");
                 for (String nameId : NameTagger.getNameIds()) {
-                    userTagsRef.child(nameId).addListenerForSingleValueEvent(initTagListener(member));
+                    userTagsRef.child(nameId).addValueEventListener(initTagListener(member));
                 }
             }
 
@@ -189,7 +188,6 @@ public class FirebaseDb {
                 GenericTypeIndicator<Member> t = new GenericTypeIndicator<Member>() {
                 };
                 Member member = dataSnapshot.getValue(t);
-                System.out.println(member.getFamily());
                 if (member!= null && member.getFamily()!=null) {
                     Log.i("family.addSaveMember", "removing member from his current family " + member.getFamily());
                     DatabaseReference oldFamilyRef = database.getReference("families/" + member.getFamily() + "/members/");
@@ -205,7 +203,6 @@ public class FirebaseDb {
 
             }
         };
-        System.out.println("something happened" + memberId);
 
         DatabaseReference ref = database.getReference("users/" + memberId);
         ref.addListenerForSingleValueEvent(membersListener);

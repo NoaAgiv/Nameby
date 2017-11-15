@@ -2,22 +2,24 @@ package com.agiv.nameby;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.internal.BottomNavigationItemView;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.agiv.nameby.Firebase.NotificationService;
 import com.agiv.nameby.entities.Member;
 import com.agiv.nameby.entities.Name;
 import com.agiv.nameby.utils.ImageArrayAdapater;
@@ -32,19 +34,21 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
     private List<Name> filteredList = null;
     private LayoutInflater mInflater;
     private NameFilter mFilter = new NameFilter();
-    private TagFilter tagFilter = new TagFilter();
     private ImageArrayAdapater itemTagAdapter;
+    private Activity activity;
+    private boolean userTouchedListItemSpinner = false;
 
-    public SearchableAdapter(Context context, List<Name> list, ImageArrayAdapater itemTagAdapter) {
+    public SearchableAdapter(Context context, Activity activity, List<Name> list, ImageArrayAdapater itemTagAdapter) {
         this.context = context;
         this.filteredList = list ;
         this.list = list ;
         mInflater = LayoutInflater.from(context);
         this.itemTagAdapter = itemTagAdapter;
+        this.activity = activity;
     }
 
     public int getCount() {
-        return filteredList.size();
+        return filteredList==null? 0: filteredList.size();
     }
 
     public Object getItem(int position) {
@@ -106,12 +110,34 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
 
 
     private void setTagSpinner(final Name name, final Spinner tagSpinner){
+
+
+        tagSpinner.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                //this code was added to avoid applying tag changes on menu clicks.
+                // Spinner onItemSelectedListener will be called on each itemSelected even if it was
+                // done programmatically for the menu click flow.
+                userTouchedListItemSpinner = true;
+                return false;
+            }});
+
         tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+                if (!userTouchedListItemSpinner)
+                    return;
+
+                userTouchedListItemSpinner = false;
+
                 Member.NameTag selectedTag = ((Member.NameTag) itemTagAdapter.get(pos));
-                Settings.getMember().tagName(name, selectedTag);
-                NameTagger.saveNameTag(name, Settings.getMember());
+                
+                if (NameTagger.markNameTag(name, selectedTag)) {
+                    Toast.makeText(activity, context.getString(R.string.match_massage) + " " + name.name,
+                            Toast.LENGTH_LONG).show();
+                    Settings.getFamily().sendNotification(context.getString(R.string.nameby_notif_title), context.getString(R.string.match_notif_body));
+                }
+                Log.i("itemListSpinner", String.format("%s was tagged %s", name.name, selectedTag));
             }
 
             @Override
@@ -128,15 +154,17 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
     private class NameFilter extends Filter {
 
         protected FilterResults performTagFiltering(String constraint) {
-
             final NameList filtered = new NameList();
 
             if (constraint.equals(context.getString(R.string.all))){
                 filtered.conditionalAddAll(list, NameList.identityFilter);
             }
             else if (constraint.equals(context.getString(R.string.matches))){
-                BottomNavigationItemView matchesMenuItem = (BottomNavigationItemView) ((Activity) context).findViewById(R.id.menu_matches);
-                matchesMenuItem.setSelected(false); // this will set the new match icon off
+                LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(context);
+
+                Intent intent = new Intent(NotificationService.MATCH_WATCHED);
+                broadcaster.sendBroadcast(intent);
+
                 filtered.conditionalAddAll(list, NameList.unanimouslyPositiveFilter);
             }
             else{
@@ -186,52 +214,6 @@ public class SearchableAdapter extends BaseAdapter implements ListAdapter, Filte
                 return performTagFiltering(stringConstraint.substring(4));
             }
             return null;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            filteredList = (ArrayList<Name>) results.values;
-            notifyDataSetChanged();
-        }
-
-    }
-
-    private class TagFilter extends Filter {
-        @Override
-        protected FilterResults performFiltering(CharSequence tagConstraint) {
-            int count = list.size();
-            final ArrayList<Name> nlist = new ArrayList<>(count);
-
-            String constraint = tagConstraint.toString().toLowerCase();
-            if (constraint.equals(context.getString(R.string.all))){
-                for (Name name : list){
-                    nlist.add(name);
-                }
-            }
-            else if (constraint.equals(context.getString(R.string.matches))){
-                for (Name name : list){
-                    if (Settings.getFamily().isUnanimouslyPositive(name)){
-                        nlist.add(name);
-                    }
-                }
-            }
-            else{
-                Member.NameTag tag = Member.NameTag.getTag(context, constraint);
-                for (Name name : list){
-                    if (Settings.member.getTag(name).equals(tag)){
-                        nlist.add(name);
-                    }
-                }
-            }
-
-
-            FilterResults results = new FilterResults();
-
-            results.values = nlist;
-            results.count = nlist.size();
-
-            return results;
         }
 
         @SuppressWarnings("unchecked")

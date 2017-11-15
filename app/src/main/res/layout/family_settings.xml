@@ -44,14 +44,14 @@
                 android:layout_gravity="right"
                 android:buttonTint="@color/colorAccent"
                 android:textSize="18sp"
-                android:textColor="@color/textColorBright"
+                android:textColor="@color/colorPrimary"
                 android:text="@string/choose_male"/>
             <RadioButton android:id="@+id/radio_female"
                 android:layout_width="wrap_content"
                 android:layout_gravity="right"
                 android:buttonTint="@color/colorAccent"
                 android:textSize="18sp"
-                android:textColor="@color/textColorBright"
+                android:textColor="@color/colorPrimary"
                 android:layout_height="wrap_content"
                 android:text="@string/choose_female"/>
         </RadioGroup>
@@ -74,6 +74,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/add" />
+        android:backgroundTint="@color/colorAccent"
+        android:src="@drawable/sym_action_add" />
 </LinearLayout>

@@ -39,7 +39,7 @@ public class EditableListViewAdapter extends BaseAdapter implements ListAdapter 
         this(removeItemCallback, list,
                 context, context.getString(R.string.remove),
                 context.getString(R.string.remove_confirm_body),
-                R.drawable.edit_unlove);
+                R.drawable.delete);
     }
 
     public EditableListViewAdapter(RemoveItemCallback removeItem, List<?> list,

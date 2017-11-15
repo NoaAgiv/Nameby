@@ -1,9 +1,9 @@
 package com.agiv.nameby.fragments;
 
 
-import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,9 +34,9 @@ public class RandomTagger extends Fragment {
     public static MediaPlayer matchSound;
     public static MediaPlayer maybeSound;
 
-    private ImageView loveButton;
-    private ImageView disloveButton;
-    private ImageView maybeButton;
+    private FloatingActionButton loveButton;
+    private FloatingActionButton disloveButton;
+    private FloatingActionButton maybeButton;
 
 
     public RandomTagger() {
@@ -56,9 +56,9 @@ public class RandomTagger extends Fragment {
         textView = (TextView) layout.findViewById(R.id.untagged_names_view);
         if (currentName != null)
             setName(currentName);
-        loveButton = (ImageView) layout.findViewById(R.id.love_image);
-        disloveButton = (ImageView) layout.findViewById(R.id.dislove_image);
-        maybeButton = (ImageView) layout.findViewById(R.id.maybe_image);
+        loveButton = (FloatingActionButton) layout.findViewById(R.id.love_image);
+        disloveButton = (FloatingActionButton) layout.findViewById(R.id.dislove_image);
+        maybeButton = (FloatingActionButton) layout.findViewById(R.id.maybe_image);
 
         loveSound = MediaPlayer.create(getContext(), R.raw.c_tone);
         unlikeSound = MediaPlayer.create(getContext(), R.raw.a_tone);
@@ -88,8 +88,9 @@ public class RandomTagger extends Fragment {
         disloveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!currentName.equals(NameGenerator.END_OF_LIST))
+                if (!currentName.equals(NameGenerator.END_OF_LIST)){
                     tagUnloved();
+                }
             }
         });
 

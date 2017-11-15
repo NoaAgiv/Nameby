@@ -129,7 +129,6 @@ public class FamilyFragment extends Fragment {
                             ErrorHandler.showErrorAlert(R.string.error_set_name, getContext(), dismissSetNamesErrorAction);
                             return;
                         }
-                        System.out.println(family.name);
                         setFamilyNameBox();
 
                         dialog.dismiss();
@@ -234,7 +233,6 @@ public class FamilyFragment extends Fragment {
     public void setFamilyNameBox(){
         final TextView familyName = (TextView) layout.findViewById(R.id.family_name);
         familyName.setText(getResources().getString(R.string.family) + " " + family.name);
-        System.out.println("setting family name " + family.name);
         familyName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

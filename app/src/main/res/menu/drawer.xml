@@ -1,48 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/names">
-        <menu>
+
             <group
                 android:id="@+id/lists_menu"
                 android:checkableBehavior="single">
 
                     <item
                         android:id="@+id/triage_menu_item"
-                        android:icon="@drawable/love"
+                        android:icon="@drawable/triage"
                         android:title="@string/triage_tab"/>
                     <item
                         android:id="@+id/matches_menu_item"
-                        android:icon="@drawable/love"
+                        android:icon="@drawable/matches"
                         android:title="@string/matches"/>
                     <item
                         android:id="@+id/loved_menu_item"
-                        android:icon="@drawable/love"
+                        android:icon="@drawable/love_icon"
                         android:title="@string/loved"/>
                     <item
                         android:id="@+id/all_names_menu_item"
-                        android:icon="@drawable/dislove"
+                        android:icon="@drawable/list"
                         android:title="@string/all_names"/>
 
                     <item
                         android:id="@+id/add_names_menu_item"
-                        android:icon="@drawable/dislove"
+                        android:icon="@drawable/add"
                         android:title="@string/add_names"/>
 
             </group>
-        </menu>
-    </item>
+
     <group
         android:id="@+id/settings_menu"
         android:checkableBehavior="single">
 
         <item
-            android:id="@+id/settings_menu_item"
-            android:icon="@drawable/love"
-            android:title="@string/settings"/>
-
-        <item
             android:id="@+id/family_menu_item"
-            android:icon="@drawable/love"
+            android:icon="@drawable/settings"
             android:title="@string/menu_family_settings"/>
     </group>
 

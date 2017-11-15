@@ -2,6 +2,8 @@ package com.agiv.nameby;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -60,13 +62,16 @@ public class NameTagger {
     private static RandomTagger randomTagger;
     private static NameList nameList = new NameList();
     private static ListsFragment listFrag;
-
+    private static NameAdditionFragment nameAdditionFrag;
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    final static String FAMILY_MEMBER_TAG = "family_member_tag";
 
     public static void initData(Context context, Activity activity, ListsFragment listsFragment, View randomTaggerLayout, RandomTagger randomTagger, FamilyFragment familyFragment, NameAdditionFragment nameAdditionFragment){
         NameTagger.randomTagger = randomTagger;
         NameTagger.listFrag = listsFragment;
-        listsFragment.setNames(nameList, context);
+        nameAdditionFrag = nameAdditionFragment;
+        listsFragment.setNames(nameList, context, nameAdditionFrag);
         nameAdditionFragment.setNames(allNames);
         NameTagger.context = context;
         NameTagger.activity = activity;
@@ -78,7 +83,6 @@ public class NameTagger {
     public static void updateListsWithName(Name name){
         allNames.addIf(name, NameList.validNameFilter);
 
-//        nameList.addIf(name, NameList.validNameFilter);
         maleNames.addIf(name, NameList.maleFilter);
         femaleNames.addIf(name, NameList.femaleFilter);
         updateListsByGender();
@@ -91,7 +95,7 @@ public class NameTagger {
                 femaleNames :
                 maleNames;
         if (listFrag!=null)
-            listFrag.setNames(nameList, context);
+            listFrag.setNames(nameList, context, nameAdditionFrag);
         if (ngen!=null)
             initUntaggedArea();
     }
@@ -101,15 +105,20 @@ public class NameTagger {
     }
 
     public static void initTag(Member member, String nameId, String tagStr){
-
         Member.NameTag tag = untagged;
         if (tagStr!=null) {
             tag = Member.NameTag.valueOf(tagStr);
         }
         Name name = allNames.getById(nameId);
         setMemberNameTag(member, name, tag);
+
         if (member.equals(Settings.getMember())) {
-            updateListsWithTags(name, member);
+            updateListsWithTags(name);
+        }
+        else {
+            LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(context);
+            Intent intent = new Intent(FAMILY_MEMBER_TAG);
+            broadcaster.sendBroadcast(intent); //now goes to MainActivity's BroadcastReciever's onReceive()
         }
         if (tag.equals(NameTag.untagged) && ngen.allNamesTagged()) // update triage view with the single new untagged name
             randomTagger.setName(ngen.getNextUntaggedName());
@@ -129,15 +138,21 @@ public class NameTagger {
     }
 
     public static boolean markNameLoved(Name name){
-        return markNameTag(name, loved);
+        boolean isMatch = markNameTag(name, loved);
+        updateListsWithTags(name);
+        return isMatch;
     }
 
     public static boolean markNameUnloved(Name name){
-       return markNameTag(name, unloved);
+        boolean isMatch = markNameTag(name, unloved);
+        updateListsWithTags(name);
+        return isMatch;
     }
 
     public static boolean markNameMaybe(Name name){
-        return markNameTag(name, maybe);
+        boolean isMatch = markNameTag(name, maybe);
+        updateListsWithTags(name);
+        return isMatch;
     }
 
     public static boolean markNameTag(Name name, NameTag tag){
@@ -145,7 +160,7 @@ public class NameTagger {
         Member member = Settings.getMember();
         member.tagName(name, tag);
         saveNameTag(name, member);
-        return updateListsWithTags(name, member);
+        return Settings.getFamily().isUnanimouslyPositive(name);
     }
 
     public static abstract class SwitchListsCallBack {
@@ -167,66 +182,10 @@ public class NameTagger {
 
     }
 
-    private static boolean updateListsWithTags(Name name, Member m) {
-        NameTag tag = m.getTag(name);
+    private static void updateListsWithTags(Name name) {
         updateListsWithName(name);
         randomTagger.setName(ngen.getNextUntaggedName());
-        return Settings.getFamily().isUnanimouslyPositive(name);
     }
 
-    private static boolean updateListsWithTags2(Name name, Member m){
-        // since all names in lists are references,
-        // all lists should be updated by updating any Name reference
-        NameTag tag = m.getTag(name);
-        NameList relevantList = tag.nameList;
-
-        for (NameTag t : NameTag.values()){
-            Boolean removed = t.nameList.remove(name);
-            if (removed)
-                Log.d("NameTagger", String.format("removed %s from %s list", name.name, t));
-        }
-
-        relevantList.add(name);
-        Log.i("NameTagger", String.format("moved %s to %s list", name.name, tag));
-        untaggedNamesView.setName(ngen.getNextUntaggedName());
-
-        // update partner related lists
-        if (Settings.getFamily().isUnanimouslyPositive(name)){
-            matchedNames.add(name);
-            return true;
-        }
-
-        if (tag.equals(untagged) && Settings.getFamily().isPositiveForSomeone(name)){
-            untaggedPartnerPositiveNames.add(name);
-        }
-        return false;
-
-    }
-
-    public static ListView getLovedNamesListView() {
-        return lovedNamesListView;
-    }
-
-    public static ListView getMatchedNamesListView() {
-        return matchedNamesListView;
-    }
-
-    public static ListView getUnlovedNamesListView() {
-        return unlovedNamesListView;
-    }
-    public static BaseAdapter getLovedAdapter() {
-        return lovedAdapter;
-    }
-
-    public static BaseAdapter getUnlovedAdapter() {
-        return unlovedAdapter;
-    }
-    public static BaseAdapter getMatchedAdapter() {
-        return matchedAdapter;
-    }
-
-    public static NameTaggerViewContainer getUntaggedNamesView() {
-        return untaggedNamesView;
-    }
 
 }

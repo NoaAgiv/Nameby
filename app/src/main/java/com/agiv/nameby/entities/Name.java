@@ -124,40 +124,6 @@ public class Name {
         return name != null && gender != null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Name name1 = (Name) o;
-
-        if (name != null ? !name.equals(name1.name) : name1.name != null) return false;
-        return gender != null ? gender.equals(name1.gender) : name1.gender == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (gender != null ? gender.hashCode() : 0);
-        return result;
-    }
-
-    //    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//
-//        Name name = (Name) o;
-//
-//        return id == name.id;
-//
-//    }
-
-//    @Override
-//    public int hashCode() {
-//        return Integer.valueOf(id);
-//    }
 
     @Override
     public String toString() {
@@ -166,5 +132,24 @@ public class Name {
                 "(" + gender + '\'' +
                 ") #" + popularity +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Name name1 = (Name) o;
+
+        if (!name.equals(name1.name)) return false;
+        return gender.equals(name1.gender);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + gender.hashCode();
+        return result;
     }
 }

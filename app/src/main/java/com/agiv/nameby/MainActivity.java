@@ -55,6 +55,8 @@ import com.squareup.picasso.Picasso;
 import java.util.Map;
 
 import static com.agiv.nameby.Firebase.NotificationService.MATCH_NOTIFICATION;
+import static com.agiv.nameby.Firebase.NotificationService.MATCH_WATCHED;
+import static com.agiv.nameby.NameTagger.FAMILY_MEMBER_TAG;
 import static com.agiv.nameby.Settings.changeUser;
 import static com.agiv.nameby.Settings.getCurrentUser;
 import static com.agiv.nameby.Settings.getGreenUser;
@@ -79,9 +81,13 @@ public class MainActivity extends AppCompatActivity
     private ListsFragment listFrag;
     private FamilyFragment familyFragment;
     private NameAdditionFragment nameAdditionFragment;
+    private BottomNavigationView quickMenu;
+    private BottomNavigationItemView quickMenuTriage;
+    private BottomNavigationItemView quickMenuLists;
 
     private static int RC_SIGN_IN = 100;
     FragmentManager fragmentManager = getSupportFragmentManager();
+    int currentScreen = -1;
 
     private enum ViewName{
         lovedNames,
@@ -100,7 +106,6 @@ public class MainActivity extends AppCompatActivity
     private CharSequence mTitle;
     private GoogleApiClient mGoogleApiClient;
 
-
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -113,6 +118,21 @@ public class MainActivity extends AppCompatActivity
                     Log.d("Receiver", "main thread: got match notification");
                     menuMatchesItem.setSelected(true); // set to selected state to change icon
                     break;
+                case MATCH_WATCHED:
+                    Log.d("Receiver", "main thread: got match watched notification");
+                    menuMatchesItem.setSelected(false); // set to not selected state to change icon
+                    break;
+                case FAMILY_MEMBER_TAG:
+                    Log.d("Receiver", "main thread: got family member tag intent");
+                    // update matches filtering if it is currently the selected filter
+                    if (currentScreen == R.id.menu_matches || currentScreen == R.id.matches_menu_item) {
+                        listFrag.filterByTag(getResources().getString(R.string.all_names)); // for calling spinner's onItemSelection. Spinner does not tirgger it if it is the same selection
+                        listFrag.filterByTag(getResources().getString(R.string.matches));
+                        listFrag.notifyChange();
+                    }
+                    break;
+
+
 
             }
         }
@@ -123,7 +143,6 @@ public class MainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
-
 
 
 
@@ -147,8 +166,13 @@ public class MainActivity extends AppCompatActivity
         createQuickMenu();
         signIn();
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
+        quickMenu = (BottomNavigationView) findViewById(R.id.quick_menu);
+        quickMenuTriage = (BottomNavigationItemView) quickMenu.findViewById(R.id.menu_triage);
+        quickMenuLists = (BottomNavigationItemView) quickMenu.findViewById(R.id.menu_lists);
+        quickMenuTriage.performClick();
+
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
 //        // ATTENTION: This was auto-generated to implement the App Indexing API.
 //        // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -156,10 +180,17 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void deselectAllQuickMenuItems(){
+        int size = quickMenu.getMenu().size();
+        for (int i = 0; i < size; i++) {
+            quickMenu.getMenu().getItem(i).setChecked(false);
+        }
+    }
 
     private void createDrawer() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setLogo(R.drawable.nameby_logo);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -174,21 +205,25 @@ public class MainActivity extends AppCompatActivity
 
     private void createQuickMenu() {
         final BottomNavigationView bottomMenu = (BottomNavigationView) findViewById(R.id.quick_menu);
+
+//        final BottomNavigationItemView triageMenuItem = (BottomNavigationItemView) bottomMenu.findViewById(R.id.menu_triage);
         bottomMenu.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        currentScreen = item.getItemId();
                         switch (item.getItemId()) {
                             case R.id.menu_matches:
-                                fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
                                 listFrag.filterByTag(getResources().getString(R.string.matches));
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
                                 break;
                             case R.id.menu_triage:
                                 fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
                                 break;
                             case R.id.menu_lists:
-                                fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
                                 listFrag.filterByTag(getResources().getString(R.string.all));
+                                fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+
                                 break;
                         }
                         return true;
@@ -212,7 +247,7 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.drawer, menu);
         getMenuInflater().inflate(R.menu.quick_menu, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -235,25 +270,33 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        currentScreen = id;
+
         if (id == R.id.triage_menu_item) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
+            quickMenuTriage.performClick();
+//            fragmentManager.beginTransaction().replace(R.id.content_frame, randomTagger).commit();
 
         }else if (id == R.id.loved_menu_item) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+            quickMenuLists.performClick();
+//            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
             listFrag.filterByTag(getResources().getString(R.string.loved));
 
         } else if (id == R.id.matches_menu_item) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+            quickMenuLists.performClick();
+//            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
             listFrag.filterByTag(getResources().getString(R.string.matches));
 
         } else if (id == R.id.all_names_menu_item) {
-            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
+            quickMenuLists.performClick();
+//            fragmentManager.beginTransaction().replace(R.id.content_frame, listFrag).commit();
             listFrag.filterByTag(getResources().getString(R.string.all));
 
         } else if (id == R.id.add_names_menu_item) {
+            deselectAllQuickMenuItems();
             fragmentManager.beginTransaction().replace(R.id.content_frame, nameAdditionFragment).commit();
 
         } else if (id == R.id.family_menu_item) {
+            deselectAllQuickMenuItems();
             fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
         }
 
@@ -336,6 +379,13 @@ public class MainActivity extends AppCompatActivity
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter(MATCH_NOTIFICATION));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter(MATCH_WATCHED));
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter(FAMILY_MEMBER_TAG));
+
     }
 
     @Override
@@ -380,21 +430,6 @@ public class MainActivity extends AppCompatActivity
 
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    private void setSwitchUserButton(){
-        ImageButton switchAccount = (ImageButton) findViewById(R.id.switchAccount);
-        switchAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                signOut();
-//                mGoogleApiClient.clearDefaultAccountAndReconnect();
-
-                signIn();
-            }
-        });
-
-
 
     }
 
@@ -434,6 +469,8 @@ public class MainActivity extends AppCompatActivity
                         Member member = new Member(getResources().getString(R.string.default_member_name), acct.getEmail());
                         member.save();
                         Settings.setMember(member);
+
+                        deselectAllQuickMenuItems();
                         fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
                     }
                     Settings.getMember().setFamily(family.id);
@@ -441,6 +478,8 @@ public class MainActivity extends AppCompatActivity
                     family.addSaveMember(member);
 
                     familyFragment.resetFamily();
+
+                    deselectAllQuickMenuItems();
                     fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
 
                 }

@@ -42,7 +42,7 @@ public class NameAdditionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         layout = inflater.inflate(R.layout.name_addition, container, false);
-
+        selectedGender = Settings.Gender.toOneLetter(Settings.getGender());
         setTagSpinner();
         setGenderRadioButtons();
         setAddButton();

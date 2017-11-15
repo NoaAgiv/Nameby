@@ -3,6 +3,7 @@ package com.agiv.nameby;
 import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,8 +24,8 @@ public class NameTaggerViewContainer extends View{
     public static MediaPlayer unlikeSound;
     public static MediaPlayer matchSound;
 
-    private ImageView loveButton;
-    private ImageView disloveButton;
+    private FloatingActionButton loveButton;
+    private FloatingActionButton disloveButton;
 
 
     public NameTaggerViewContainer(Context context, TextView textView, Activity activity, View randomTaggerLayout) {
@@ -45,8 +46,8 @@ public class NameTaggerViewContainer extends View{
         });
 
 
-        loveButton = (ImageView) randomTaggerLayout.findViewById(R.id.love_image);
-        disloveButton = (ImageView) randomTaggerLayout.findViewById(R.id.dislove_image);
+        loveButton = (FloatingActionButton) randomTaggerLayout.findViewById(R.id.love_image);
+        disloveButton = (FloatingActionButton) randomTaggerLayout.findViewById(R.id.dislove_image);
 
         loveButton.setOnClickListener(new View.OnClickListener() {
             @Override

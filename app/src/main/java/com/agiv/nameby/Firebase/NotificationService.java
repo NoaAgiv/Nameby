@@ -16,6 +16,7 @@ import com.google.firebase.messaging.RemoteMessage;
 public class NotificationService extends FirebaseMessagingService {
     private static final String TAG = "FCM Service";
     public static final String MATCH_NOTIFICATION = "match_notification";
+    public static final String MATCH_WATCHED = "match_watched";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -32,16 +33,7 @@ public class NotificationService extends FirebaseMessagingService {
         LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(getBaseContext());
 
         Intent intent = new Intent(MATCH_NOTIFICATION);
-//        intent.putExtra("message", "a");
-//        intent.putExtra("key2", "b");
         broadcaster.sendBroadcast(intent); //now goes to MainActivity's BroadcastReciever's onReceive()
-
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            public void run() {
-//                Toast.makeText(getApplicationContext(), body, Toast.LENGTH_LONG).show();
-//            }
-//        });
 
     }
 }
