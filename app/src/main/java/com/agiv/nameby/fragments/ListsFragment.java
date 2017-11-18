@@ -64,13 +64,11 @@ public class ListsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (layout!=null)
-            return layout;
         layout = inflater.inflate(R.layout.name_lists, container, false);
         nameList = (ListView) layout.findViewById(R.id.loved_names);
         if (names != null){
             ImageItems tagImages = new ImageItems();
-            for (Member.NameTag tag : Member.NameTag.taggedValues()){
+            for (Member.NameTag tag : Member.NameTag.values()){
                 tagImages.add(new ImageItem(tag.imageResId, tag));
             }
             itemSpinnerAdapter = new ImageArrayAdapater(getContext(), tagImages);

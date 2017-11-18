@@ -85,12 +85,14 @@ public class NameTagger {
 
         maleNames.addIf(name, NameList.maleFilter);
         femaleNames.addIf(name, NameList.femaleFilter);
-        updateListsByGender();
+        if (Settings.isGenderChanged() || ngen.allNamesTagged())
+            updateListsByGender();
 
         listFrag.notifyChange();
     }
 
     public static void updateListsByGender(){
+        Settings.setGenderChanged(false);
         nameList = Settings.getGender().equals(Settings.Gender.FEMALE)?
                 femaleNames :
                 maleNames;
@@ -112,16 +114,16 @@ public class NameTagger {
         Name name = allNames.getById(nameId);
         setMemberNameTag(member, name, tag);
 
-        if (member.equals(Settings.getMember())) {
-            updateListsWithTags(name);
+        if (member.equals(Settings.getMember()) || ngen.allNamesTagged()) {
+            updateListsWithTags(name, tag.equals(NameTag.untagged) && ngen.allNamesTagged());
         }
         else {
             LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(context);
             Intent intent = new Intent(FAMILY_MEMBER_TAG);
             broadcaster.sendBroadcast(intent); //now goes to MainActivity's BroadcastReciever's onReceive()
         }
-        if (tag.equals(NameTag.untagged) && ngen.allNamesTagged()) // update triage view with the single new untagged name
-            randomTagger.setName(ngen.getNextUntaggedName());
+//        if (tag.equals(NameTag.untagged) && ngen.allNamesTagged()) // update triage view with the single new untagged name
+//            randomTagger.setName(ngen.getNextUntaggedName());
     }
 
     private static void initUntaggedArea(){
@@ -139,19 +141,19 @@ public class NameTagger {
 
     public static boolean markNameLoved(Name name){
         boolean isMatch = markNameTag(name, loved);
-        updateListsWithTags(name);
+        updateListsWithTags(name, true);
         return isMatch;
     }
 
     public static boolean markNameUnloved(Name name){
         boolean isMatch = markNameTag(name, unloved);
-        updateListsWithTags(name);
+        updateListsWithTags(name, true);
         return isMatch;
     }
 
     public static boolean markNameMaybe(Name name){
         boolean isMatch = markNameTag(name, maybe);
-        updateListsWithTags(name);
+        updateListsWithTags(name, true);
         return isMatch;
     }
 
@@ -182,9 +184,14 @@ public class NameTagger {
 
     }
 
-    private static void updateListsWithTags(Name name) {
+    private static void updateListsWithTags(Name name, boolean generateNextRandomName) {
         updateListsWithName(name);
-        randomTagger.setName(ngen.getNextUntaggedName());
+        if (generateNextRandomName)
+            randomTagger.setName(ngen.getNextUntaggedName());
+    }
+
+    private static void updateListsWithTags(Name name) {
+        updateListsWithTags(name, false);
     }
 
 

@@ -30,6 +30,8 @@ public class Settings {
     static Member member;
     static String familyId = "1";
     static Family family;
+    static boolean genderChanged = true;
+
     final static FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     public enum Gender {
@@ -168,13 +170,24 @@ public class Settings {
 //        return sharedPref.getInt("gender", -1)==-1 ? null : Gender.values()[sharedPref.getInt("gender", -1)];
     }
 
+    public static boolean isGenderChanged() {
+        return genderChanged;
+    }
+
+    public static void setGenderChanged(boolean genderChanged) {
+        Settings.genderChanged = genderChanged;
+    }
+
     public static void setGender(String gender) {
+
         setGender(Gender.fromOneLetter(gender));
+        genderChanged = true;
     }
     public static void setGender(Gender gender) {
         Settings.gender = gender;
         DatabaseReference familyRef = database.getReference("families");
         familyRef.child(getFamilyId()).child("gender").setValue(Gender.toOneLetter(gender));
+        genderChanged = true;
         NameTagger.updateListsByGender();
 //        editor.putInt("gender", gender.ordinal());
 //        editor.commit();

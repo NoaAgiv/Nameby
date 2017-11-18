@@ -85,6 +85,8 @@ public class Family {
         familyMembers.remove(member);
         DatabaseReference familyMembersRef = database.getReference("families/" + this.id + "/members");
         familyMembersRef.child(String.valueOf(member.id)).removeValue();
+        DatabaseReference membesRef = database.getReference("users/" + member.id);
+        membesRef.child("family").removeValue();
         Log.i("Family",String.format("removed %s from %s", member, this));
     }
 

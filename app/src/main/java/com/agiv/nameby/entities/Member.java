@@ -62,7 +62,11 @@ public class Member {
     public void save() {
         DatabaseReference membersRef = database.getReference("users");
         setId(Member.generateId(email));
-        membersRef.child(id).setValue(this);
+        // Setting everything apart from the tags, which we don't want to be overrider of course
+        membersRef.child(id + "/id").setValue(id);
+        membersRef.child(id + "/name").setValue(name);
+        membersRef.child(id + "/email").setValue(email);
+        membersRef.child(id + "/family").setValue(family);
     }
 
     public boolean setName(String name) {
@@ -76,12 +80,12 @@ public class Member {
     public boolean setEmail(String email) {
         if (!isValidEmailAddress(email))
             return false;
-        this.email = email;
+        this.email = email.toLowerCase();
         return true;
     }
 
     public enum NameTag{
-        untagged(R.string.untagged, untaggedNames, untaggedAdapter),
+        untagged(R.string.untagged, untaggedNames, untaggedAdapter, R.color.trans),
         loved(R.string.loved, lovedNames, lovedAdapter, R.drawable.love_icon),
         unloved(R.string.unloved, unlovedNames, unlovedAdapter, R.drawable.unlove),
         maybe(R.string.maybe, maybeNames, maybeAdapter, R.drawable.maybe);

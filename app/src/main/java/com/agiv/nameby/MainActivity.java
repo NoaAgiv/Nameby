@@ -1,6 +1,5 @@
 package com.agiv.nameby;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.AbsListView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -408,8 +406,6 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
-        if (Settings.getMember()!=null)
-            NameTagger.initData(MainActivity.this, this, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
     }
 
     private void signIn(){
@@ -458,30 +454,31 @@ public class MainActivity extends AppCompatActivity
             tryGetMember.addOnCompleteListener(new OnCompleteListener<FirebaseDb.MemberInitiationState>() {
                 @Override
                 public void onComplete(@NonNull Task task) {
-                    if (task.getResult() == FirebaseDb.MemberInitiationState.SubscribedToFamily)
-                        return;
+                    if (task.getResult() != FirebaseDb.MemberInitiationState.SubscribedToFamily) {
 
-                    Family family = Family.addSaveFamily(getResources().getString(R.string.default_family_name));
-                    Settings.setFamily(family);
+                        Family family = Family.addSaveFamily(getResources().getString(R.string.default_family_name));
+                        Settings.setFamily(family);
 
-                    if (task.getResult() == FirebaseDb.MemberInitiationState.Unknown) {
-                        Log.i("sign in handler", "unknown member, creating a new one");
-                        Member member = new Member(getResources().getString(R.string.default_member_name), acct.getEmail());
+                        if (task.getResult() == FirebaseDb.MemberInitiationState.Unknown) {
+                            Log.i("sign in handler", "unknown member, creating a new one");
+                            Member member = new Member(getResources().getString(R.string.default_member_name), acct.getEmail());
+                            member.save();
+                            Settings.setMember(member);
+
+                            deselectAllQuickMenuItems();
+                            fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
+                        }
+                        Settings.getMember().setFamily(family.id);
                         member.save();
-                        Settings.setMember(member);
+                        family.addSaveMember(member);
+
+                        familyFragment.resetFamily();
 
                         deselectAllQuickMenuItems();
                         fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
                     }
-                    Settings.getMember().setFamily(family.id);
-                    member.save();
-                    family.addSaveMember(member);
 
-                    familyFragment.resetFamily();
-
-                    deselectAllQuickMenuItems();
-                    fragmentManager.beginTransaction().replace(R.id.content_frame, familyFragment).commit();
-
+                    NameTagger.initData(MainActivity.this, MainActivity.this, listFrag, randomTaggerLayout, randomTagger, familyFragment, nameAdditionFragment);
                 }
             });
 
@@ -494,6 +491,5 @@ public class MainActivity extends AppCompatActivity
 //            updateUI(false);
         }
     }
-
 }
 
