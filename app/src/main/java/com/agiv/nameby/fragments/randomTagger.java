@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,8 +37,15 @@ public class RandomTagger extends Fragment {
     private FloatingActionButton disloveButton;
     private FloatingActionButton maybeButton;
 
+    private View loading;
+    private boolean doneLoading;
 
     public RandomTagger() {
+    }
+
+    public void dismissLoadingSign(){
+        loading.setVisibility(View.INVISIBLE);
+        doneLoading = true;
     }
 
     public void setName(Name name){
@@ -54,6 +60,8 @@ public class RandomTagger extends Fragment {
 
         layout = inflater.inflate(R.layout.random_tagger, container, false);
         textView = (TextView) layout.findViewById(R.id.untagged_names_view);
+        loading = layout.findViewById(R.id.loading);
+
         if (currentName != null)
             setName(currentName);
         loveButton = (FloatingActionButton) layout.findViewById(R.id.love_image);
@@ -101,6 +109,9 @@ public class RandomTagger extends Fragment {
                     tagMaybe();
             }
         });
+
+        if (doneLoading)
+            dismissLoadingSign();
 
         return layout;
     }

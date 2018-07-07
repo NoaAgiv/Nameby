@@ -129,6 +129,7 @@ public class NameTagger {
     private static void initUntaggedArea(){
         ngen = new NameGenerator(nameList, new NamePreferences());
         randomTagger.setName(ngen.getNextUntaggedName());
+        NameTagger.randomTagger.dismissLoadingSign();
     }
 
 
